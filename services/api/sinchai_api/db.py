@@ -244,6 +244,13 @@ def init_db(drop: bool = False) -> None:
              *[f"GRANT SELECT ON {t} TO sinchai_analyst" for t in sorted(ANALYST_TABLES)])
 
 
+def refresh_geometry() -> None:
+    """Fill PostGIS geometry from the stored GeoJSON (Postgres only; called after seeding)."""
+    eng = engine()
+    if eng.dialect.name == "postgresql":
+        _try(eng, "UPDATE plots SET geom = ST_SetSRID(ST_GeomFromGeoJSON(geojson::text), 4326) WHERE geom IS NULL")
+
+
 def _try(eng, *stmts: str) -> bool:
     try:
         with eng.begin() as c:

@@ -8,7 +8,6 @@ services:
       POSTGRES_USER: sinchai
       POSTGRES_PASSWORD: sinchai
       POSTGRES_DB: sinchai
-    ports: ["5432:5432"]
     volumes: [dbdata:/home/postgres/pgdata/data]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sinchai -d sinchai"]
@@ -17,7 +16,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports: ["6379:6379"]
 
   mqtt:
     image: eclipse-mosquitto:2

@@ -5,12 +5,14 @@ MQTT_HOST is set (docker compose)."""
 from __future__ import annotations
 
 import json
+import logging
 from datetime import datetime
 
 from . import db
 from .settings import settings
 
 _client = None
+log = logging.getLogger("sinchai.bridge")
 
 
 def start() -> None:
@@ -22,14 +24,15 @@ def start() -> None:
     c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="sinchai-api")
 
     def on_msg(cl, ud, m):
+        # Never let an exception escape: in paho-mqtt 2 it would stop the network loop for good.
         try:
             data = json.loads(m.payload)
-        except ValueError:
-            return
-        pump = m.topic.split("/")[1]
-        with db.session() as s:
-            s.add(db.Telemetry(ts=datetime.utcnow(), pump_id=pump, data=data))
-            s.commit()
+            pump = m.topic.split("/")[1]
+            with db.session() as s:
+                s.add(db.Telemetry(ts=datetime.utcnow(), pump_id=pump, data=data))
+                s.commit()
+        except Exception as e:  # noqa: BLE001
+            log.warning("telemetry not stored: %s", e)
 
     c.on_message = on_msg
     c.on_connect = lambda cl, *a, **k: cl.subscribe("sinchai/+/telemetry", qos=0)

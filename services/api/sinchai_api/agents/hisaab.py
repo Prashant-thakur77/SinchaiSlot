@@ -66,7 +66,9 @@ def run_readonly_sql(sql: str) -> dict:
         try:
             res = c.execute(text(safe))
             cols = list(res.keys())
-            rows = [list(r) for r in res.fetchmany(MAX_ROWS)]
+            rows = [[float(x) if hasattr(x, "is_finite") else x for x in r] for r in res.fetchmany(MAX_ROWS)]
+        except Exception as e:  # noqa: BLE001 - report query errors to the asker instead of failing the request
+            return {"error": f"query failed: {str(e).splitlines()[0][:200]}", "sql": safe}
         finally:
             if eng.dialect.name == "sqlite":
                 c.exec_driver_sql("PRAGMA query_only = OFF")
@@ -92,25 +94,25 @@ def template_sql(question: str) -> tuple[str, str] | None:
     month = _month(question)
     where = f"WHERE kind = 'water' AND substr(start, 1, 7) = '{month}'" if month else "WHERE kind = 'water'"
     if any(k in q for k in ("diesel", "डीजल", "डीज़ल")):
-        return (f"SELECT round(sum(diesel_l_avoided), 1) AS diesel_l_avoided, round(sum(co2_kg_avoided), 1) AS co2_kg "
+        return (f"SELECT round(CAST(sum(diesel_l_avoided) AS numeric), 1) AS diesel_l_avoided, round(CAST(sum(co2_kg_avoided) AS numeric), 1) AS co2_kg "
                 f"FROM ledger {where}", "diesel")
     if any(k in q for k in ("co2", "carbon", "कार्बन")):
-        return f"SELECT round(sum(co2_kg_avoided), 1) AS co2_kg_avoided FROM ledger {where}", "co2"
+        return f"SELECT round(CAST(sum(co2_kg_avoided) AS numeric), 1) AS co2_kg_avoided FROM ledger {where}", "co2"
     if any(k in q for k in ("tenant", "बटाईदार", "किरायेदार")):
-        return (f"SELECT tenant, count(DISTINCT farmer_ref) AS farmers, round(sum(m3), 1) AS m3 FROM ledger {where} "
+        return (f"SELECT tenant, count(DISTINCT farmer_ref) AS farmers, round(CAST(sum(m3) AS numeric), 1) AS m3 FROM ledger {where} "
                 f"GROUP BY tenant", "tenants")
     if any(k in q for k in ("mill", "चक्की", "battery", "बैटरी", "secondary")):
         cond = f"AND substr(start, 1, 7) = '{month}'" if month else ""
-        return (f"SELECT kind, round(sum(kwh), 1) AS kwh, round(sum(amount_rs), 0) AS revenue_rs FROM ledger "
+        return (f"SELECT kind, round(CAST(sum(kwh) AS numeric), 1) AS kwh, round(CAST(sum(amount_rs) AS numeric), 0) AS revenue_rs FROM ledger "
                 f"WHERE kind != 'water' {cond} GROUP BY kind", "secondary")
     if any(k in q for k in ("revenue", "income", "कमाई", "आमदनी", "पैसा")):
         cond = f"WHERE substr(start, 1, 7) = '{month}'" if month else ""
-        return f"SELECT kind, round(sum(amount_rs), 0) AS revenue_rs FROM ledger {cond} GROUP BY kind", "revenue"
+        return f"SELECT kind, round(CAST(sum(amount_rs) AS numeric), 0) AS revenue_rs FROM ledger {cond} GROUP BY kind", "revenue"
     if any(k in q for k in ("water", "पानी", "m3", "litre", "लीटर")):
-        return (f"SELECT round(sum(m3), 1) AS m3, round(sum(m3) * 1000, 0) AS litres, count(*) AS receipts "
+        return (f"SELECT round(CAST(sum(m3) AS numeric), 1) AS m3, round(CAST(sum(m3) * 1000 AS numeric), 0) AS litres, count(*) AS receipts "
                 f"FROM ledger {where}", "water")
     if any(k in q for k in ("daily", "per day", "रोज")):
-        return (f"SELECT substr(start, 1, 10) AS day, round(sum(m3), 1) AS m3 FROM ledger {where} GROUP BY day "
+        return (f"SELECT substr(start, 1, 10) AS day, round(CAST(sum(m3) AS numeric), 1) AS m3 FROM ledger {where} GROUP BY day "
                 f"ORDER BY day", "daily")
     if any(k in q for k in ("farmer", "किसान", "served")):
         return f"SELECT count(DISTINCT farmer_ref) AS farmers_served FROM ledger {where}", "farmers"

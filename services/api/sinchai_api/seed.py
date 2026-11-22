@@ -191,6 +191,7 @@ def seed(ledger_from: date = date(2024, 1, 1), verbose: bool = True) -> dict:
         n_ledger = s.query(db.LedgerRow).count()
         n_book = s.query(db.Booking).count()
         save_snapshot(s)
+    db.refresh_geometry()
     out = {"demo_day": day.isoformat(), "farmers": len(vil.households), "plots": len(vil.plots), "bookings": n_book,
            "ledger_rows": n_ledger, "label": "SIMULATED village on REAL weather"}
     if verbose:
