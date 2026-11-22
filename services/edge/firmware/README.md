@@ -7,5 +7,5 @@ MQTT uplink, offline plan, unlock codes, drive-as-meter, budget and dry-run cut-
 Build: `pio run` (needs PlatformIO). Provision NVS keys `secret`, `ssid`, `wpa`, `broker` at install.
 Hardware: ESP32 DevKit + MAX3485 transceiver on Serial2, DE/RE on GPIO 4, to the drive's RJ45 Modbus port.
 
-Status: not yet compiled in CI and not yet run on hardware. Register addresses come only
+Status: builds with `pio run` for esp32dev (RAM 17.4%, flash 72.0%); not yet run on hardware. Register addresses come only
 from the verified register map.

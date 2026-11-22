@@ -35,3 +35,6 @@ docs/schneider/manuals/
 # Derived caches
 reports/cache/
 reports/proof_quick.json
+
+# PlatformIO build output
+.pio/
