@@ -35,7 +35,7 @@ proof: ## Regenerate reports/proof.json and reports/figures from real data
 
 publish: ## Render README, form notes and the deck from proof.json and evals.json
 	$(UV) python -m sinchai_sim.publish
-	@if [ -d apps/web/node_modules ]; then cd apps/web && node .deckpdf.mjs ../../submission/deck/deck.html ../../submission/deck/deck.pdf; fi
+	@if [ -d apps/web/node_modules ]; then cd apps/web && node scripts/deck-pdf.mjs ../../submission/deck/deck.html ../../submission/deck/deck.pdf; fi
 
 proof-quick: ## Small proof run for CI
 	$(UV) python -W ignore -m sinchai_sim.proof --quick
