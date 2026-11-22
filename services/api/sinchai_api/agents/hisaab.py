@@ -1,7 +1,7 @@
 """Hisaab: questions over the ledger in plain language.
 
 Offline path: a small set of question templates (Hindi and English) mapped to parameterised SQL.
-LLM path (LLM_PROVIDER=anthropic): Claude writes the SQL. Either way the SQL goes through the same
+LLM path (LLM_PROVIDER=anthropic): the hosted LLM writes the SQL. Either way the SQL goes through the same
 guard: one statement, SELECT/WITH only, allow-listed tables, no writes or pragmas, LIMIT forced,
 executed in a read-only transaction.
 """

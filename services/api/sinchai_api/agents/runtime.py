@@ -7,7 +7,7 @@ NLU, not by the model).
 
 Providers
   rules     - offline, deterministic (default; no key needed)
-  anthropic - Claude with tool use via the Anthropic SDK (set LLM_PROVIDER=anthropic)
+  anthropic - optional hosted LLM with tool use (set LLM_PROVIDER=anthropic and its API key)
 """
 
 from __future__ import annotations
@@ -118,7 +118,7 @@ def recall(farmer_id: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Anthropic provider (optional)
+# Hosted LLM provider (optional)
 # ---------------------------------------------------------------------------
 
 def anthropic_available() -> bool:
@@ -131,9 +131,9 @@ def anthropic_available() -> bool:
     return True
 
 
-def claude_turn(system: str, session: Session, user_text: str, tool_names: list[str], run: Run,
+def llm_turn(system: str, session: Session, user_text: str, tool_names: list[str], run: Run,
                 ctx: tools.ToolContext, max_steps: int = 6) -> tuple[str, Pending | None]:
-    """Manual tool-use loop with Claude. Confirm-tools are intercepted and returned as pending."""
+    """Manual tool-use loop with the hosted LLM. Confirm-tools are intercepted and returned as pending."""
     import anthropic
 
     client = anthropic.Anthropic()

@@ -3,7 +3,7 @@ SHELL := /bin/bash
 UV := env -u VIRTUAL_ENV uv run
 COMPOSE := docker compose
 
-.PHONY: help dev up down seed demo soak proof proof-quick ingest test test-py test-web evals lint fmt web mcp drive-sim api
+.PHONY: help dev up down seed demo soak proof proof-quick publish ingest test test-py test-web evals lint fmt web mcp drive-sim api
 
 help:
 	@grep -E '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -32,6 +32,10 @@ ingest: ## Re-download NASA POWER and Open-Meteo snapshots
 
 proof: ## Regenerate reports/proof.json and reports/figures from real data
 	$(UV) python -W ignore -m sinchai_sim.proof
+
+publish: ## Render README, form notes and the deck from proof.json and evals.json
+	$(UV) python -m sinchai_sim.publish
+	@if [ -d apps/web/node_modules ]; then cd apps/web && node .deckpdf.mjs ../../submission/deck/deck.html ../../submission/deck/deck.pdf; fi
 
 proof-quick: ## Small proof run for CI
 	$(UV) python -W ignore -m sinchai_sim.proof --quick

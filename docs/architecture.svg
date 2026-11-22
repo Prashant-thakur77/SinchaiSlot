@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" font-family="Helvetica, Arial, sans-serif">
+  <rect width="1600" height="1000" fill="#0E1512"/>
+  <text x="60" y="70" font-size="34" font-weight="700" fill="#F5B83D">SinchaiSlot architecture</text>
+  <text x="60" y="104" font-size="17" fill="#9FB0A6">Agents plan, explain and talk. A deterministic optimiser and the edge controller execute. The Altivar Solar drive acts and meters.</text>
+
+  <!-- users -->
+  <g font-size="16">
+    <rect x="60" y="140" width="440" height="96" rx="12" fill="#142019" stroke="#3BA7E5"/>
+    <text x="80" y="174" font-size="19" font-weight="700" fill="#fff">Farmers</text>
+    <text x="80" y="200" fill="#C9D3CD">Missed-call IVR · WhatsApp voice/text · USSD</text>
+    <text x="80" y="222" fill="#9FB0A6">Hindi · Maithili · Bhojpuri · English</text>
+
+    <rect x="580" y="140" width="440" height="96" rx="12" fill="#142019" stroke="#F5B83D"/>
+    <text x="600" y="174" font-size="19" font-weight="700" fill="#fff">Saur Mitra (operator)</text>
+    <text x="600" y="200" fill="#C9D3CD">Offline-first PWA, Hindi-first</text>
+    <text x="600" y="222" fill="#9FB0A6">Cash book · alerts · guided fault fix</text>
+
+    <rect x="1100" y="140" width="440" height="96" rx="12" fill="#142019" stroke="#5BBF6A"/>
+    <text x="1120" y="174" font-size="19" font-weight="700" fill="#fff">FPO · funders · Schneider</text>
+    <text x="1120" y="200" fill="#C9D3CD">Village Twin · ledger · proof lab · Hisaab</text>
+    <text x="1120" y="222" fill="#9FB0A6">Web dashboards, MCP clients</text>
+  </g>
+
+  <!-- platform -->
+  <rect x="60" y="280" width="1480" height="400" rx="16" fill="#101a15" stroke="#2A3A30"/>
+  <text x="80" y="314" font-size="15" fill="#9FB0A6">PLATFORM (FastAPI · typed tool layer · agent runtime with trace store · MCP server sinchaislot-mcp · server-sent events)</text>
+  <g font-size="15">
+    <rect x="90" y="335" width="340" height="150" rx="10" fill="#142019" stroke="#3BA7E5"/>
+    <text x="108" y="364" font-size="18" font-weight="700" fill="#3BA7E5">Agents</text>
+    <text x="108" y="390" fill="#C9D3CD">Saathi (farmer) · Copilot (operator)</text>
+    <text x="108" y="412" fill="#C9D3CD">Surya Planner agent · Rasid Auditor</text>
+    <text x="108" y="434" fill="#C9D3CD">Hisaab (read-only SQL)</text>
+    <text x="108" y="462" fill="#9FB0A6">confirmation gate for money/water/energy</text>
+
+    <rect x="460" y="335" width="380" height="150" rx="10" fill="#142019" stroke="#F5B83D"/>
+    <text x="478" y="364" font-size="18" font-weight="700" fill="#F5B83D">Surya Planner</text>
+    <text x="478" y="390" fill="#C9D3CD">Quantile solar forecast (LightGBM, 3 NWP)</text>
+    <text x="478" y="412" fill="#C9D3CD">FAO-56 crop water need</text>
+    <text x="478" y="434" fill="#C9D3CD">Stochastic MILP (HiGHS) · re-planner</text>
+    <text x="478" y="462" fill="#9FB0A6">plan diffs with reasons (en / hi)</text>
+
+    <rect x="870" y="335" width="300" height="150" rx="10" fill="#142019" stroke="#3BA7E5"/>
+    <text x="888" y="364" font-size="18" font-weight="700" fill="#3BA7E5">Jal Prahari</text>
+    <text x="888" y="390" fill="#C9D3CD">Seasonal water budget (hard)</text>
+    <text x="888" y="412" fill="#C9D3CD">AWD rules for paddy</text>
+    <text x="888" y="434" fill="#C9D3CD">Dry-run cut-off thresholds</text>
+
+    <rect x="1200" y="335" width="310" height="150" rx="10" fill="#142019" stroke="#3DCD58"/>
+    <text x="1218" y="364" font-size="18" font-weight="700" fill="#3DCD58">Rasid</text>
+    <text x="1218" y="390" fill="#C9D3CD">Receipts · hash-chained ledger</text>
+    <text x="1218" y="412" fill="#C9D3CD">Anomaly audit · Merkle root</text>
+    <text x="1218" y="434" fill="#C9D3CD">Funder PDF · Anudan claim packs</text>
+
+    <rect x="90" y="510" width="560" height="140" rx="10" fill="#142019" stroke="#2A3A30"/>
+    <text x="108" y="540" font-size="18" font-weight="700" fill="#fff">Channels and speech (adapters + local simulators)</text>
+    <text x="108" y="568" fill="#C9D3CD">IVR callback · WhatsApp Cloud API · USSD · UPI (test mode)</text>
+    <text x="108" y="592" fill="#C9D3CD">ASR / TTS: offline text, or a hosted Indic speech endpoint</text>
+    <text x="108" y="616" fill="#C9D3CD">LLM: offline rules provider, or an optional hosted LLM</text>
+
+    <rect x="680" y="510" width="400" height="140" rx="10" fill="#142019" stroke="#F5B83D"/>
+    <text x="698" y="540" font-size="18" font-weight="700" fill="#fff">Prayogshala</text>
+    <text x="698" y="568" fill="#C9D3CD">Village digital twin, policies A-D</text>
+    <text x="698" y="592" fill="#C9D3CD">Monte Carlo · sensitivity · ablations</text>
+    <text x="698" y="616" fill="#C9D3CD">make proof -> reports/proof.json</text>
+
+    <rect x="1110" y="510" width="400" height="140" rx="10" fill="#142019" stroke="#2A3A30"/>
+    <text x="1128" y="540" font-size="18" font-weight="700" fill="#fff">Storage</text>
+    <text x="1128" y="568" fill="#C9D3CD">Postgres 16 + TimescaleDB (telemetry)</text>
+    <text x="1128" y="592" fill="#C9D3CD">PostGIS (plots) · Redis</text>
+    <text x="1128" y="616" fill="#C9D3CD">SQLite for offline runs and tests</text>
+  </g>
+
+  <!-- arrows users->platform -->
+  <g stroke="#9FB0A6" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M280 236 V280"/><path d="M800 236 V280"/><path d="M1320 236 V280"/>
+    <path d="M760 720 V680"/>
+  </g>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#9FB0A6"/></marker></defs>
+
+  <!-- edge + drive -->
+  <rect x="380" y="720" width="760" height="230" rx="16" fill="#101a15" stroke="#2A3A30"/>
+  <text x="400" y="752" font-size="15" fill="#9FB0A6">FIELD (works offline)</text>
+  <g font-size="15">
+    <rect x="410" y="770" width="340" height="160" rx="10" fill="#142019" stroke="#F5B83D"/>
+    <text x="428" y="800" font-size="18" font-weight="700" fill="#F5B83D">SinchaiSlot Edge</text>
+    <text x="428" y="826" fill="#C9D3CD">ESP32 or Linux · Modbus RTU to drive</text>
+    <text x="428" y="848" fill="#C9D3CD">Holds the plan · unlock codes</text>
+    <text x="428" y="870" fill="#C9D3CD">Drive-as-meter · budget · dry run</text>
+    <text x="428" y="900" fill="#9FB0A6">MQTT: plans down, telemetry up</text>
+
+    <rect x="790" y="770" width="320" height="160" rx="10" fill="#1d2b23" stroke="#3DCD58" stroke-width="2"/>
+    <text x="808" y="800" font-size="14" fill="#3DCD58">Schneider Electric</text>
+    <text x="808" y="824" font-size="18" font-weight="700" fill="#fff">Altivar Solar ATV320</text>
+    <text x="808" y="850" fill="#C9D3CD">Actuator: CMD 8501, LFR 8502</text>
+    <text x="808" y="872" fill="#C9D3CD">Meter: RFR 3202, OPR 3211, APH 3230</text>
+    <text x="808" y="894" fill="#C9D3CD">Faults: LFT 7121 -> Copilot</text>
+    <text x="808" y="916" fill="#9FB0A6">5 HP pump · 5 kWp array</text>
+  </g>
+  <path d="M750 850 H790" stroke="#3DCD58" stroke-width="3"/>
+
+  <!-- data sources -->
+  <rect x="1180" y="720" width="360" height="230" rx="16" fill="#101a15" stroke="#2A3A30"/>
+  <text x="1200" y="752" font-size="15" fill="#9FB0A6">REAL DATA</text>
+  <g font-size="15" fill="#C9D3CD">
+    <text x="1200" y="784">NASA POWER hourly, Samastipur 2016-2025</text>
+    <text x="1200" y="808">Open-Meteo archived forecasts</text>
+    <text x="1200" y="832">(ECMWF IFS, GFS, ICON) 2022-2025</text>
+    <text x="1200" y="856">FAO-56 crop coefficients</text>
+    <text x="1200" y="880">Published prices and factors</text>
+    <text x="1200" y="904">Altivar manuals (register map)</text>
+  </g>
+  <path d="M1360 720 V680" stroke="#9FB0A6" stroke-width="2" marker-end="url(#a)"/>
+
+  <rect x="60" y="720" width="290" height="230" rx="16" fill="#101a15" stroke="#2A3A30"/>
+  <text x="80" y="752" font-size="15" fill="#9FB0A6">LOADS ON THE SAME ARRAY</text>
+  <g font-size="16">
+    <circle cx="92" cy="790" r="9" fill="#3BA7E5"/><text x="112" y="796" fill="#fff">Water (first)</text>
+    <circle cx="92" cy="830" r="9" fill="#F5B83D"/><text x="112" y="836" fill="#fff">Flour mill</text>
+    <circle cx="92" cy="870" r="9" fill="#5BBF6A"/><text x="112" y="876" fill="#fff">Chaff cutter</text>
+    <circle cx="92" cy="910" r="9" fill="#3DCD58"/><text x="112" y="916" fill="#fff">Battery packs</text>
+  </g>
+  <path d="M410 850 H350" stroke="#9FB0A6" stroke-width="2" marker-end="url(#a)"/>
+</svg>
