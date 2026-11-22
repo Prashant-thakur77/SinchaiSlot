@@ -79,6 +79,10 @@ def handle(session_id: str, farmer_id: str, text: str, channel: str = "ivr", ope
         out["injection_flag"] = p.injection_flag
         return out
 
+    if sess.pending is not None and p.intent == "cancel" and "no" in p.all_intents:
+        p.intent = "no"  # "नहीं चाहिए" while an offer is pending is a decline, not a cancellation
+    if sess.pending is not None and sess.pending.tool == "book_slot" and p.intent == "book" and "no" not in p.all_intents:
+        p.intent = "yes"  # "ठीक है बुक करो" / "ok book it" in reply to a booking offer accepts that offer
     # ---- Confirmation turn: only a clear yes runs a pending action ----
     if sess.pending is not None and p.intent in ("yes", "no"):
         pend, sess.pending = sess.pending, None

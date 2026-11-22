@@ -12,17 +12,18 @@ import unicodedata
 from dataclasses import dataclass, field
 
 INTENTS: dict[str, list[str]] = {
-    "yes": ["हाँ", "हां", "हाँ जी", "जी हाँ", "हँ", "हं", "ठीक", "ठीक है", "ठीक अछि", "बेस", "करू", "कर दीं", "कर दो",
+    "yes": ["हाँ", "हां", "हाँ जी", "जी हाँ", "जी", "हँ", "हं", "ठीक", "ठीक है", "ठीक अछि", "बेस", "करू", "कर दीं", "कर दो",
             "haan", "han", "ha", "haa", "ji", "theek", "thik", "yes", "ok", "okay", "sure", "confirm", "1"],
     "no": ["नहीं", "नही", "ना", "नै", "नइ", "मत", "nahi", "nahin", "na", "nai", "no", "dont", "don't", "2"],
     "cancel": ["रद्द", "कैंसल", "कैन्सल", "नहीं चाहिए", "नै चाही", "ना चाहीं", "बुकिंग हटा", "cancel", "radd"],
     "price": ["कितना", "कितने", "कतेक", "केतना", "दाम", "रेट", "भाव", "पैसा लगेगा", "खर्च", "price", "rate",
               "cost", "kitna", "katek", "ketna", "daam"],
     "when": ["कब", "कहिया", "कखन", "कब मिलेगा", "समय", "टाइम", "kab", "kahiya", "kakhan", "when", "time", "slot"],
-    "book": ["पानी चाहिए", "पानी चाही", "पानी चाहीं", "पानी दे", "पानी दिअ", "पानी द", "पटवन", "सिंचाई", "पटाना",
-             "बुक", "बुकिंग", "book", "booking", "irrigat", "pani chahiye", "pani chahi", "patwan", "sinchai",
-             "paani", "pani"],
-    "balance": ["बाकी", "बकाया", "हिसाब", "बैलेंस", "कितना देना", "balance", "due", "baki", "bakaya", "hisab"],
+    "book": ["पानी चाहिए", "पानी चाही", "पानी चाहीं", "पानी दे", "पानी दिअ", "पानी द", "पानि", "पटवन", "सिंचाई",
+             "पटाना", "पानी लेना", "पानी लगाना", "बुक", "बुकिंग", "book", "booking", "irrigat", "pani chahiye",
+             "pani chahi", "patwan", "sinchai", "sinchaai", "paani", "pani", "water"],
+    "balance": ["बाकी", "बकाया", "हिसाब", "बैलेंस", "कितना देना", "balance", "due", "owe", "baki", "baaki",
+                "bakaya", "hisab", "hisaab"],
     "pay": ["पेमेंट", "भुगतान", "यूपीआई", "upi", "pay", "payment", "bhugtan"],
     "schemes": ["योजना", "सब्सिडी", "अनुदान", "कुसुम", "scheme", "subsidy", "yojana", "anudan", "kusum"],
     "issue": ["खराब", "नहीं आ रहा", "नै आबि रहल", "बंद है", "बंद", "शिकायत", "दिक्कत", "समस्या", "लीक", "problem",
@@ -68,12 +69,18 @@ def clean(text: str, limit: int = 500) -> str:
     return t.strip()[:limit]
 
 
+DEVA = "\u0900-\u097F"
+
+
 def _has(text_l: str, kw: str) -> bool:
+    """Keyword match with word boundaries. Short keywords need both boundaries (so "ना" does not match
+    inside "देना"); longer ones only a left boundary, so inflected forms ("पटवनक", "booking") match."""
     kw_l = kw.lower()
     if kw_l.isascii():
-        return re.search(rf"(?<![a-z]){re.escape(kw_l)}(?![a-z])", text_l) is not None if len(kw_l) <= 3 \
-            else kw_l in text_l
-    return kw_l in text_l
+        right = "(?![a-z])" if len(kw_l) <= 3 else ""
+        return re.search(rf"(?<![a-z0-9]){re.escape(kw_l)}{right}", text_l) is not None
+    right = f"(?![{DEVA}])" if len(kw_l) <= 3 else ""
+    return re.search(rf"(?<![{DEVA}]){re.escape(kw_l)}{right}", text_l) is not None
 
 
 def detect_language(text: str, default: str = "hi") -> str:

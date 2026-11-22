@@ -156,6 +156,30 @@ def village() -> dict:
         }
 
 
+@app.get("/api/bookings")
+def bookings(day: str | None = None) -> list[dict]:
+    d = day or state.get_state().day
+    with db.session() as s:
+        fs = {f.id: f for f in s.query(db.Farmer).all()}
+        ps = {p.id: p for p in s.query(db.Plot).all()}
+        out = []
+        for b in s.query(db.Booking).filter(db.Booking.day == d).order_by(db.Booking.slot_start).all():
+            f, p = fs.get(b.farmer_id), ps.get(b.plot_id)
+            out.append({"id": b.id, "farmer_id": b.farmer_id, "farmer": f.display_name if f else b.farmer_id,
+                        "tenant": bool(f and f.tenant), "language": f.language if f else "hi",
+                        "crop": p.crop if p else None, "slot_start": b.slot_start, "slot_end": b.slot_end,
+                        "m3": b.m3_requested, "m3_delivered": round(b.m3_delivered, 1), "price_rs": b.price_rs,
+                        "status": b.status, "paid": b.paid, "channel": b.channel})
+        return out
+
+
+@app.get("/api/issues")
+def issues() -> list[dict]:
+    with db.session() as s:
+        return [{"id": i.id, "farmer_id": i.farmer_id, "kind": i.kind, "note": i.note, "status": i.status,
+                 "at": i.created_at.isoformat()} for i in s.query(db.Issue).order_by(db.Issue.id.desc()).limit(30).all()]
+
+
 @app.get("/api/farmers/{farmer_id}")
 def farmer(farmer_id: str) -> dict:
     from .agents.runtime import recall
@@ -437,6 +461,20 @@ def drive_calibration() -> dict:
             "label": "Pump curve model; calibration points SIMULATED (flow meter not fitted in the demo)"}
 
 
+@app.get("/api/drive/faults")
+def drive_faults() -> list[dict]:
+    from sinchai_devices import altivar_map as M
+    return [{"mnemonic": f.mnemonic, "name": f.name, "lft": f.lft_value, "description": f.description,
+             "verified": f.verified} for f in M.faults().values()]
+
+
+@app.get("/api/drive/registers")
+def drive_registers() -> list[dict]:
+    from sinchai_devices import altivar_map as M
+    return [{"mnemonic": r.mnemonic, "address": r.address, "scale": r.scale, "unit": r.unit, "verified": r.verified,
+             "description": r.description[:160]} for r in M.registers().values()]
+
+
 @app.post("/api/drive/fault")
 def drive_fault(inp: FaultIn) -> dict:
     st = state.get_state()
@@ -530,6 +568,33 @@ def traces(limit: int = 50, agent: str | None = None) -> list[dict]:
                                         "confirmed": c.confirmed, "error": c.error, "ms": round(c.latency_ms, 1)}
                                        for c in calls]})
         return out
+
+
+_STORY: dict = {}
+
+
+@app.get("/api/story")
+def story() -> dict:
+    """Live content for the landing story: Saathi's real offer to Ramesh (rendered from the planner,
+    cached), the latest plan-change callback if the day has run past 13:40, and the latest receipt."""
+    from .agents import i18n
+    from .agents.saathi import _offer_text
+
+    st = state.get_state()
+    if st.day not in _STORY:
+        r = tools.call("find_slots", {"farmer_id": "H01"}, tools.ToolContext(role="system"))
+        offer = None
+        if r.get("available"):
+            offer = {"mai": _offer_text("mai", r, "Ramesh"), "en": _offer_text("en", r, "Ramesh"),
+                     "greet": i18n.say("greet", "mai", name="Ramesh"), "numbers": {k: r[k] for k in (
+                         "need_m3", "expected_m3_p50", "carry_over_m3", "window_start", "window_end", "price_rs",
+                         "diesel_equivalent_rs")}}
+        _STORY[st.day] = offer
+    with db.session() as s:
+        last = s.query(db.LedgerRow).filter(db.LedgerRow.kind == "water").order_by(db.LedgerRow.seq.desc()).first()
+        receipt = ledger_service.row_to_dict(last) if last else None
+    return {"day": st.day, "offer": _STORY[st.day], "callbacks": st.callbacks[-3:], "diffs": st.diffs[-1:],
+            "receipt": receipt}
 
 
 @app.get("/api/evals")
