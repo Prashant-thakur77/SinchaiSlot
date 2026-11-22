@@ -35,7 +35,7 @@ from sinchai_devices.physics import PumpModel, default_pump
 
 W_WATER = 1000.0  # per m3 * priority; dominates any secondary-load value per kWh
 W_FAIR = 500.0  # per m3 of fair-share shortfall
-START_PENALTY = 5.0
+START_PENALTY = 150.0  # keeps each farmer's water in one contiguous block
 
 
 @dataclass

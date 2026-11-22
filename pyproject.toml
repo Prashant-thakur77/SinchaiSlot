@@ -68,7 +68,7 @@ sinchaislot-mcp = "sinchai_api.mcp_server:main"
 testpaths = ["tests", "evals"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-addopts = "-q"
+addopts = "-q -p no:warnings"
 markers = ["slow: long-running tests", "network: needs internet"]
 
 [tool.ruff]
