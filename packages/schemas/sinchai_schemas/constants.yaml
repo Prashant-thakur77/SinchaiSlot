@@ -307,3 +307,53 @@ constants:
     unit: category
     kind: assumption
     note: UNVERIFIED. Most Samastipur blocks are assessed Safe; confirm the pilot block category from the CGWB dynamic groundwater assessment.
+  households_per_pump:
+    value: 50
+    unit: households
+    kind: assumption
+    note: Mid-point of the 40-60 households a 20-acre command serves at Bihar holding sizes (PLAN.md 7.1).
+  tenant_share:
+    value: 0.35
+    unit: fraction of households
+    kind: assumption
+    note: Share of households farming leased or sharecropped land. Confirm in the pilot survey.
+  owner_plot_ha:
+    value: 0.8
+    unit: ha
+    kind: assumption
+    note: Land of the pump-owning household inside the command area.
+  crop_mix_rabi:
+    value: {wheat: 0.65, potato: 0.20, fallow: 0.15}
+    unit: share of plots
+    kind: assumption
+  crop_mix_zaid:
+    value: {maize: 0.40, veg_summer: 0.25, fallow: 0.35}
+    unit: share of plots
+    kind: assumption
+  crop_mix_kharif:
+    value: {paddy: 0.85, fallow: 0.15}
+    unit: share of plots
+    kind: assumption
+  request_window_days:
+    value: 3
+    unit: days
+    kind: assumption
+    note: Days a farmer waits for solar water after the crop needs it before buying diesel water.
+  oorja_style_tariff_rs_per_m3:
+    value: 3.5
+    unit: Rs/m3
+    kind: assumption
+    note: Mid-point of the published Oorja Rs 3-4/m3 band, used for baseline C.
+  operator_start_hour:
+    value: 7
+    unit: h IST
+    kind: assumption
+  operator_end_hour:
+    value: 17
+    unit: h IST
+    kind: assumption
+  om_rs_per_year:
+    value: 15000
+    unit: Rs/yr
+    kind: assumption
+    note: Annual operation and maintenance of a 5 kWp shared pump (cleaning, small parts). Confirm with operators.

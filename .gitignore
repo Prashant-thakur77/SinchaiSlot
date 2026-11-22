@@ -31,3 +31,7 @@ data_cache/
 
 # Vendor manuals are fetched locally, not redistributed
 docs/schneider/manuals/
+
+# Derived caches
+reports/cache/
+reports/proof_quick.json
