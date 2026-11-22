@@ -112,17 +112,14 @@ export default function LabPage() {
           </div>
 
           <div className="grid min-w-0 gap-4 xl:grid-cols-2">
-            <Panel title="Honest results: where SinchaiSlot adds little" right={<span className="rounded bg-sun/10 px-2 py-0.5 text-[11px] text-sun">negative result</span>}>
+            <Panel title="Honest results: what the planner does and does not add" right={<span className="rounded bg-sun/10 px-2 py-0.5 text-[11px] text-sun">negative result</span>}>
               <div className="grid grid-cols-2 gap-4">
                 <Stat value={fmt.signedPct(p.negative_results.gain_vs_Cloads_monsoon, 1)} label="Gain vs greedy loads, monsoon weeks" />
                 <Stat value={fmt.signedPct(p.negative_results.gain_vs_Cloads_dry, 1)} label="Gain vs greedy loads, dry season" />
               </div>
-              <p className="mt-3 text-[13px] text-fog">{p.negative_results.explanation}</p>
-              {p.negative_results.budget_tradeoff && (
-                <p className="mt-3 text-[13px] text-fog">
-                  <b className="num">{fmt.n(p.negative_results.budget_tradeoff.solar_m3_lost_to_budget_p50)} m³</b> of solar water per year is held back by the groundwater cap. {p.negative_results.budget_tradeoff.explanation}
-                </p>
-              )}
+              <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 text-[13px] text-fog">
+                {((p.negative_results.statements as string[] | undefined) ?? [p.negative_results.explanation ?? ""]).map((t, i) => <li key={i}>{t}</li>)}
+              </ul>
             </Panel>
             <Panel title="Sensitivity of the headline to assumptions" right={<SourceTag kind="assumption" />}>
               <table className="num w-full text-[12.5px]">

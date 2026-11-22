@@ -312,7 +312,7 @@ export default function Home() {
         )}
         {proof?.negative_results?.explanation && (
           <div className="mt-14 max-w-3xl border-l-2 border-sun/60 pl-5">
-            <div className="text-[13px] text-sun">Where it adds little</div>
+            <div className="text-[13px] text-sun">What the planner does not add</div>
             <p className="mt-2 font-serif text-[19px] leading-relaxed text-fog">{proof.negative_results.explanation}</p>
           </div>
         )}
