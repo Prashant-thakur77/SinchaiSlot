@@ -8,7 +8,6 @@ import json
 from pathlib import Path
 
 import yaml
-
 from sinchai_schemas import constants as C
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -100,6 +99,9 @@ def numbers(p: dict, ev: dict) -> dict:
         "neg_mon": spct(p["negative_results"].get("gain_vs_Cloads_monsoon", 0), 1),
         "neg_dry": spct(p["negative_results"].get("gain_vs_Cloads_dry", 0), 1),
         "neg_text": p["negative_results"].get("explanation", ""),
+        "neg_list": "\n".join(f"- {x}" for x in p["negative_results"].get("statements", [])),
+        "diesel_C": n(Cp["diesel_l_avoided"]["p50"]),
+        "gini_Cl": f"{pol['C+loads']['gini_solar_share_by_household']['p50']:.2f}" if "C+loads" in pol else "",
         "budget_lost": n(p["negative_results"].get("budget_tradeoff", {}).get("solar_m3_lost_to_budget_p50", 0)),
         "budget_text": p["negative_results"].get("budget_tradeoff", {}).get("explanation", ""),
         "demo_day": p["demo_day"]["date"],
@@ -156,21 +158,17 @@ NASA POWER sun and real archived forecasts. P50 with P10 to P90 across runs.
 | Farmer price, solar water | **{v['rsm3_D']}/m³** | {v['rsm3_B']}/m³ | {v['rsm3_C']}/m³ (diesel {v['rsm3_diesel']}) |
 | Share of tenant water need met by solar | **{v['tenant_D']}** | {v['tenant_B']} | |
 | Fairness of access (Gini, lower is fairer) | **{v['gini_D']}** | {v['gini_B']} | |
-| Diesel avoided per pump-year | **{v['diesel_D']} L** ({v['co2_D']} kg CO₂) | {v['diesel_B']} L | |
+| Diesel avoided per pump-year | **{v['diesel_D']} L** ({v['co2_D']} kg CO₂) | {v['diesel_B']} L | {v['diesel_C']} L (no cap) |
 | Seasons over the groundwater cap | **{v['budget_exceed_D']} of runs** | {v['budget_exceed_B']} of runs | |
 | Pump revenue per year | **{v['rev_D']}** (mill {v['rev_mill_D']}, battery packs {v['rev_batt_D']}) | {v['rev_B']} | |
 | Saur Mitra income | **{v['mitra_D']}/month** | | |
 
 Owner-only use of the pump (policy A, context): {v['util_A']} kWh/kWp/yr.
 
-**Where the gain comes from.** Against the same mill, cutter and batteries run greedily (C + loads), the
-planner adds {v['gain_Cl']}{(', the forecast adds ' + v['gain_fc'] + ' over planning on yesterday' + "'" + 's sun, and a perfect forecast would add ' + v['gain_oracle'] + ' more') if 'gain_fc' in v else ''}.
-Most of the utilisation gain comes from giving the pump's spare sun somewhere useful to go; the planner's
-own contribution shows up mainly in fairness, tenants served and the groundwater cap.
-
-**Negative results (published on purpose).**
-- Monsoon weeks: gain over greedy loads {v['neg_mon']} vs {v['neg_dry']} in the dry season. {v['neg_text']}
-- Groundwater cap: {v['budget_lost']} m³ of solar water per year is held back. {v['budget_text']}
+**Where the gain comes from, and where it does not (published on purpose).** Most of the gain over the
+baseline comes from giving the pump's spare sun somewhere useful to go (mill, chaff cutter, battery packs). The
+planner's own contribution is fairness of access and holding the groundwater cap, not extra sun:
+{v['neg_list']}
 
 **Forecast (held-out {v['years']}).** Pinball loss {v['fc_pin']} W/m² vs {v['fc_pin_p']} (persistence) and
 {v['fc_pin_c']} (climatology): {v['fc_skill_p']} and {v['fc_skill_c']} skill; P10-P90 coverage {v['fc_cov']} over
@@ -284,7 +282,8 @@ Facts only. Final answers are written by the team. Every number below is copied 
 - Groundwater: seasons over the cap in {v['budget_exceed_D']} of D runs vs {v['budget_exceed_B']} of B runs.
 - Forecast skill {v['fc_skill_p']} vs persistence, {v['fc_skill_c']} vs climatology (pinball loss, held-out years).
 - Agent: {v.get('ev_cases', '–')} held-out conversations, {v.get('ev_case', '–')} correct, {v.get('ev_wrong', '–')} wrong bookings (first run).
-- Negative results: monsoon gain {v['neg_mon']}; {v['budget_lost']} m³/yr held back by the groundwater cap.
+- Negative results (verbatim from proof.json):
+{v['neg_list']}
 
 ## Key metric
 - Solar kWh used per kWp per year vs the Chakhaji-style baseline: {v['util_D']} vs {v['util_B']} ({v['gain_B']}).

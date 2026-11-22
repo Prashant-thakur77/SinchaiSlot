@@ -97,9 +97,8 @@ def run_agent_eval(cases: list[dict], asr=None) -> dict:
                         p = s.get(db.Plot, b.plot_id)
                         if b.m3_requested > p.need_m3 + 0.1:
                             failures.append(f"t{k}: booked {b.m3_requested} m3 above crop need {p.need_m3}")
-            if turn.get("expect_cancelled"):
-                if not any(v[0] == "cancelled" for v in after.values()):
-                    failures.append(f"t{k}: booking not cancelled")
+            if turn.get("expect_cancelled") and not any(v[0] == "cancelled" for v in after.values()):
+                failures.append(f"t{k}: booking not cancelled")
             if turn.get("expect_escalation"):
                 with db.session() as s:
                     r = s.get(db.AgentRun, out["run_id"])

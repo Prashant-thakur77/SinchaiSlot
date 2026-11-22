@@ -1,0 +1,166 @@
+{
+  "generated_by": "make evals (evals/run.py)",
+  "split": "dev",
+  "thresholds": {
+    "case_success": 0.85,
+    "booking_success": 0.9,
+    "wrong_booking_rate": 0.0
+  },
+  "agent": {
+    "cases": 52,
+    "case_success": 1.0,
+    "tool_call_accuracy": 1.0,
+    "booking_success": 1.0,
+    "wrong_booking_rate": 0.0,
+    "wrong_bookings": 0,
+    "reply_language_match": 0.8442,
+    "latency_ms_p50": 4.9,
+    "latency_ms_p95": 183.0,
+    "by_kind": {
+      "balance": {
+        "n": 3,
+        "success": 1.0
+      },
+      "book_no": {
+        "n": 7,
+        "success": 1.0
+      },
+      "book_yes": {
+        "n": 10,
+        "success": 1.0
+      },
+      "callback_no": {
+        "n": 3,
+        "success": 1.0
+      },
+      "callback_yes": {
+        "n": 4,
+        "success": 1.0
+      },
+      "cancel": {
+        "n": 2,
+        "success": 1.0
+      },
+      "crop_cap": {
+        "n": 6,
+        "success": 1.0
+      },
+      "diesel": {
+        "n": 1,
+        "success": 1.0
+      },
+      "injection": {
+        "n": 2,
+        "success": 1.0
+      },
+      "issue": {
+        "n": 3,
+        "success": 1.0
+      },
+      "pay": {
+        "n": 1,
+        "success": 1.0
+      },
+      "price": {
+        "n": 3,
+        "success": 1.0
+      },
+      "schemes": {
+        "n": 2,
+        "success": 1.0
+      },
+      "status": {
+        "n": 2,
+        "success": 1.0
+      },
+      "unknown": {
+        "n": 1,
+        "success": 1.0
+      },
+      "why": {
+        "n": 2,
+        "success": 1.0
+      }
+    },
+    "failures": []
+  },
+  "passes_thresholds": true,
+  "asr_robustness": {
+    "label": "SIMULATED ASR word errors (drop/truncate) on the test utterances; real Indic ASR WER not measured (no hosted ASR configured)",
+    "points": [
+      {
+        "simulated_word_noise": 0.1,
+        "wer": 0.082,
+        "case_success": 0.7727,
+        "wrong_booking_rate": 0.0
+      },
+      {
+        "simulated_word_noise": 0.2,
+        "wer": 0.1636,
+        "case_success": 0.5909,
+        "wrong_booking_rate": 0.0
+      },
+      {
+        "simulated_word_noise": 0.3,
+        "wer": 0.1696,
+        "case_success": 0.5909,
+        "wrong_booking_rate": 0.0
+      }
+    ]
+  },
+  "provider": "rules",
+  "forecast_backtest": {
+    "sinchaislot_meta": {
+      "pinball_w_m2": 16.55,
+      "pinball_by_quantile": {
+        "0.1": 13.15,
+        "0.5": 25.81,
+        "0.9": 10.68
+      },
+      "p10_p90_coverage": 0.754,
+      "mae_p50_w_m2": 51.62
+    },
+    "persistence": {
+      "pinball_w_m2": 25.56,
+      "pinball_by_quantile": {
+        "0.1": 18.43,
+        "0.5": 35.08,
+        "0.9": 23.15
+      },
+      "p10_p90_coverage": 0.7,
+      "mae_p50_w_m2": 70.17
+    },
+    "climatology": {
+      "pinball_w_m2": 23.48,
+      "pinball_by_quantile": {
+        "0.1": 21.21,
+        "0.5": 36.49,
+        "0.9": 12.73
+      },
+      "p10_p90_coverage": 0.785,
+      "mae_p50_w_m2": 72.98
+    },
+    "base_ecmwf_ifs025": {
+      "pinball_w_m2": 20.96
+    },
+    "base_gfs_seamless": {
+      "pinball_w_m2": 17.17
+    },
+    "base_icon_seamless": {
+      "pinball_w_m2": 16.73
+    },
+    "skill_vs_persistence": 0.353,
+    "skill_vs_climatology": 0.295,
+    "cqr_margin_clearsky_index": 0.0448,
+    "n_test_hours": 8838,
+    "train_years": [
+      2022,
+      2023
+    ],
+    "test_years": [
+      2024,
+      2025
+    ]
+  },
+  "runtime_s": 33.2
+}

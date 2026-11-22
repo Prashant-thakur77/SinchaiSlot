@@ -178,12 +178,50 @@ def negative_results(main_rows: list[dict]) -> dict:
         out["gain_vs_Cloads_dry"] = gain("Cl", ~mon)
         out["monsoon_pump_share_of_useful"] = round(float(df.loc[mon, "Dpump"].sum() / max(df.loc[mon, "D"].sum(), 1)), 4)
         out["monsoon_pv_share_of_year"] = round(float(df.loc[mon, "pv"].sum() / df["pv"].sum()), 4)
-        out["explanation"] = (
-            "In the monsoon, rain meets most crop water need and cloud cuts the sun, so the pump idles whichever "
-            "policy runs it; the remaining surplus is small and the fixed daily demand of the mill, cutter and battery "
-            "packs is already met. The router's gain over the same loads run greedily is close to zero in these weeks."
-        )
     return out
+
+
+def sp(x: float, d: int = 1) -> str:
+    return f"{'+' if x >= 0 else '-'}{abs(x) * 100:.{d}f}%"
+
+
+def narrate(proof: dict, rows: list[dict]) -> None:
+    """Write the result statements from the numbers (no claim is typed by hand)."""
+    pol, neg = proof["policies"], proof["negative_results"]
+    g = proof["gains"]
+    if "D-nobudget" in pol and "C+loads" in pol:
+        g["utilisation_Dnobudget_vs_Cloads"] = paired_gain(rows, "D-nobudget", "C+loads", "utilisation_kwh_per_kwp")
+        g["diesel_D_vs_C"] = paired_gain(rows, "D", "C", "diesel_l_avoided")
+    statements = []
+    if "utilisation_D_vs_Cloads" in g:
+        a = g["utilisation_D_vs_Cloads"]
+        statements.append(
+            f"Against the same mill, cutter and battery packs run greedily, SinchaiSlot with the groundwater cap uses "
+            f"{sp(a['p50'])} solar energy (P10 {sp(a['p10'])} to P90 {sp(a['p90'])}): the planner does not add sun on its own; "
+            f"the extra loads do. Its gains are elsewhere: Gini of access {pol['D']['gini_solar_share_by_household']['p50']:.2f} "
+            f"vs {pol['C+loads']['gini_solar_share_by_household']['p50']:.2f}, and the cap held in "
+            f"{(1 - pol['D']['runs_exceeding_budget_share']) * 100:.0f}% of runs vs "
+            f"{(1 - pol['C+loads']['runs_exceeding_budget_share']) * 100:.0f}%.")
+    if "utilisation_Dnobudget_vs_Cloads" in g:
+        statements.append(f"Without the cap the planner uses {sp(g['utilisation_Dnobudget_vs_Cloads']['p50'])} solar energy "
+                          f"vs greedy dispatch and meets {pol['D-nobudget']['tenant_share_served_by_solar']['p50'] * 100:.0f}% "
+                          f"of tenant need.")
+    if "gain_vs_Cloads_monsoon" in neg:
+        statements.append(f"By season (one village, first held-out year): {sp(neg['gain_vs_Cloads_monsoon'])} vs greedy loads in "
+                          f"monsoon weeks, {sp(neg['gain_vs_Cloads_dry'])} in the rest of the year, when water demand fills the "
+                          f"pump and the cap holds water back.")
+    if "budget_tradeoff" in neg and "diesel_D_vs_C" in g:
+        statements.append(f"The cap holds back {neg['budget_tradeoff']['solar_m3_lost_to_budget_p50']:,.0f} m3 of solar water a "
+                          f"year, so SinchaiSlot avoids {abs(g['diesel_D_vs_C']['p50']) * 100:.1f}% {'less' if g['diesel_D_vs_C']['p50'] < 0 else 'more'} diesel than the per-m3 "
+                          f"operator model without a cap; that water goes to diesel sellers on the same aquifer unless they "
+                          f"share the cluster budget.")
+    if "utilisation_D_vs_Dpersistence" in g:
+        statements.append(f"The solar forecast adds {sp(g['utilisation_D_vs_Dpersistence']['p50'])} over planning on yesterday's "
+                          f"sun; a perfect forecast would add {sp(g['utilisation_Doracle_vs_D']['p50'])} more.")
+    neg["statements"] = statements
+    neg["explanation"] = statements[0] if statements else ""
+    if "budget_tradeoff" in neg and len(statements) > 3:
+        neg["budget_tradeoff"]["explanation"] = statements[3]
 
 
 def demo_day() -> dict:
@@ -229,10 +267,13 @@ def figures(proof: dict, out_dir) -> list[str]:
 
     def bar(metric: str, title: str, fname: str, fmt="{:.0f}"):
         fig, ax = plt.subplots(figsize=(7, 3.6))
-        p50 = [pol[k][metric]["p50"] for k in keys]
-        lo = [pol[k][metric]["p50"] - pol[k][metric]["p10"] for k in keys]
-        hi = [pol[k][metric]["p90"] - pol[k][metric]["p50"] for k in keys]
-        ax.bar(labels, p50, color=colors, yerr=[lo, hi], capsize=4, ecolor="#333")
+        ks = [k for k in keys if metric in pol[k]]  # e.g. owner-only sells no water, so it has no price
+        lab = [labels[keys.index(k)] for k in ks]
+        col = [colors[keys.index(k)] for k in ks]
+        p50 = [pol[k][metric]["p50"] for k in ks]
+        lo = [pol[k][metric]["p50"] - pol[k][metric]["p10"] for k in ks]
+        hi = [pol[k][metric]["p90"] - pol[k][metric]["p50"] for k in ks]
+        ax.bar(lab, p50, color=col, yerr=[lo, hi], capsize=4, ecolor="#333")
         for i, v in enumerate(p50):
             ax.text(i, v, fmt.format(v), ha="center", va="bottom", fontsize=9)
         ax.set_title(title, loc="left", fontsize=11)
@@ -246,7 +287,7 @@ def figures(proof: dict, out_dir) -> list[str]:
     bar("utilisation_kwh_per_kwp", "Solar kWh used per kWp per year (P50, bars P10-P90)", "utilisation")
     bar("tenant_share_served_by_solar", "Share of tenant water need met by solar", "tenants", "{:.2f}")
     bar("gini_solar_share_by_household", "Gini of solar share across households (lower is fairer)", "fairness", "{:.2f}")
-    bar("farmer_rs_per_m3_solar", "Farmer Rs per m3 of solar water (diesel = Rs 4.0)", "rs_per_m3", "{:.2f}")
+    bar("farmer_rs_per_m3_solar", f"Farmer Rs per m3 of solar water (diesel = Rs {proof['headline']['diesel_rs_per_m3']:.1f})", "rs_per_m3", "{:.2f}")
 
     wk = proof.get("weekly_example", {})
     if wk:
@@ -311,7 +352,15 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 2))
     ap.add_argument("--refit-forecast", action="store_true")
     ap.add_argument("--quick", action="store_true", help="2 seeds, 1 year, small sweep (CI smoke)")
+    ap.add_argument("--figures-only", action="store_true", help="redraw figures from the existing proof.json")
     a = ap.parse_args()
+    if a.figures_only:
+        proof = json.loads((data.REPORTS / "proof.json").read_text())
+        rows = [r for r in json.loads((data.REPORTS / "runs.json").read_text()) if "sweep" not in r and r.get("seed", 0) < 100]
+        narrate(proof, rows)
+        (data.REPORTS / "proof.json").write_text(json.dumps(proof, indent=2, default=str))
+        print(figures(proof, data.REPORTS / "figures"))
+        return
     t0 = time.time()
     preds, fc_metrics = data.ensure_forecasts(refit=a.refit_forecast)
     years = YEARS[:1] if a.quick else YEARS
@@ -387,10 +436,6 @@ def main() -> None:
         neg["budget_tradeoff"] = {
             "solar_m3_lost_to_budget_p50": round(
                 policies["D-nobudget"]["solar_m3"]["p50"] - policies["D"]["solar_m3"]["p50"], 0),
-            "explanation": (
-                "Holding the pump inside its seasonal cap moves that water to diesel sellers, who draw on the same "
-                "aquifer. The cap protects groundwater only when the sellers on Paani Khata share the same cluster "
-                "budget; on the pump alone it costs diesel."),
         }
 
     proof = {
@@ -432,6 +477,7 @@ def main() -> None:
         "forecast_skill_vs_persistence": fc_metrics["skill_vs_persistence"],
         "forecast_skill_vs_climatology": fc_metrics["skill_vs_climatology"],
     }
+    narrate(proof, main_rows)
     proof["runtime_s"] = round(time.time() - t0, 1)
     out = data.REPORTS / ("proof_quick.json" if a.quick else "proof.json")
     out.write_text(json.dumps(proof, indent=2, default=str))

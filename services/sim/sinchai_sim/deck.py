@@ -41,7 +41,7 @@ def build_deck(v: dict, out_dir: Path) -> Path:
     def s(body: str, cls: str = "", page: int = 0, note: str = "") -> None:
         slides.append(f'<section class="s {cls}">{body}<div class="foot"><span>SinchaiSlot · Yuva Yodha 2026 · Challenge 1</span><span>{note}</span><span>{page:02d}</span></div></section>')
 
-    s(f"""<div class="kick">Samastipur, Bihar · shared solar irrigation</div>
+    s("""<div class="kick">Samastipur, Bihar · shared solar irrigation</div>
 <h1>SINCHAISLOT</h1>
 <h2 style="margin-top:60px;color:#eef3ee">Water first, then everything else, inside the village's groundwater budget.</h2>
 <p style="margin-top:40px;max-width:1450px">Ramesh books water with a missed call and pays per cubic metre; every sunny kWh his booking does not need goes to the mill or a battery, so the pump earns more, his water gets cheaper, and the village stays inside its groundwater budget.</p>""", page=1)
@@ -87,14 +87,14 @@ def build_deck(v: dict, out_dir: Path) -> Path:
     s(f"""<div class="kick">Proof · {v['runs']} simulated years per policy · held-out weather {v['years']}</div><h2>{v['util_D']} kWh of sun used per kWp per year, against {v['util_B']} for first-come hourly sales.</h2>
 <div class="grid g4"><div><div class="big" style="font-size:96px">{v['gain_B']}</div><div class="lab">solar used vs baseline ({v['gain_B_band']})</div></div>
 <div><div class="big" style="font-size:96px">{v['rsm3_D']}</div><div class="lab">farmer per m³ (baseline {v['rsm3_B']}, diesel {v['rsm3_diesel']})</div></div>
-<div><div class="big" style="font-size:96px">{v['diesel_D']} L</div><div class="lab">diesel avoided per pump-year ({v['co2_D']} kg CO₂)</div></div>
+<div><div class="big" style="font-size:96px">{v['diesel_D']}</div><div class="lab">litres of diesel avoided per pump-year ({v['co2_D']} kg CO₂)</div></div>
 <div><div class="big" style="font-size:96px">{v['fc_skill_p']}</div><div class="lab">forecast skill vs yesterday's sun</div></div></div>""", page=10, note="SIMULATED village on REAL weather · reports/proof.json")
 
     s(f"""<div class="kick">Fairness and water</div><h2>More tenants served, fairer access, and the groundwater cap held.</h2>
 <div class="grid g3"><div><div class="big">{v['tenant_D']}</div><div class="lab">of tenant water need met by solar (baseline {v['tenant_B']})</div></div>
 <div><div class="big">{v['gini_D']}</div><div class="lab">Gini of access (baseline {v['gini_B']}; lower is fairer)</div></div>
 <div><div class="big">{v['budget_exceed_D']}</div><div class="lab">of runs over the seasonal cap (baseline {v['budget_exceed_B']})</div></div></div>
-<p style="margin-top:48px;font-size:26px"><b style="color:var(--sun)">Negative results.</b> Monsoon weeks: planner gain {v['neg_mon']} vs {v['neg_dry']} in the dry season. The cap holds back {v['budget_lost']} m³ of solar water a year, which goes to diesel sellers on the same aquifer unless they share the budget.</p>""", page=11)
+<p style="margin-top:48px;font-size:24px"><b style="color:var(--sun)">Where it adds little.</b> Against the same loads run greedily, the planner uses {v['gain_Cl']} solar energy; its value is fairness (Gini {v['gini_D']} vs {v['gini_Cl']}) and the cap. The cap holds back {v['budget_lost']} m³ of solar water a year, which goes to diesel sellers on the same aquifer unless they share the budget.</p>""", page=11)
 
     s(f"""<div class="kick">Business model</div><h2>Five payers. The pump earns more, the farmer pays less.</h2>
 <table><tr><th>Revenue line</th><th>Payer</th><th>Simulated per pump-year</th></tr>

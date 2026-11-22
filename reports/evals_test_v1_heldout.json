@@ -1,0 +1,616 @@
+{
+  "generated_by": "make evals (evals/run.py)",
+  "split": "test",
+  "thresholds": {
+    "case_success": 0.85,
+    "booking_success": 0.9,
+    "wrong_booking_rate": 0.0
+  },
+  "agent": {
+    "cases": 204,
+    "case_success": 0.8824,
+    "tool_call_accuracy": 0.9877,
+    "booking_success": 0.764,
+    "wrong_booking_rate": 0.0,
+    "wrong_bookings": 0,
+    "reply_language_match": 0.822,
+    "latency_ms_p50": 5.1,
+    "latency_ms_p95": 192.3,
+    "by_kind": {
+      "balance": {
+        "n": 8,
+        "success": 1.0
+      },
+      "book_no": {
+        "n": 54,
+        "success": 1.0
+      },
+      "book_yes": {
+        "n": 66,
+        "success": 0.727
+      },
+      "callback_no": {
+        "n": 9,
+        "success": 1.0
+      },
+      "callback_yes": {
+        "n": 11,
+        "success": 0.727
+      },
+      "cancel": {
+        "n": 6,
+        "success": 1.0
+      },
+      "crop_cap": {
+        "n": 6,
+        "success": 1.0
+      },
+      "diesel": {
+        "n": 2,
+        "success": 1.0
+      },
+      "injection": {
+        "n": 6,
+        "success": 1.0
+      },
+      "issue": {
+        "n": 7,
+        "success": 0.857
+      },
+      "pay": {
+        "n": 3,
+        "success": 1.0
+      },
+      "price": {
+        "n": 9,
+        "success": 0.889
+      },
+      "schemes": {
+        "n": 5,
+        "success": 1.0
+      },
+      "status": {
+        "n": 5,
+        "success": 1.0
+      },
+      "unknown": {
+        "n": 3,
+        "success": 0.667
+      },
+      "why": {
+        "n": 4,
+        "success": 1.0
+      }
+    },
+    "failures": [
+      {
+        "id": "test-book-yes-1-2",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-1-8",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-2-10",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-4-2",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-4-8",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-5-10",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-7-2",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-7-8",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-8-10",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-10-2",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-10-8",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-11-10",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-13-2",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-13-8",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-14-10",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-16-2",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-16-8",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-book-yes-17-10",
+        "kind": "book_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-callback-yes-2",
+        "kind": "callback_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-callback-yes-8",
+        "kind": "callback_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-callback-yes-10",
+        "kind": "callback_yes",
+        "ok": false,
+        "failures": [
+          "t1: expected one new booking, got 0"
+        ]
+      },
+      {
+        "id": "test-price-4",
+        "kind": "price",
+        "ok": false,
+        "failures": [
+          "t0: expected quote_price, called ['list_sellers'] (intent diesel)"
+        ]
+      },
+      {
+        "id": "test-issue-6",
+        "kind": "issue",
+        "ok": false,
+        "failures": [
+          "t0: expected report_issue, called [] (intent unknown)"
+        ]
+      },
+      {
+        "id": "test-unknown-2",
+        "kind": "unknown",
+        "ok": false,
+        "failures": [
+          "t1: expected hand-over to Saur Mitra"
+        ]
+      }
+    ]
+  },
+  "passes_thresholds": false,
+  "asr_robustness": {
+    "label": "SIMULATED ASR word errors (drop/truncate) on the test utterances; real Indic ASR WER not measured (no hosted ASR configured)",
+    "points": [
+      {
+        "simulated_word_noise": 0.1,
+        "wer": 0.1432,
+        "case_success": 0.6963,
+        "wrong_booking_rate": 0.0
+      },
+      {
+        "simulated_word_noise": 0.2,
+        "wer": 0.204,
+        "case_success": 0.6519,
+        "wrong_booking_rate": 0.0
+      },
+      {
+        "simulated_word_noise": 0.3,
+        "wer": 0.2484,
+        "case_success": 0.637,
+        "wrong_booking_rate": 0.0
+      }
+    ]
+  },
+  "provider": "rules",
+  "forecast_backtest": {
+    "sinchaislot_meta": {
+      "pinball_w_m2": 16.55,
+      "pinball_by_quantile": {
+        "0.1": 13.15,
+        "0.5": 25.81,
+        "0.9": 10.68
+      },
+      "p10_p90_coverage": 0.754,
+      "mae_p50_w_m2": 51.62
+    },
+    "persistence": {
+      "pinball_w_m2": 25.56,
+      "pinball_by_quantile": {
+        "0.1": 18.43,
+        "0.5": 35.08,
+        "0.9": 23.15
+      },
+      "p10_p90_coverage": 0.7,
+      "mae_p50_w_m2": 70.17
+    },
+    "climatology": {
+      "pinball_w_m2": 23.48,
+      "pinball_by_quantile": {
+        "0.1": 21.21,
+        "0.5": 36.49,
+        "0.9": 12.73
+      },
+      "p10_p90_coverage": 0.785,
+      "mae_p50_w_m2": 72.98
+    },
+    "base_ecmwf_ifs025": {
+      "pinball_w_m2": 20.96
+    },
+    "base_gfs_seamless": {
+      "pinball_w_m2": 17.17
+    },
+    "base_icon_seamless": {
+      "pinball_w_m2": 16.73
+    },
+    "skill_vs_persistence": 0.353,
+    "skill_vs_climatology": 0.295,
+    "cqr_margin_clearsky_index": 0.0448,
+    "n_test_hours": 8838,
+    "train_years": [
+      2022,
+      2023
+    ],
+    "test_years": [
+      2024,
+      2025
+    ]
+  },
+  "optimiser_benchmark": {
+    "setting": "24 half-hour slots, 3 solar scenarios, mill + chaff + battery; production: gap 0.1%, 8 s limit; reference: gap 0, 120 s",
+    "by_size": {
+      "5": {
+        "solve_s_median": 1.748,
+        "solve_s_max": 8.002,
+        "gap_max": 0.001028,
+        "binaries_median": 129
+      },
+      "10": {
+        "solve_s_median": 8.003,
+        "solve_s_max": 8.004,
+        "gap_max": 0.001047,
+        "binaries_median": 234
+      },
+      "20": {
+        "solve_s_median": 0.989,
+        "solve_s_max": 6.02,
+        "gap_max": 0.000693,
+        "binaries_median": 431
+      },
+      "40": {
+        "solve_s_median": 0.613,
+        "solve_s_max": 1.634,
+        "gap_max": 7.7e-05,
+        "binaries_median": 833
+      },
+      "60": {
+        "solve_s_median": 0.978,
+        "solve_s_max": 1.086,
+        "gap_max": 0.0,
+        "binaries_median": 1233
+      }
+    },
+    "runs": [
+      {
+        "requests": 5,
+        "rep": 0,
+        "solve_s": 0.014,
+        "ref_solve_s": 0.374,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.0,
+        "binaries": 124,
+        "constraints": 578
+      },
+      {
+        "requests": 5,
+        "rep": 1,
+        "solve_s": 0.177,
+        "ref_solve_s": 5.052,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 1.6e-05,
+        "binaries": 128,
+        "constraints": 590
+      },
+      {
+        "requests": 5,
+        "rep": 2,
+        "solve_s": 3.319,
+        "ref_solve_s": 19.792,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.0,
+        "binaries": 130,
+        "constraints": 596
+      },
+      {
+        "requests": 5,
+        "rep": 3,
+        "solve_s": 8.002,
+        "ref_solve_s": 120.003,
+        "status": "Time limit reached",
+        "ref_status": "Time limit reached",
+        "gap_vs_reference": 0.001028,
+        "binaries": 130,
+        "constraints": 596
+      },
+      {
+        "requests": 10,
+        "rep": 0,
+        "solve_s": 8.004,
+        "ref_solve_s": 70.81,
+        "status": "Time limit reached",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.000424,
+        "binaries": 232,
+        "constraints": 1018
+      },
+      {
+        "requests": 10,
+        "rep": 1,
+        "solve_s": 2.103,
+        "ref_solve_s": 11.274,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 7.1e-05,
+        "binaries": 234,
+        "constraints": 1024
+      },
+      {
+        "requests": 10,
+        "rep": 2,
+        "solve_s": 8.004,
+        "ref_solve_s": 45.233,
+        "status": "Time limit reached",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.001047,
+        "binaries": 234,
+        "constraints": 1024
+      },
+      {
+        "requests": 10,
+        "rep": 3,
+        "solve_s": 8.002,
+        "ref_solve_s": 120.004,
+        "status": "Time limit reached",
+        "ref_status": "Time limit reached",
+        "gap_vs_reference": 0.000234,
+        "binaries": 234,
+        "constraints": 1024
+      },
+      {
+        "requests": 20,
+        "rep": 0,
+        "solve_s": 6.02,
+        "ref_solve_s": 15.786,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.000693,
+        "binaries": 432,
+        "constraints": 1851
+      },
+      {
+        "requests": 20,
+        "rep": 1,
+        "solve_s": 1.326,
+        "ref_solve_s": 5.973,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 3.5e-05,
+        "binaries": 424,
+        "constraints": 1827
+      },
+      {
+        "requests": 20,
+        "rep": 2,
+        "solve_s": 0.651,
+        "ref_solve_s": 11.056,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.000101,
+        "binaries": 434,
+        "constraints": 1857
+      },
+      {
+        "requests": 20,
+        "rep": 3,
+        "solve_s": 0.151,
+        "ref_solve_s": 5.524,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 3.9e-05,
+        "binaries": 430,
+        "constraints": 1845
+      },
+      {
+        "requests": 40,
+        "rep": 0,
+        "solve_s": 1.634,
+        "ref_solve_s": 5.747,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 7.7e-05,
+        "binaries": 832,
+        "constraints": 3516
+      },
+      {
+        "requests": 40,
+        "rep": 1,
+        "solve_s": 0.406,
+        "ref_solve_s": 1.846,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 7.3e-05,
+        "binaries": 826,
+        "constraints": 3498
+      },
+      {
+        "requests": 40,
+        "rep": 2,
+        "solve_s": 0.788,
+        "ref_solve_s": 1.779,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.0,
+        "binaries": 834,
+        "constraints": 3522
+      },
+      {
+        "requests": 40,
+        "rep": 3,
+        "solve_s": 0.437,
+        "ref_solve_s": 1.109,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.0,
+        "binaries": 834,
+        "constraints": 3522
+      },
+      {
+        "requests": 60,
+        "rep": 0,
+        "solve_s": 1.086,
+        "ref_solve_s": 2.144,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.0,
+        "binaries": 1232,
+        "constraints": 5181
+      },
+      {
+        "requests": 60,
+        "rep": 1,
+        "solve_s": 0.923,
+        "ref_solve_s": 1.362,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.0,
+        "binaries": 1226,
+        "constraints": 5163
+      },
+      {
+        "requests": 60,
+        "rep": 2,
+        "solve_s": 0.707,
+        "ref_solve_s": 1.242,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.0,
+        "binaries": 1234,
+        "constraints": 5187
+      },
+      {
+        "requests": 60,
+        "rep": 3,
+        "solve_s": 1.032,
+        "ref_solve_s": 1.657,
+        "status": "Optimal",
+        "ref_status": "Optimal",
+        "gap_vs_reference": 0.0,
+        "binaries": 1234,
+        "constraints": 5187
+      }
+    ]
+  },
+  "runtime_s": 1297.5
+}
