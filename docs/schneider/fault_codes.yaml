@@ -1,0 +1,1030 @@
+device: Schneider Electric Altivar Solar ATV320
+lft_register:
+  mnemonic: LFT
+  address: 7121
+  history: DP1..DP8 at 7201..7208 use the same values
+no_fault:
+  mnemonic: NOF
+  lft_value: 0
+  source: NVE41316 V3.5, sheet Enumerations, row 313
+faults:
+- mnemonic: EEF1
+  name: EEprom Control
+  description: EEprom control error
+  lft_value: 2
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 314
+  causes:
+  - Internal memory detected error, control block.
+  remedies:
+  - Check the environment (electromagnetic compatibility).
+  - Turn off, reset, return to factory settings
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.165
+  - NVE41295.06 (ATV320 Programming Manual), p.407
+  verified: true
+- mnemonic: CFF
+  name: Incorrect Config
+  description: Incorrect configuration error
+  lft_value: 3
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 315
+  causes:
+  - Option module changed or removed.
+  - Control block replaced by a control block configured on a drive with a different rating.
+  - The current configuration is inconsistent.
+  remedies:
+  - Check that there are no detected module errors.
+  - In the event of the option module being changed/removed deliberately, see the remarks below.
+  - Return to factory settings or retrieve the backup configuration, if it is valid.
+  clearing: This detected error is cleared as soon as its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.163
+  - NVE41295.06 (ATV320 Programming Manual), p.405
+  verified: true
+- mnemonic: CFI
+  name: Invalid Configuration
+  description: Invalid configuration error
+  lft_value: 4
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 316
+  causes:
+  - Invalid configuration. The configuration loaded in the drive via the bus or communication network is inconsistent.
+  remedies:
+  - Check the configuration loaded previously.
+  - Load a compatible configuration.
+  clearing: This detected error is cleared as soon as its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.163
+  - NVE41295.06 (ATV320 Programming Manual), p.405
+  verified: true
+- mnemonic: SLF1
+  name: Modbus Com Interrupt
+  description: Modbus communication interruption error
+  lft_value: 5
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 317
+  causes:
+  - Communication interruption on the Modbus bus.
+  remedies:
+  - Check the communication bus.
+  - Check the time-out.
+  - Refer to the Modbus User manual.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.176
+  - NVE41295.06 (ATV320 Programming Manual), p.417
+  verified: true
+- mnemonic: ILF
+  name: Internal Link Error
+  description: Internal link error
+  lft_value: 6
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 318
+  causes:
+  - Communication interruption between option module and drive.
+  remedies:
+  - Check the environment (electromagnetic compatibility).
+  - Check the connections.
+  - Replace the option module.
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.168
+  - NVE41295.06 (ATV320 Programming Manual), p.409
+  verified: true
+- mnemonic: CNF
+  name: Fieldbus Com Interrupt
+  description: Fieldbus module communication interruption error
+  lft_value: 7
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 319
+  causes:
+  - Communication interruption on communication module.
+  remedies:
+  - Check the environment (electromagnetic compatibility).
+  - Check the wiring.
+  - Check the time-out.
+  - Replace the option module.
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.164
+  - NVE41295.06 (ATV320 Programming Manual), p.406
+  verified: true
+- mnemonic: EPF1
+  name: External Error
+  description: External error
+  lft_value: 8
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 320
+  causes:
+  - Event triggered by an external device, depending on user.
+  remedies:
+  - Check the device which caused the triggering and reset.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.166
+  - NVE41295.06 (ATV320 Programming Manual), p.407
+  verified: true
+- mnemonic: OCF
+  name: Overcurrent
+  description: Overcurrent error
+  lft_value: 9
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 321
+  causes:
+  - Parameters in the [Settings] SET- and [Motor control] DRC- menus are not correct.
+  - Inertia or load too high.
+  - Mechanical locking.
+  remedies:
+  - Check the parameters.
+  - Check the size of the motor/drive/load.
+  - Check the state of the mechanism.
+  - Decrease [Current Limitation] CLI.
+  - Increase the switching frequency.
+  clearing: '● If the parameter [Extended Fault Reset] HrfC is set to [No] NO : This detected error requires a power reset.
+    ● If the parameter [Extended Fault Reset] HrfC is set to [Yes] YES : This detected error can be cleared manually with
+    the [Fault Reset Assign] rsf parameter after its cause has been removed.'
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.171
+  - NVE41295.06 (ATV320 Programming Manual), p.413
+  verified: true
+- mnemonic: CRF1
+  name: Precharge Capacitor
+  description: Precharge capacitor error
+  lft_value: 10
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 322
+  causes:
+  - Charging relay control detected error or charging resistor damaged.
+  remedies:
+  - Turn the drive off and then turn on again.
+  - Check the internal connections.
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.165
+  - NVE41295.06 (ATV320 Programming Manual), p.406
+  verified: true
+- mnemonic: SPF
+  name: Encoder Feedback Loss
+  description: Encoder feedback loss error
+  lft_value: 11
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 323
+  causes:
+  - Signal on Pulse input missing, if the input is used for speed measurement.
+  - Encoder feedback signal missing.
+  remedies:
+  - Check the wiring of the input cable and the detector used.
+  - Check the configuration parameters of the encoder.
+  - Check the wiring between the encoder and the drive.
+  - Check the encoder.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.177
+  - NVE41295.06 (ATV320 Programming Manual), p.418
+  verified: true
+- mnemonic: ANF
+  name: Load slipping
+  description: Load slipping error
+  lft_value: 12
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 324
+  causes:
+  - The difference between the output frequency and the speed feedback is not correct.
+  remedies:
+  - Check the motor, gain and stability parameters.
+  - Add a braking resistor.
+  - Check the size of the motor/drive/load.
+  - Check the encoder's mechanical coupling and its wiring.
+  - Check the setting of parameters.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.162
+  - NVE41295.06 (ATV320 Programming Manual), p.404
+  verified: true
+- mnemonic: OHF
+  name: Drive Overheating
+  description: Drive overheating error
+  lft_value: 16
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 325
+  causes:
+  - Drive temperature too high.
+  remedies:
+  - Check the motor load, the drive ventilation and the ambient temperature. Wait for the drive to cool down before restarting.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.172
+  - NVE41295.06 (ATV320 Programming Manual), p.413
+  verified: true
+- mnemonic: OLF
+  name: Motor Overload
+  description: Motor overload error
+  lft_value: 17
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 326
+  causes:
+  - Triggered by excessive motor current.
+  remedies:
+  - Check the setting of the motor thermal protection, check the motor load. Wait for the motor to cool down before restarting.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.172
+  - NVE41295.06 (ATV320 Programming Manual), p.413
+  verified: true
+- mnemonic: OBF
+  name: DC Bus Overvoltage
+  description: DC bus overvoltage error
+  lft_value: 18
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 327
+  causes:
+  - Braking too sudden or driving load.
+  - Supply voltage too high.
+  remedies:
+  - Increase the deceleration time.
+  - Install a braking resistor if necessary.
+  - Activate the [Dec.Ramp Adapt] BRA function, if it is compatible with the application.
+  - Check the supply voltage.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.171
+  - NVE41295.06 (ATV320 Programming Manual), p.412
+  verified: true
+- mnemonic: OSF
+  name: Supply Mains Overvoltage
+  description: Supply mains overvoltage error
+  lft_value: 19
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 328
+  causes:
+  - Supply voltage too high.
+  - Disturbed mains supply.
+  remedies:
+  - Check the supply voltage.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.173
+  - NVE41295.06 (ATV320 Programming Manual), p.414
+  verified: true
+- mnemonic: OPF1
+  name: Single Output Phase Loss
+  description: Single output phase loss error
+  lft_value: 20
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 329
+  causes:
+  - Loss of one phase at drive output.
+  remedies:
+  - Check the connections from the drive to the motor.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.172
+  - NVE41295.06 (ATV320 Programming Manual), p.414
+  verified: true
+- mnemonic: PHF
+  name: Input Phase Loss
+  description: Input phase loss error
+  lft_value: 21
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 330
+  causes:
+  - Drive incorrectly supplied or a fuse blown.
+  - One phase missing.
+  - 3-phase ATV320 used on a single-phase supply mains.
+  - Unbalanced load. This protection only operates with the drive on load.
+  remedies:
+  - Check the power connection and the fuses. Use a 3-phase supply mains. Disable the detected error by [InPhaseLoss Assign]
+    IPL = [No] NO.
+  clearing: This detected error is cleared as soon as its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.174
+  - NVE41295.06 (ATV320 Programming Manual), p.415
+  verified: true
+- mnemonic: USF
+  name: Supply Mains UnderV
+  description: Supply mains undervoltage error
+  lft_value: 22
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 331
+  causes:
+  - Supply mains too low.
+  - Transient voltage dip.
+  remedies:
+  - Check the voltage and the parameters of [Undervoltage handling] USB- .
+  clearing: This detected error is cleared as soon as its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.179
+  - NVE41295.06 (ATV320 Programming Manual), p.420
+  verified: true
+- mnemonic: SCF1
+  name: Motor short circuit
+  description: Motor short circuit error
+  lft_value: 23
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 332
+  causes:
+  - Short-circuit or grounding at the drive output.
+  remedies:
+  - Check the cables connecting the drive to the motor, and the motor insulation.
+  - Reduce the switching frequency.
+  - Connect chokes in series with the motor.
+  - Check the adjustment of speed loop and brake.
+  - Increase the [Time to restart] TTR .
+  - Increase the switching frequency.
+  clearing: '● If the parameter [Extended Fault Reset] HrfC is set to [No] NO : This detected error requires a power reset.
+    ● If the parameter [Extended Fault Reset] HrfC is set to [Yes] YES : This detected error can be cleared manually with
+    the [Fault Reset Assign] rsf parameter after its cause has been removed.'
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.175
+  - NVE41295.06 (ATV320 Programming Manual), p.416
+  verified: true
+- mnemonic: SOF
+  name: Motor Overspeed
+  description: Motor overspeed error
+  lft_value: 24
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 333
+  causes:
+  - Instability or driving load too high.
+  - If a downstream contactor is used, the contacts between the motor and the drive have not been closed before applying a
+    Run command.
+  - The overspeed threshold (corresponding to 110 % of [Max Frequency] TFR) has been reached.
+  remedies:
+  - Check the motor, gain and stability parameters.
+  - Add a braking resistor.
+  - Check the size of the motor/drive/load.
+  - Check the parameters settings for the [Frequency meter] FQF- function, if it is configured.
+  - Verify and close the contacts between the motor and the drive before applying a Run command.
+  - Verify the consistency between [Max Frequency] TFR and [High Speed] HSP. It is recommended to have at least [Max Frequency]
+    TFR ≥ 110% * [High Speed] HSP.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.177
+  - NVE41295.06 (ATV320 Programming Manual), p.418
+  verified: true
+- mnemonic: TNF
+  name: Autotuning Error
+  description: Autotuning detected error
+  lft_value: 25
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 334
+  causes:
+  - Special motor or motor whose power is not suitable for the drive.
+  - Motor not connected to the drive.
+  - Motor not stopped
+  remedies:
+  - Check that the motor/drive are compatible.
+  - Check that the motor is present during auto-tuning.
+  - If an output contactor is being used, close it during auto-tuning.
+  - Check that the motor is stopped during tune operation.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.178
+  - NVE41295.06 (ATV320 Programming Manual), p.419
+  verified: true
+- mnemonic: INF1
+  name: Internal Error 1
+  description: Internal error 1 (Rating)
+  lft_value: 26
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 335
+  causes:
+  - The power board is different from the board stored.
+  remedies:
+  - Check the reference of the power board.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.168
+  - NVE41295.06 (ATV320 Programming Manual), p.410
+  verified: true
+- mnemonic: INF2
+  name: Internal Error 2
+  description: Internal error 2 (Soft)
+  lft_value: 27
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 336
+  causes:
+  - The power board is incompatible with the control block.
+  remedies:
+  - Check the reference of the power board and its compatibility.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.168
+  - NVE41295.06 (ATV320 Programming Manual), p.410
+  verified: true
+- mnemonic: INF3
+  name: Internal Error 3
+  description: Internal error 3 (Intern Comm)
+  lft_value: 28
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 337
+  causes:
+  - Communication interruption between the internal cards.
+  remedies:
+  - Check the internal connections.
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.169
+  - NVE41295.06 (ATV320 Programming Manual), p.410
+  verified: true
+- mnemonic: INF4
+  name: Internal Error 4
+  description: Internal error 4 (Manufacturing)
+  lft_value: 29
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 338
+  causes:
+  - Internal data inconsistent.
+  remedies:
+  - Re-calibrate the drive (performed by Schneider Electric Product Support).
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.169
+  - NVE41295.06 (ATV320 Programming Manual), p.410
+  verified: true
+- mnemonic: EEF2
+  name: EEprom Power
+  description: EEprom power error
+  lft_value: 30
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 339
+  causes:
+  - Internal memory detected error, power board.
+  remedies:
+  - Check the environment (electromagnetic compatibility).
+  - Turn off, reset, return to factory settings
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.166
+  - NVE41295.06 (ATV320 Programming Manual), p.407
+  verified: true
+- mnemonic: SCF3
+  name: Ground Short Circuit
+  description: Ground short circuit error
+  lft_value: 32
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 340
+  causes:
+  - Significant earth leakage current at the drive output if several motors are connected in parallel.
+  remedies:
+  - Check the cables connecting the drive to the motor, and the motor insulation.
+  - Reduce the switching frequency.
+  - Connect chokes in series with the motor.
+  - Check the adjustment of speed loop and brake.
+  - Increase the [Time to restart] TTR .
+  - Reduce the switching frequency.
+  clearing: '● If the parameter [Extended Fault Reset] HrfC is set to [No] NO : This detected error requires a power reset.
+    ● If the parameter [Extended Fault Reset] HrfC is set to [Yes] YES : This detected error can be cleared manually with
+    the [Fault Reset Assign] rsf parameter after its cause has been removed.'
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.175
+  - NVE41295.06 (ATV320 Programming Manual), p.416
+  verified: true
+- mnemonic: OPF2
+  name: Output Phase Loss
+  description: Output phase loss error
+  lft_value: 33
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 341
+  causes:
+  - Motor not connected or motor power too low.
+  - Output contactor open.
+  - Instantaneous instability in the motor current.
+  remedies:
+  - Check the connections from the drive to the motor.
+  - If an output contactor is being used, set [Output phase loss] OPL to [No Error Triggered] OAC.
+  - 'Test on a low power motor or without a motor: In factory settings mode, motor phase loss detection is active [Output
+    phase loss] OPL = [Yes] YES. To check the drive in a test or maintenance environment, without having to use a motor with
+    the same rating as the drive (in particular for high power drives), deactivate motor phase loss detection [Output phase
+    loss] OPL = [No] NO.'
+  - 'Check and optimize the following parameters: [IR compensation] UFR , [Nom Motor Voltage] UNS and [Nom Motor Current]
+    NCR and perform [Autotuning] TUN .'
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.173
+  - NVE41295.06 (ATV320 Programming Manual), p.414
+  verified: true
+- mnemonic: COF
+  name: CANopen Com Interrupt
+  description: CANopen communication interruption error
+  lft_value: 34
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 342
+  causes:
+  - Communication interruption on the CANopen® bus.
+  remedies:
+  - Check the communication bus.
+  - Check the time-out.
+  - Refer to the CANopen® User manual.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.164
+  - NVE41295.06 (ATV320 Programming Manual), p.406
+  verified: true
+- mnemonic: BLF
+  name: Brake Control
+  description: Brake control error
+  lft_value: 35
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 343
+  causes:
+  - Brake release current not reached.
+  - Brake engage frequency threshold [Brake engage freq] BEN only regulated when brake logic control is assigned.
+  remedies:
+  - Check the drive/motor connection.
+  - Check the motor windings.
+  - Check the [Brk Release Current] IBR and [Brake release I Rev] IRD settings.
+  - Apply the recommended settings for [Brake engage freq] BEN.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.162
+  - NVE41295.06 (ATV320 Programming Manual), p.404
+  verified: true
+- mnemonic: EPF2
+  name: Fieldbus External Error
+  description: Fieldbus external detected error
+  lft_value: 38
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 344
+  causes:
+  - Event triggered by a communication network.
+  remedies:
+  - Check for the cause of the triggering and reset.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.166
+  - NVE41295.06 (ATV320 Programming Manual), p.408
+  verified: true
+- mnemonic: BRF
+  name: Brake Feedback
+  description: Brake feedback error
+  lft_value: 41
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 345
+  causes:
+  - The brake feedback contact does not match the brake logic control.
+  - The brake does not stop the motor quickly enough (detected by measuring the speed on the Pulse input input).
+  remedies:
+  - Check the feedback circuit and the brake logic control circuit.
+  - Check the mechanical state of the brake.
+  - Check the brake linings.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.163
+  - NVE41295.06 (ATV320 Programming Manual), p.405
+  verified: true
+- mnemonic: SLF2
+  name: PC com Interruption
+  description: PC communication interruption error
+  lft_value: 42
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 346
+  causes:
+  - Communication interruption with PC Software.
+  remedies:
+  - Check the PC Software connecting cable.
+  - Check the time-out.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.176
+  - NVE41295.06 (ATV320 Programming Manual), p.417
+  verified: true
+- mnemonic: SSF
+  name: Torque Limitation Error
+  description: Torque limitation error
+  lft_value: 44
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 347
+  causes:
+  - Switch to torque or current limitation.
+  remedies:
+  - Check if there are any mechanical problems.
+  - Check the parameters of [Torque limitation] TOL- and the parameters of the [Torque or I limit detect] TID- .
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.177
+  - NVE41295.06 (ATV320 Programming Manual), p.419
+  verified: true
+- mnemonic: SLF3
+  name: HMI com Interruption
+  description: HMI communication interruption error
+  lft_value: 45
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 348
+  causes:
+  - Communication interruption with the graphic display terminal or remote display terminal.
+  remedies:
+  - Check the terminal connection.
+  - Check the time-out.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.176
+  - NVE41295.06 (ATV320 Programming Manual), p.418
+  verified: true
+- mnemonic: PTFL
+  name: DI6=PTC Probe Error
+  description: DI6=PTC probe error
+  lft_value: 49
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 349
+  causes:
+  - PTC probe on input DI6 open or short-circuited.
+  remedies:
+  - Check the PTC probe and the wiring between it and the motor/drive.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.174
+  - NVE41295.06 (ATV320 Programming Manual), p.415
+  verified: true
+- mnemonic: OTFL
+  name: DI6=PTC Overheat
+  description: DI6=PTC overheat error
+  lft_value: 50
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 350
+  causes:
+  - Overheating of PTC probes detected on input DI6.
+  remedies:
+  - Check the motor load and motor size.
+  - Check the motor ventilation.
+  - Wait for the motor to cool before restarting.
+  - Check the type and state of the PTC probes.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.173
+  - NVE41295.06 (ATV320 Programming Manual), p.415
+  verified: true
+- mnemonic: INF9
+  name: Internal Error 9
+  description: Internal error 9 (Measure)
+  lft_value: 51
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 351
+  causes:
+  - The current measurements are incorrect.
+  remedies:
+  - Replace the current sensors or the power board.
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.169
+  - NVE41295.06 (ATV320 Programming Manual), p.411
+  verified: true
+- mnemonic: INFA
+  name: Internal Error 10
+  description: Internal error 10 (Mains)
+  lft_value: 52
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 352
+  causes:
+  - The input stage is not operating correctly.
+  remedies:
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.170
+  - NVE41295.06 (ATV320 Programming Manual), p.411
+  verified: true
+- mnemonic: INFB
+  name: Internal Error 11
+  description: Internal error 1 (Temperature)
+  lft_value: 53
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 353
+  causes:
+  - The drive temperature sensor is not operating correctly.
+  remedies:
+  - Replace the drive temperature sensor.
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.170
+  - NVE41295.06 (ATV320 Programming Manual), p.411
+  verified: true
+- mnemonic: TJF
+  name: IGBT Overheating
+  description: IGBT overheating
+  lft_value: 54
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 354
+  causes:
+  - Drive overheated.
+  remedies:
+  - Check the size of the load/motor/drive.
+  - Reduce the switching frequency.
+  - Wait for the motor to cool before restarting.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.178
+  - NVE41295.06 (ATV320 Programming Manual), p.419
+  verified: true
+- mnemonic: SCF4
+  name: IGBT Short Circuit
+  description: IGBT short circuit error
+  lft_value: 55
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 355
+  causes:
+  - Power component detected error.
+  remedies:
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.175
+  - NVE41295.06 (ATV320 Programming Manual), p.417
+  verified: true
+- mnemonic: SCF5
+  name: Motor Short Circuit
+  description: Motor short circuit error
+  display_alias: SCFS
+  lft_value: 56
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 356
+  causes:
+  - Short-circuit at drive output.
+  remedies:
+  - Check the cables connecting the drive to the motor, and the motor insulation.
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.176
+  - NVE41295.06 (ATV320 Programming Manual), p.417
+  verified: true
+- mnemonic: FCF1
+  name: Out Contact Closed
+  description: Output contactor closed error
+  lft_value: 58
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 357
+  causes:
+  - The output contactor remains closed although the opening conditions have been met.
+  remedies:
+  - Check the contactor and its wiring.
+  - Check the feedback circuit.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.167
+  - NVE41295.06 (ATV320 Programming Manual), p.408
+  verified: true
+- mnemonic: FCF2
+  name: Out Contact Opened
+  description: Output contactor opened error
+  lft_value: 59
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 358
+  causes:
+  - The output contactor remains open although the closing conditions have been met.
+  remedies:
+  - Check the contactor and its wiring.
+  - Check the feedback circuit.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.167
+  - NVE41295.06 (ATV320 Programming Manual), p.409
+  verified: true
+- mnemonic: LCF
+  name: Input Contactor
+  description: Input contactor error
+  lft_value: 64
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 359
+  causes:
+  - The drive is not turned on even though [Mains V. time out] LCT has elapsed.
+  remedies:
+  - Check the contactor and its wiring.
+  - Check the time-out.
+  - Check the supply mains /contactor /drive connection.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.170
+  - NVE41295.06 (ATV320 Programming Manual), p.412
+  verified: true
+- mnemonic: HDF
+  name: IGBT Desaturation
+  description: IGBT desaturation error
+  lft_value: 67
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 360
+  causes:
+  - Short-circuit or grounding at the drive.
+  remedies:
+  - Check the cables connecting the drive to the motor, and the motor insulation.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.168
+  - NVE41295.06 (ATV320 Programming Manual), p.409
+  verified: true
+- mnemonic: INF6
+  name: Internal Error 6
+  description: Internal error 6 (Option)
+  lft_value: 68
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 361
+  causes:
+  - The option installed in the drive is not recognized.
+  remedies:
+  - Check the reference and compatibility of the option.
+  - Check that the option is well inserted into the ATV320.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.169
+  - NVE41295.06 (ATV320 Programming Manual), p.411
+  verified: true
+- mnemonic: INFE
+  name: Internal Error 14
+  description: Internal error 14 (CPU) error
+  lft_value: 69
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 362
+  causes:
+  - Internal microprocessor detected error.
+  remedies:
+  - Turn off and reset.
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.170
+  - NVE41295.06 (ATV320 Programming Manual), p.412
+  verified: true
+- mnemonic: LFF3
+  name: AI3 4-20mA loss
+  description: AI3 4-20mA loss error
+  lft_value: 71
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 363
+  causes:
+  - Loss of the 4-20 mA reference on analog input AI3.
+  remedies:
+  - Check the connection on the analog inputs.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.171
+  - NVE41295.06 (ATV320 Programming Manual), p.412
+  verified: true
+- mnemonic: HCF
+  name: Boards Compatibility
+  description: Boards compatibility error
+  lft_value: 73
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 364
+  causes:
+  - The [Boards pairing] PPI- function has been configured and a drive card has been changed.
+  remedies:
+  - In the event of a card error, reinsert the original card.
+  - Confirm the configuration by entering the [Pairing password] PPI if the card was changed deliberately.
+  clearing: This detected error is cleared as soon as its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.167
+  - NVE41295.06 (ATV320 Programming Manual), p.409
+  verified: true
+- mnemonic: DLF
+  name: Dynamic Load Error
+  description: Dynamic load detected error
+  lft_value: 76
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 365
+  causes:
+  - Abnormal load variation.
+  remedies:
+  - Check that the load is not blocked by an obstacle.
+  - Removal of a run command causes a reset.
+  clearing: This detected error is cleared as soon as its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.165
+  - NVE41295.06 (ATV320 Programming Manual), p.407
+  verified: true
+- mnemonic: CFI2
+  name: Conf Transfer Error
+  description: Configuration transfer error
+  lft_value: 77
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 366
+  causes:
+  - Invalid configuration. The configuration loaded in the drive via the bus or communication network is inconsistent.
+  remedies:
+  - Check the configuration loaded previously.
+  - Load a compatible configuration.
+  clearing: This detected error is cleared as soon as its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.164
+  - NVE41295.06 (ATV320 Programming Manual), p.405
+  verified: true
+- mnemonic: CSF
+  name: Ch Switch Error
+  description: Channel switching detected error
+  lft_value: 99
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 367
+  causes:
+  - Switch to not valid channels.
+  remedies:
+  - Check the function parameters.
+  clearing: This detected error is cleared as soon as its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.165
+  - NVE41295.06 (ATV320 Programming Manual), p.406
+  verified: true
+- mnemonic: ULF
+  name: Process Underload
+  description: Process underload error
+  lft_value: 100
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 368
+  causes:
+  - Process underload.
+  remedies:
+  - Check and remove the cause of the underload. Check the parameters of the [Process underload] ULD- function.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.179
+  - NVE41295.06 (ATV320 Programming Manual), p.419
+  verified: true
+- mnemonic: OLC
+  name: Process Overload
+  description: Process overload error
+  lft_value: 101
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 369
+  causes:
+  - Process overload.
+  remedies:
+  - Check and remove the cause of the overload.
+  - Check the parameters of the [Process overload] OLD- function.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.172
+  - NVE41295.06 (ATV320 Programming Manual), p.413
+  verified: true
+- mnemonic: ASF
+  name: Angle Error
+  description: Angle error
+  lft_value: 105
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 370
+  causes:
+  - It occurs during the phase-shift angle measurement, if the motor phase is disconnected or if the motor inductance is too
+    high.
+  remedies:
+  - Check the motor phases and the maximum current allowed by the drive.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.162
+  - NVE41295.06 (ATV320 Programming Manual), p.404
+  verified: true
+- mnemonic: SAFF
+  name: Safety fct error
+  description: Safety function detected error
+  lft_value: 107
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 371
+  causes:
+  - Debounce time exceeded.
+  - SS1 threshold exceeded.
+  - Incorrect configuration.
+  - SLS type overspeed detected.
+  remedies:
+  - Check the safety functions configuration.
+  - Check the ATV320 Integrated safety Functions manual
+  - Contact Schneider Electric Product Support.
+  clearing: This detected error requires a power reset of the device after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.174
+  - NVE41295.06 (ATV320 Programming Manual), p.416
+  verified: true
+- mnemonic: FBE
+  name: Fct Block Error
+  description: Function block error
+  lft_value: 108
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 372
+  causes:
+  - Function block detected error.
+  remedies:
+  - See [FB Error] FBFT for more details.
+  clearing: This detected error is cleared as soon as its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.166
+  - NVE41295.06 (ATV320 Programming Manual), p.408
+  verified: true
+- mnemonic: FBES
+  name: Fct Block StopError
+  description: Function block stop error
+  lft_value: 109
+  lft_source: NVE41316 V3.5, sheet Enumerations, row 373
+  causes:
+  - Function blocks have been stopped while motor was running.
+  remedies:
+  - Check [FB Motor Stop Type] FBSM configuration.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.167
+  - NVE41295.06 (ATV320 Programming Manual), p.408
+  verified: true
+- mnemonic: SCF2
+  name: null
+  description: null
+  lft_value: null
+  lft_source: null
+  causes: []
+  remedies: []
+  clearing: null
+  source: []
+  verified: false
+  note: 'UNVERIFIED: SCF2 does not appear in any ATV320 manual or in the NVE41316 LFT enumeration.'
+- mnemonic: TSF
+  name: Tank Probe Error
+  description: Tank Probe Error
+  lft_value: null
+  lft_source: 'UNVERIFIED: not in the LFT enumeration of NVE41316 V3.5'
+  causes:
+  - Tank water probe disconnected
+  - Tank water probe broken
+  - Alarm threshold too low ([Probe Threshold] LPTP)
+  remedies:
+  - Check the liquid probe connexion.
+  - Check [Liquid Threshold] LPT and [Probe Threshold] LPTP parameters refer to [Tank Liquid Probe] LPM, page 104.
+  clearing: This detected error can be cleared with the [Auto Fault Reset] ATR or manually with the [Fault Reset Assign] rsf
+    parameter after its cause has been removed.
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.178
+  verified: false
+  note: Description verified in the manual; numeric LFT value UNVERIFIED (solar-specific fault).

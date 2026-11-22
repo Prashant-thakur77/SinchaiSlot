@@ -1,0 +1,1793 @@
+device: Schneider Electric Altivar Solar ATV320 (ATV320 platform)
+addressing:
+  register_type: holding registers (function 3 read, 6/16 write, 23 read/write)
+  pdu_address: 'logical address used directly as the Modbus PDU register address (no 40001 offset, no -1). Example in NVE41308
+    p.19: W3102 is requested as 0x0C1E.'
+  byte_order: 'big endian: high-order byte first within each 16-bit word (NVE41308 p.18)'
+  word_size: 16 bit; all registers listed are single 16-bit words
+  signed_types: INT (Signed16) values are two's complement
+registers:
+- name: Control word (CiA402 / Drivecom)
+  mnemonic: CMD
+  address: 8501
+  address_hex: '0x2135'
+  access: RW
+  type: WORD (BitString16)
+  unit: null
+  scale: null
+  description: Control word. Bit0 switch on, bit1 enable voltage, bit2 quick stop (0 = active), bit3 enable operation, bit7
+    fault reset on 0->1 edge, bit8 halt, bit11 direction (0 forward, 1 reverse; default assignment of [Reverse Assign] rrS),
+    bits 11-15 assignable.
+  group: control
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 3
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.46 (bit map and command values)
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.48 (bit 11 default = reverse)
+  - NVE41316 V3.5, sheet Registers, rows 26-50
+  verified: true
+- name: Frequency reference
+  mnemonic: LFR
+  address: 8502
+  address_hex: '0x2136'
+  access: RW
+  type: INT (Signed16)
+  unit: Hz
+  scale: 0.1
+  description: Signed frequency setpoint, range -599.0 .. 599.0 Hz.
+  group: control
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 6
+  - NVE41295.06 (ATV320 Programming Manual), p.46 and p.49
+  verified: true
+- name: Speed setpoint
+  mnemonic: LFRD
+  address: 8602
+  address_hex: '0x219A'
+  access: RW
+  type: INT (Signed16)
+  unit: rpm
+  scale: 1
+  description: Signed speed setpoint in rpm, range -32767 .. 32767 rpm. Default second word of the communication scanner output
+    (NCA2 = 8602).
+  group: control
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 5
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+- name: Extended control word
+  mnemonic: CMI
+  address: 8504
+  address_hex: '0x2138'
+  access: RW
+  type: WORD (BitString16)
+  unit: null
+  scale: null
+  description: Bit0 factory setting command, bit1 save configuration to EEPROM (only when stopped).
+  group: control
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 2
+  - NVE41316 V3.5, sheet Registers, rows 1-25
+  verified: true
+- name: Status word (CiA402 / Drivecom)
+  mnemonic: ETA
+  address: 3201
+  address_hex: '0x0C81'
+  access: R
+  type: WORD (BitString16)
+  unit: null
+  scale: null
+  description: Status word. Bit0 ready to switch on, bit1 switched on, bit2 operation enabled, bit3 fault, bit4 voltage enabled,
+    bit5 quick stop (0 = active), bit6 switch on disabled, bit7 warning, bit9 remote, bit10 target reached, bit11 internal
+    limit active, bit14 stop via STOP key, bit15 direction (1 = reverse). State = ETA & 0x006F.
+  group: status
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 10
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.49
+  - NVE41316 V3.5, sheet Registers, rows 52-86
+  verified: true
+- name: Drivecom status word (alternate address)
+  mnemonic: ETAD
+  address: 8603
+  address_hex: '0x219B'
+  access: R
+  type: WORD (BitString16)
+  unit: null
+  scale: null
+  description: DRIVECOM status word at the 86xx address block.
+  group: status
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 724
+  - NVE41316 V3.5, sheet Registers, rows 62-86
+  verified: true
+- name: Extended state register
+  mnemonic: ETI
+  address: 3206
+  address_hex: '0x0C86'
+  access: R
+  type: WORD (BitString16)
+  unit: null
+  scale: null
+  description: Bit0 EEPROM access, bit2 fault no longer active (not reset), bit4 speed mode, bit5 DC injection, bit6 transient
+    state, bit7 motor thermal threshold, bit8 DC bus overvoltage, bit9 accelerating, bit10 decelerating, bit11 current limit,
+    bit12 fast stop, bits13-14 command source (0/0 terminal, 1/0 remote keypad, 0/1 Modbus, 1/1 CANopen or network card),
+    bit15 reverse before ramp.
+  group: status
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 12
+  - NVE41316 V3.5, sheet Registers, rows 87-108
+  verified: true
+- name: Drive state
+  mnemonic: HMIS
+  address: 3240
+  address_hex: '0x0CA8'
+  access: R
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 'Enumerated drive state: 0 TUN, 1 DCB, 2 RDY, 3 NST, 4 RUN, 5 ACC, 6 DEC, 7 CLI, 8 FST, 9 FLU, 11 NLP (no mains
+    voltage), 12 PRA, 13 CTL, 14 OBR, 15 SOC, 17 USA, 18 TC, 19 ST, 20 FA, 21 OK, 22 EP, 23 FLT (in fault), 25 DCP, 28 SS1,
+    29 SLS, 30 STO.'
+  group: status
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 11
+  - NVE41316 V3.5, sheet Enumerations, rows 265-292
+  verified: true
+  note: The solar firmware adds a [Low Light] LL state (PKR47019.03 p.122); its numeric HMIS value is not listed in NVE41316
+    V3.5. UNVERIFIED for LL.
+- name: Active reference channel
+  mnemonic: CRC
+  address: 8441
+  address_hex: '0x20F9'
+  access: R
+  type: WORD (BitString16)
+  unit: null
+  scale: null
+  description: Bit string of the active reference channel.
+  group: status
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 13
+  verified: true
+- name: Active command channel
+  mnemonic: CCC
+  address: 8442
+  address_hex: '0x20FA'
+  access: R
+  type: WORD (BitString16)
+  unit: null
+  scale: null
+  description: Bit string of the active command channel.
+  group: status
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 14
+  verified: true
+- name: Output (motor) frequency
+  mnemonic: RFR
+  address: 3202
+  address_hex: '0x0C82'
+  access: R
+  type: INT (Signed16)
+  unit: Hz
+  scale: 0.1
+  description: Signed motor frequency.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 21
+  - NVE41295.06 (ATV320 Programming Manual), p.49
+  verified: true
+- name: Output velocity
+  mnemonic: RFRD
+  address: 8604
+  address_hex: '0x219C'
+  access: R
+  type: INT (Signed16)
+  unit: rpm
+  scale: 1
+  description: Signed output speed in rpm. Default second word of the communication scanner input (NMA2 = 8604).
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 20
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+- name: Frequency reference before ramp
+  mnemonic: FRH
+  address: 3203
+  address_hex: '0x0C83'
+  access: R
+  type: INT (Signed16)
+  unit: Hz
+  scale: 0.1
+  description: Signed pre-ramp frequency reference.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 28
+  - NVE41295.06 (ATV320 Programming Manual), p.46 and p.49
+  verified: true
+- name: Speed reference before ramp
+  mnemonic: FRHD
+  address: 8605
+  address_hex: '0x219D'
+  access: R
+  type: INT (Signed16)
+  unit: rpm
+  scale: 1
+  description: Signed pre-ramp speed reference.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 26
+  verified: true
+- name: Motor speed (estimated)
+  mnemonic: SPD
+  address: 12004
+  address_hex: '0x2EE4'
+  access: R
+  type: UINT (Unsigned16)
+  unit: rpm
+  scale: null
+  description: Estimated motor speed in rpm.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 732
+  - NVE41295.06 (ATV320 Programming Manual), p.50
+  verified: false
+  note: Address and unit (rpm, PM p.50) confirmed. Fieldbus scale is given as 'Refer to programming manual' in NVE41316 and
+    the programming manual gives no scale factor. Scale UNVERIFIED; use RFRD (8604, 1 rpm) for a verified speed value.
+- name: Motor current
+  mnemonic: LCR
+  address: 3204
+  address_hex: '0x0C84'
+  access: R
+  type: UINT (Unsigned16)
+  unit: A
+  scale: 0.1
+  description: Estimated motor current, 0.0 .. 6553.5 A.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 23
+  - NVE41295.06 (ATV320 Programming Manual), p.50
+  verified: true
+- name: Motor torque
+  mnemonic: OTR
+  address: 3205
+  address_hex: '0x0C85'
+  access: R
+  type: INT (Signed16)
+  unit: '%'
+  scale: 0.1
+  description: Signed motor torque, 100% = nominal motor torque.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 22
+  - NVE41295.06 (ATV320 Programming Manual), p.50
+  verified: true
+- name: Motor voltage
+  mnemonic: UOP
+  address: 3208
+  address_hex: '0x0C88'
+  access: R
+  type: UINT (Unsigned16)
+  unit: V
+  scale: 1
+  description: Estimated motor voltage.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 24
+  - NVE41295.06 (ATV320 Programming Manual), p.50
+  verified: true
+- name: Motor power
+  mnemonic: OPR
+  address: 3211
+  address_hex: '0x0C8B'
+  access: R
+  type: INT (Signed16)
+  unit: '%'
+  scale: 1
+  description: Signed motor power in percent of nominal motor power (estimated from current measurement).
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 25
+  - NVE41295.06 (ATV320 Programming Manual), p.50
+  verified: true
+- name: Mains voltage
+  mnemonic: ULN
+  address: 3207
+  address_hex: '0x0C87'
+  access: R
+  type: UINT (Unsigned16)
+  unit: V
+  scale: 0.1
+  description: Mains voltage, based on the DC bus measurement, motor running or stopped.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 34
+  - NVE41295.06 (ATV320 Programming Manual), p.49-50
+  verified: true
+  note: Programming manual states the value is derived from the DC bus measurement. On a solar (DC) supply, how this value
+    relates to the PV/DC bus voltage is not documented. Treat as derived, not as a direct DC bus reading.
+- name: Drive thermal state
+  mnemonic: THD
+  address: 3209
+  address_hex: '0x0C89'
+  access: R
+  type: UINT (Unsigned16)
+  unit: '%'
+  scale: 1
+  description: 100% = nominal thermal state, 118% = OHF (drive overheat) threshold. Range 0..200%.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 35
+  - NVE41295.06 (ATV320 Programming Manual), p.50
+  verified: true
+- name: Motor thermal state
+  mnemonic: THR
+  address: 9630
+  address_hex: '0x259E'
+  access: R
+  type: UINT (Unsigned16)
+  unit: '%'
+  scale: 1
+  description: 100% = nominal thermal state, 118% = OLF (motor overload) threshold. Range 0..200%.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 36
+  - NVE41295.06 (ATV320 Programming Manual), p.50
+  verified: true
+- name: Energy consumption counter
+  mnemonic: APH
+  address: 3230
+  address_hex: '0x0C9E'
+  access: R
+  type: UINT (Unsigned16)
+  unit: Wh | kWh | MWh (see UNT bits 0-1)
+  scale: 1
+  description: 'Accumulated energy consumption. The unit is read from UNT (3234) bits 0-1: 0 = Wh, 1 = kWh, 2 = MWh. UNT should
+    be read after APH.'
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 758
+  - NVE41295.06 (ATV320 Programming Manual), p.66
+  - NVE41316 V3.5, sheet Registers, rows 671-674
+  verified: true
+  note: PM p.66 names the unit parameter [Unit] UNI; the communication parameters file names it UNT at address 3234. Single
+    16-bit register (0..65535).
+- name: Motor run time
+  mnemonic: RTH
+  address: 3231
+  address_hex: '0x0C9F'
+  access: R
+  type: UINT (Unsigned16)
+  unit: s | min | h (see UNT bits 4-5)
+  scale: 1
+  description: 'Motor run elapsed time (resettable). Unit from UNT bits 4-5: 0 = s, 1 = min, 2 = h.'
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 37
+  - NVE41295.06 (ATV320 Programming Manual), p.66-67
+  - NVE41316 V3.5, sheet Registers, rows 671-674
+  verified: true
+- name: Power-on time
+  mnemonic: PTH
+  address: 3233
+  address_hex: '0x0CA1'
+  access: R
+  type: UINT (Unsigned16)
+  unit: s | min | h (see UNT bits 2-3)
+  scale: 1
+  description: 'Drive power-on elapsed time. Unit from UNT bits 2-3: 0 = s, 1 = min, 2 = h.'
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 38
+  - NVE41295.06 (ATV320 Programming Manual), p.67
+  - NVE41316 V3.5, sheet Registers, rows 671-674
+  verified: true
+- name: Unit register for APH, PTH, RTH
+  mnemonic: UNT
+  address: 3234
+  address_hex: '0x0CA2'
+  access: R
+  type: WORD (BitString16)
+  unit: null
+  scale: null
+  description: Bits 0-1 APH unit (0 Wh, 1 kWh, 2 MWh); bits 2-3 PTH unit (0 s, 1 min, 2 h); bits 4-5 RTH unit (0 s, 1 min,
+    2 h). Read after the value parameter.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 1071
+  - NVE41316 V3.5, sheet Registers, rows 671-684
+  verified: true
+- name: Counter reset
+  mnemonic: RPR
+  address: 3120
+  address_hex: '0x0C30'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 'Write to reset counters: 0 NO, 1 APH (reset kWh counters), 2 RTH (run time), 3 RTHI, 4 PTH (power-on time),
+    64 ALL.'
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 4
+  - NVE41316 V3.5, sheet Enumerations, rows 709-714
+  - NVE41295.06 (ATV320 Programming Manual), p.67
+  verified: true
+- name: IGBT alarm counter
+  mnemonic: TAC
+  address: 3235
+  address_hex: '0x0CA3'
+  access: R
+  type: UINT (Unsigned16)
+  unit: s
+  scale: 1
+  description: IGBT alarm counter.
+  group: measurements
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 1037
+  verified: true
+- name: Last fault
+  mnemonic: LFT
+  address: 7121
+  address_hex: '0x1BD1'
+  access: R
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Code of the last detected fault, enumerated (see fault_codes.yaml, lft_value).
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 51
+  - NVE41316 V3.5, sheet Enumerations, rows 313-373
+  verified: true
+- name: Fault history n-1
+  mnemonic: DP1
+  address: 7201
+  address_hex: '0x1C21'
+  access: R
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Fault code of the fault n-1; same enumeration as LFT.
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 72
+  verified: true
+- name: Fault history n-2
+  mnemonic: DP2
+  address: 7202
+  address_hex: '0x1C22'
+  access: R
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Fault code of the fault n-2; same enumeration as LFT.
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 88
+  verified: true
+- name: Fault history n-3
+  mnemonic: DP3
+  address: 7203
+  address_hex: '0x1C23'
+  access: R
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Fault code of the fault n-3; same enumeration as LFT.
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 104
+  verified: true
+- name: Fault history n-4
+  mnemonic: DP4
+  address: 7204
+  address_hex: '0x1C24'
+  access: R
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Fault code of the fault n-4; same enumeration as LFT.
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 120
+  verified: true
+- name: Fault history n-5
+  mnemonic: DP5
+  address: 7205
+  address_hex: '0x1C25'
+  access: R
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Fault code of the fault n-5; same enumeration as LFT.
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 136
+  verified: true
+- name: Fault history n-6
+  mnemonic: DP6
+  address: 7206
+  address_hex: '0x1C26'
+  access: R
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Fault code of the fault n-6; same enumeration as LFT.
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 152
+  verified: true
+- name: Fault history n-7
+  mnemonic: DP7
+  address: 7207
+  address_hex: '0x1C27'
+  access: R
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Fault code of the fault n-7; same enumeration as LFT.
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 168
+  verified: true
+- name: Fault history n-8
+  mnemonic: DP8
+  address: 7208
+  address_hex: '0x1C28'
+  access: R
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Fault code of the fault n-8; same enumeration as LFT.
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 184
+  verified: true
+- name: Fault counter
+  mnemonic: FNB
+  address: 7393
+  address_hex: '0x1CE1'
+  access: R
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Number of detected faults.
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 55
+  verified: true
+- name: CiA402 fault code
+  mnemonic: ERRD
+  address: 8606
+  address_hex: '0x219E'
+  access: R
+  type: WORD (BitString16)
+  unit: null
+  scale: null
+  description: CiA402 error code of the active fault.
+  group: faults
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 50
+  verified: true
+- name: Modbus slave address
+  mnemonic: ADD
+  address: 6001
+  address_hex: '0x1771'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: 0 = OFF (not assigned, factory setting), 1..247. Address 0 in a request is broadcast. Restart the drive after
+    changing.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 657
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.17, p.32, p.60
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Modbus baud rate
+  mnemonic: TBR
+  address: 6003
+  address_hex: '0x1773'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 'Enumeration: 24 = 4800, 28 = 9600, 32 = 19200 (factory), 36 = 38400.'
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 659
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.32
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Modbus format
+  mnemonic: TFO
+  address: 6004
+  address_hex: '0x1774'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 'Enumeration: 2 = 8O1, 3 = 8E1 (factory), 4 = 8N1, 5 = 8N2.'
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 660
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.32
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Modbus timeout
+  mnemonic: TTO
+  address: 6005
+  address_hex: '0x1775'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: s
+  scale: 0.1
+  description: Communication timeout 0.1..30.0 s, factory 10.0 s. Expiry raises SLF1 (response per SLL).
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 661
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.33
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Modbus fault management
+  mnemonic: SLL
+  address: 7010
+  address_hex: '0x1B62'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 'Response to Modbus communication interruption. Factory: freewheel stop with fault (YES). Other values: RMP,
+    FST, DCI (fault), NO (ignore), STT, LFF (fallback speed), RLS (maintain speed).'
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 614
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.66
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner input 1 address
+  mnemonic: NMA1
+  address: 12701
+  address_hex: '0x319D'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner input word 1. Factory 3201 (ETA).
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 637
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner input 2 address
+  mnemonic: NMA2
+  address: 12702
+  address_hex: '0x319E'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner input word 2. Factory 8604 (RFRD).
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 638
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner input 3 address
+  mnemonic: NMA3
+  address: 12703
+  address_hex: '0x319F'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner input word 3. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 639
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner input 4 address
+  mnemonic: NMA4
+  address: 12704
+  address_hex: '0x31A0'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner input word 4. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 640
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner input 5 address
+  mnemonic: NMA5
+  address: 12705
+  address_hex: '0x31A1'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner input word 5. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 641
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner input 6 address
+  mnemonic: NMA6
+  address: 12706
+  address_hex: '0x31A2'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner input word 6. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 642
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner input 7 address
+  mnemonic: NMA7
+  address: 12707
+  address_hex: '0x31A3'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner input word 7. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 643
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner input 8 address
+  mnemonic: NMA8
+  address: 12708
+  address_hex: '0x31A4'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner input word 8. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 644
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner output 1 address
+  mnemonic: NCA1
+  address: 12721
+  address_hex: '0x31B1'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner output word 1. Factory 8501 (CMD).
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 629
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner output 2 address
+  mnemonic: NCA2
+  address: 12722
+  address_hex: '0x31B2'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner output word 2. Factory 8602 (LFRD).
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 630
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner output 3 address
+  mnemonic: NCA3
+  address: 12723
+  address_hex: '0x31B3'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner output word 3. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 631
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner output 4 address
+  mnemonic: NCA4
+  address: 12724
+  address_hex: '0x31B4'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner output word 4. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 632
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner output 5 address
+  mnemonic: NCA5
+  address: 12725
+  address_hex: '0x31B5'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner output word 5. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 633
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner output 6 address
+  mnemonic: NCA6
+  address: 12726
+  address_hex: '0x31B6'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner output word 6. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 634
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner output 7 address
+  mnemonic: NCA7
+  address: 12727
+  address_hex: '0x31B7'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner output word 7. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 635
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner output 8 address
+  mnemonic: NCA8
+  address: 12728
+  address_hex: '0x31B8'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Logical address mapped to scanner output word 8. Factory 0.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 636
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Com scanner input 1 value
+  mnemonic: NM1
+  address: 12741
+  address_hex: '0x31C5'
+  access: R
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value of the parameter addressed by NMA1; readable as a block from 12741.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 220
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+- name: Com scanner input 2 value
+  mnemonic: NM2
+  address: 12742
+  address_hex: '0x31C6'
+  access: R
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value of the parameter addressed by NMA2; readable as a block from 12741.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 221
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+- name: Com scanner input 3 value
+  mnemonic: NM3
+  address: 12743
+  address_hex: '0x31C7'
+  access: R
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value of the parameter addressed by NMA3; readable as a block from 12741.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 222
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+- name: Com scanner input 4 value
+  mnemonic: NM4
+  address: 12744
+  address_hex: '0x31C8'
+  access: R
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value of the parameter addressed by NMA4; readable as a block from 12741.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 223
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+- name: Com scanner input 5 value
+  mnemonic: NM5
+  address: 12745
+  address_hex: '0x31C9'
+  access: R
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value of the parameter addressed by NMA5; readable as a block from 12741.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 224
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+- name: Com scanner input 6 value
+  mnemonic: NM6
+  address: 12746
+  address_hex: '0x31CA'
+  access: R
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value of the parameter addressed by NMA6; readable as a block from 12741.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 225
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+- name: Com scanner input 7 value
+  mnemonic: NM7
+  address: 12747
+  address_hex: '0x31CB'
+  access: R
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value of the parameter addressed by NMA7; readable as a block from 12741.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 226
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+- name: Com scanner input 8 value
+  mnemonic: NM8
+  address: 12748
+  address_hex: '0x31CC'
+  access: R
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value of the parameter addressed by NMA8; readable as a block from 12741.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 227
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+- name: Com scanner output 1 value
+  mnemonic: NC1
+  address: 12761
+  address_hex: '0x31D9'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value written to the parameter addressed by NCA1; writable as a block from 12761.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 212
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  note: NVE41316 lists access R; NVE41308 p.63 shows the master writing these words (function 23). Access RW taken from NVE41308.
+- name: Com scanner output 2 value
+  mnemonic: NC2
+  address: 12762
+  address_hex: '0x31DA'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value written to the parameter addressed by NCA2; writable as a block from 12761.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 213
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  note: NVE41316 lists access R; NVE41308 p.63 shows the master writing these words (function 23). Access RW taken from NVE41308.
+- name: Com scanner output 3 value
+  mnemonic: NC3
+  address: 12763
+  address_hex: '0x31DB'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value written to the parameter addressed by NCA3; writable as a block from 12761.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 214
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  note: NVE41316 lists access R; NVE41308 p.63 shows the master writing these words (function 23). Access RW taken from NVE41308.
+- name: Com scanner output 4 value
+  mnemonic: NC4
+  address: 12764
+  address_hex: '0x31DC'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value written to the parameter addressed by NCA4; writable as a block from 12761.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 215
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  note: NVE41316 lists access R; NVE41308 p.63 shows the master writing these words (function 23). Access RW taken from NVE41308.
+- name: Com scanner output 5 value
+  mnemonic: NC5
+  address: 12765
+  address_hex: '0x31DD'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value written to the parameter addressed by NCA5; writable as a block from 12761.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 216
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  note: NVE41316 lists access R; NVE41308 p.63 shows the master writing these words (function 23). Access RW taken from NVE41308.
+- name: Com scanner output 6 value
+  mnemonic: NC6
+  address: 12766
+  address_hex: '0x31DE'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value written to the parameter addressed by NCA6; writable as a block from 12761.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 217
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  note: NVE41316 lists access R; NVE41308 p.63 shows the master writing these words (function 23). Access RW taken from NVE41308.
+- name: Com scanner output 7 value
+  mnemonic: NC7
+  address: 12767
+  address_hex: '0x31DF'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value written to the parameter addressed by NCA7; writable as a block from 12761.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 218
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  note: NVE41316 lists access R; NVE41308 p.63 shows the master writing these words (function 23). Access RW taken from NVE41308.
+- name: Com scanner output 8 value
+  mnemonic: NC8
+  address: 12768
+  address_hex: '0x31E0'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: null
+  scale: 1
+  description: Value written to the parameter addressed by NCA8; writable as a block from 12761.
+  group: communication_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 219
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.63
+  verified: true
+  note: NVE41316 lists access R; NVE41308 p.63 shows the master writing these words (function 23). Access RW taken from NVE41308.
+- name: Reference channel 1
+  mnemonic: FR1
+  address: 8413
+  address_hex: '0x20DD'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 'Enumeration (PSA list): 164 = MDB (reference via Modbus), 163 = LCC (HMI), 1/2/3 = AI1/AI2/AI3, 167 = CAN,
+    169 = NET.'
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 413
+  - NVE41316 V3.5, sheet Enumerations, rows 420-462
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.60, p.70
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Control mode (profile)
+  mnemonic: CHCF
+  address: 8401
+  address_hex: '0x20D1'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 1 = SIM (CiA402 not separate; standard factory), 2 = SEP (CiA402 separate; Altivar Solar factory), 3 = IO (I/O
+    profile).
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 416
+  - NVE41316 V3.5, sheet Enumerations, rows 70-72
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.70
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.96
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Command channel 1
+  mnemonic: CD1
+  address: 8423
+  address_hex: '0x20E7'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 1 = TER (terminals, factory), 2 = LOC, 3 = LCC (HMI), 10 = MDB (Modbus), 20 = CAN, 30 = NET.
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 418
+  - NVE41316 V3.5, sheet Enumerations, rows 54-59
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.69, p.71
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Command channel switching
+  mnemonic: CCS
+  address: 8421
+  address_hex: '0x20E5'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Standard factory CD1 (command channel 1); Altivar Solar factory LI4 (DI4 selects between CD1 and CD2).
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 417
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.96
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Reference switching
+  mnemonic: RFC
+  address: 8411
+  address_hex: '0x20DB'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Reference channel switching assignment. Standard factory FR1; Altivar Solar factory LI4 (DI4).
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 420
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.70
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.96
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Reference channel 2
+  mnemonic: FR2
+  address: 8414
+  address_hex: '0x20DE'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 'Same enumeration as FR1. Altivar Solar factory setting: MDB (164), reference via Modbus; standard ATV320 factory:
+    NO.'
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 421
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.96
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Command channel 2
+  mnemonic: CD2
+  address: 8424
+  address_hex: '0x20E8'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Same enumeration as CD1. Factory MDB (10) per NVE41316.
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 419
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Reverse assignment
+  mnemonic: RRS
+  address: 11105
+  address_hex: '0x2B61'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Input or control bit assigned to reverse. Standard factory LI2 (and CMD bit 11 in CiA402); Altivar Solar factory
+    NO.
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 383
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.96
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.48
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Reverse direction inhibit
+  mnemonic: RIN
+  address: 3108
+  address_hex: '0x0C24'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: NO / YES. Altivar Solar factory YES (reverse disabled); standard factory NO.
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 414
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.96
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Disable operation option code
+  mnemonic: DOTD
+  address: 8652
+  address_hex: '0x21CC'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 'Reaction to Disable operation (CMD 0x000F -> 0x0007): 0 = NST freewheel, 1 = RMP ramp stop (factory).'
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 235
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.43
+  - NVE41316 V3.5, sheet Enumerations, rows 121-122
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Quick stop option code
+  mnemonic: QSTD
+  address: 8651
+  address_hex: '0x21CB'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 2 = FST2 (fast stop then Switch on disabled), 6 = FST6 (fast stop then remain in Quick stop active, factory).
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 236
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.44
+  - NVE41316 V3.5, sheet Enumerations, rows 702-703
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Type of stop
+  mnemonic: STT
+  address: 11201
+  address_hex: '0x2BC1'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Stop type used by the Halt bit (CMD bit 8). Factory RMP (ramp stop).
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 449
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.47
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Macro configuration
+  mnemonic: CFG
+  address: 3052
+  address_hex: '0x0BEC'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: Macro configuration. NVE41316 lists 0 STS, 1 HDG, 2 HST, 3 GEN, 4 PID, 5 NET.
+  group: channel_config
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 766
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.98
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+  note: Altivar Solar factory value is [Solar Application] SUN (PKR47019.03 p.98); the numeric value of SUN is not in NVE41316
+    V3.5. UNVERIFIED for SUN.
+- name: Acceleration ramp time
+  mnemonic: ACC
+  address: 9001
+  address_hex: '0x2329'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: s
+  scale: 0.1
+  description: Acceleration time; unit set by INR (factory 0.1 s). Factory value 30 (3.0 s) on standard ATV320, 100 (10.0
+    s) on Altivar Solar.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 438
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.19 (example W9001 = 0x000D = 1.3 s)
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.96
+  verified: true
+  note: Scale 0.1 s holds for the factory INR setting (01 = tenths of seconds). If INR is changed to 0.01 s or 1 s the scale
+    changes.
+- name: Deceleration ramp time
+  mnemonic: DEC
+  address: 9002
+  address_hex: '0x232A'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: s
+  scale: 0.1
+  description: Deceleration time; unit set by INR (factory 0.1 s). Factory value 30 (3.0 s) on standard ATV320, 100 (10.0
+    s) on Altivar Solar.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 439
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.20
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.96
+  verified: true
+  note: Scale depends on INR, as for ACC.
+- name: Ramp increment
+  mnemonic: INR
+  address: 9020
+  address_hex: '0x233C'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: 0 = 0.01 s, 1 = 0.1 s (factory), 2 = 1 s.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 437
+  - NVE41316 V3.5, sheet Enumerations, rows 299-301
+  verified: true
+- name: High speed
+  mnemonic: HSP
+  address: 3104
+  address_hex: '0x0C20'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: Hz
+  scale: 0.1
+  description: Upper frequency limit.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 305
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.19
+  verified: true
+- name: Low speed
+  mnemonic: LSP
+  address: 3105
+  address_hex: '0x0C21'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: Hz
+  scale: 0.1
+  description: Lower frequency limit.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 304
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.19
+  verified: true
+- name: Maximum output frequency
+  mnemonic: TFR
+  address: 3103
+  address_hex: '0x0C1F'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: Hz
+  scale: 0.1
+  description: Maximum frequency, 10.0 .. 599.0 Hz.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 335
+  - NVE41308 (ATV320 Modbus Serial Link Manual, 04/2016), p.19
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Nominal motor voltage
+  mnemonic: UNS
+  address: 9601
+  address_hex: '0x2581'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: V
+  scale: 1
+  description: Nameplate voltage, 100..690 V.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 331
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Nominal motor current
+  mnemonic: NCR
+  address: 9603
+  address_hex: '0x2583'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: A
+  scale: 0.1
+  description: Nameplate current.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 332
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Nominal motor frequency
+  mnemonic: FRS
+  address: 9602
+  address_hex: '0x2582'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: Hz
+  scale: 0.1
+  description: Nameplate frequency, 10.0..800.0 Hz.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 333
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Nominal motor speed
+  mnemonic: NSP
+  address: 9604
+  address_hex: '0x2584'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: rpm
+  scale: 1
+  description: Nameplate speed.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 334
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Nominal motor power
+  mnemonic: NPR
+  address: 9613
+  address_hex: '0x258D'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: kW or HP (per BFR)
+  scale: null
+  description: Nameplate power; kW if [Motor Standard] BFR = 50 Hz, HP if 60 Hz.
+  group: drive_settings
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 329
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.99
+  verified: false
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+  note: Address confirmed. Fieldbus scale given as 'Refer to programming manual' in NVE41316; scale factor not found. UNVERIFIED
+    scale.
+- name: Underload detection delay
+  mnemonic: ULT
+  address: 14411
+  address_hex: '0x384B'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: s
+  scale: 1
+  description: 0..100 s; 0 disables process underload (dry-run) detection.
+  group: underload_dry_run
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 710
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.119
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Underload threshold at nominal speed
+  mnemonic: LUN
+  address: 14416
+  address_hex: '0x3850'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: '%'
+  scale: 1
+  description: 20..100 % of rated motor torque.
+  group: underload_dry_run
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 715
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.119
+  verified: true
+  note: 'Factory value differs between sources: NVE41316 gives 60 %, PKR47019.03 p.119 gives 50 %.'
+- name: Underload threshold at zero speed
+  mnemonic: LUL
+  address: 14415
+  address_hex: '0x384F'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: '%'
+  scale: 1
+  description: 0..LUN % of rated motor torque.
+  group: underload_dry_run
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 714
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.119
+  verified: true
+- name: Underload minimum frequency threshold
+  mnemonic: RMUD
+  address: 14414
+  address_hex: '0x384E'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: Hz
+  scale: 0.1
+  description: Underload detection inactive below this frequency.
+  group: underload_dry_run
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 713
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.119
+  verified: true
+- name: Hysteresis frequency (steady state)
+  mnemonic: SRB
+  address: 14401
+  address_hex: '0x3841'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: Hz
+  scale: 0.1
+  description: Max deviation between reference and motor frequency defining steady state.
+  group: underload_dry_run
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 711
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.119
+  verified: true
+- name: Underload error response
+  mnemonic: UDL
+  address: 14412
+  address_hex: '0x384C'
+  access: RW
+  type: WORD (Enumeration)
+  unit: null
+  scale: null
+  description: NO ignore, YES freewheel stop (factory), RMP ramp stop, FST fast stop.
+  group: underload_dry_run
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 712
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.119-120
+  verified: true
+  write_condition: 'R/WS: writable only when the motor is stopped (spreadsheet access class R/WS)'
+- name: Underload time before restart
+  mnemonic: FTU
+  address: 14413
+  address_hex: '0x384D'
+  access: RW
+  type: UINT (Unsigned16)
+  unit: min
+  scale: 1
+  description: 0..6 min, minimum time between underload detection and automatic restart.
+  group: underload_dry_run
+  source:
+  - NVE41316 V3.5 (ATV320 communication parameters), sheet Parameters, row 726
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.120
+  verified: true
+- name: PV supply assign (MPPT enable)
+  mnemonic: PVSA
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: null
+  scale: null
+  description: YES (factory) activates MPPT; NO disables; or assigned to a digital input. When active, PHF detection is disabled.
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.121
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: Low voltage assign (extended DC range)
+  mnemonic: LDCA
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: null
+  scale: null
+  description: 'NO = standard range (M3: 199..374 VDC, N4: 390..778 VDC); YES = extended range (M3: 150..374 VDC, N4: 280..778
+    VDC); or digital input.'
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.121
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: Low light duration
+  mnemonic: LITR
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: s
+  scale: null
+  description: 0..3600 s, factory 30 s. Time the drive stays in Low Light (LL) state instead of RUN after a USF from insufficient
+    PV power.
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.122
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: Global MPPT mode
+  mnemonic: GPPT
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: null
+  scale: null
+  description: NO (disabled, factory) or TMR (timer).
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.123
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: GMPPT timer
+  mnemonic: GPTT
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: min
+  scale: null
+  description: 1..1000 min, factory 10 min.
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.123
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: Estimated pump flow
+  mnemonic: SLFV
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: m3/h
+  scale: null
+  description: Sensorless estimated pump flow, 0..3276.7 m3/h (accuracy about +/-20 %).
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.113
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: Pumped volume
+  mnemonic: PVLD
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: m3
+  scale: null
+  description: Volume pumped since last power-up or RPR, 0..6553.5 m3.
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.117
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: Cumulated pumped volume
+  mnemonic: PVLT
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: dam3
+  scale: null
+  description: Volume pumped since last RPR, 0..6553.5 dam3.
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.117
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: Volume source
+  mnemonic: PVCS
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: null
+  scale: null
+  description: NO, SLFV (flow estimation) or SPUC (slow pulse counter).
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.117
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: Pump curve flow points
+  mnemonic: PCQ1-PCQ5
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: m3/h
+  scale: null
+  description: Flow points of the power/flow curve, 0..3276.7 m3/h.
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.113
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: Pump curve power points
+  mnemonic: PCP1-PCP5
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: kW
+  scale: null
+  description: Mechanical power points of the power/flow curve, 0..327.67 kW.
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.113
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: Anti-jam status
+  mnemonic: JAMS
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: null
+  scale: null
+  description: Anti-jam function status (NONE, NACT, PEND, RUN).
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.110
+  verified: false
+  note: 'UNVERIFIED: no Modbus address published in NVE41316 V3.5 or PKR47019.03.'
+- name: DC bus / PV input voltage
+  mnemonic: DC_BUS_VOLTAGE
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: V
+  scale: null
+  description: No dedicated DC bus voltage monitoring register found. ULN (3207) is documented as derived from the DC bus
+    measurement.
+  group: solar
+  source:
+  - NVE41295.06 (ATV320 Programming Manual), p.49-50
+  verified: false
+  note: 'UNVERIFIED: no register documented.'
+- name: PV input power
+  mnemonic: SOLAR_POWER
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: W
+  scale: null
+  description: No PV input power register found in any manual. OPR (3211) gives motor power in % of nominal.
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024)
+  verified: false
+  note: 'UNVERIFIED: no register documented.'
+- name: MPPT / GMPPT running state
+  mnemonic: MPPT_STATE
+  address: null
+  address_hex: null
+  access: null
+  type: null
+  unit: null
+  scale: null
+  description: GMPPT activity is shown only as 'GPPT' on the display terminal; no fieldbus status register documented.
+  group: solar
+  source:
+  - PKR47019.03 (Altivar Solar ATV320 User Manual, 11/2024), p.122
+  verified: false
+  note: 'UNVERIFIED: no register documented.'
