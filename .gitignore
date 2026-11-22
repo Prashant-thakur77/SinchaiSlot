@@ -38,3 +38,6 @@ reports/proof_quick.json
 
 # PlatformIO build output
 .pio/
+
+# Design reference captures (local only)
+.design-refs/

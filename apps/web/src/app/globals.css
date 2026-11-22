@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+:root {
+  --night: #0e1512;
+  --night-2: #142019;
+  --night-3: #1b2a22;
+  --soil: #2a3a30;
+  --mist: #9fb0a6;
+  --fog: #c9d3cd;
+  --paper: #f3eee2;
+  --paper-2: #e8e1d0;
+  --ink: #13201a;
+  --sun: #f5b83d;
+  --sun-deep: #e39b12;
+  --water: #3ba7e5;
+  --water-deep: #1f7fb8;
+  --leaf: #5bbf6a;
+  --se: #3dcd58;
+  --fault: #e5484d;
+  --ease-precise: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --ease-fill: cubic-bezier(0.65, 0, 0.35, 1);
+  --d-quick: 160ms;
+  --d-ui: 280ms;
+  --d-flow: 520ms;
+  --d-story: 1100ms;
+}
+
+@theme inline {
+  --color-night: var(--night);
+  --color-night-2: var(--night-2);
+  --color-night-3: var(--night-3);
+  --color-soil: var(--soil);
+  --color-mist: var(--mist);
+  --color-fog: var(--fog);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-sun: var(--sun);
+  --color-sun-deep: var(--sun-deep);
+  --color-water: var(--water);
+  --color-water-deep: var(--water-deep);
+  --color-leaf: var(--leaf);
+  --color-se: var(--se);
+  --color-fault: var(--fault);
+  --font-display: var(--font-bricolage);
+  --font-serif: var(--font-newsreader);
+  --font-sans: var(--font-geist), var(--font-devanagari);
+  --font-mono: var(--font-geist-mono);
+  --font-deva: var(--font-devanagari);
+}
+
+html {
+  background: var(--night);
+  color-scheme: dark;
+}
+
+body {
+  background: var(--night);
+  color: #e9efe9;
+  font-family: var(--font-geist), var(--font-devanagari), system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+.num {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "zero";
+}
+
+.deva {
+  font-family: var(--font-devanagari), var(--font-geist), sans-serif;
+  line-height: 1.7;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sun);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--sun);
+  color: var(--ink);
+}
+
+/* Ledger paper for receipts */
+.paper {
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 23px, rgba(19, 32, 26, 0.07) 23px 24px),
+    var(--paper);
+  color: var(--ink);
+}
+
+.perforated {
+  -webkit-mask: radial-gradient(circle 5px at 8px 0, transparent 98%, #000) -8px 0 / 16px 100% repeat-x;
+  mask: radial-gradient(circle 5px at 8px 0, transparent 98%, #000) -8px 0 / 16px 100% repeat-x;
+}
+
+@media (max-width: 1023px) {
+  .grain::after {
+    display: none;
+  }
+}
+
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.flow-line {
+  stroke-dasharray: 4 8;
+  animation: flow-dash var(--flow-dur, 1.2s) linear infinite;
+}
+
+@keyframes print {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(-8px);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+
+.print-in {
+  animation: print 480ms var(--ease-precise) both;
+}
+
+@keyframes ring {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-8deg); }
+  40% { transform: rotate(7deg); }
+  60% { transform: rotate(-5deg); }
+  80% { transform: rotate(3deg); }
+}
+
+.ringing {
+  animation: ring 0.6s ease-in-out 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .flow-line {
+    stroke-dasharray: none;
+  }
+}
+
+/* Saur Mitra PWA: light, high-contrast outdoor theme */
+.mitra {
+  background: var(--paper);
+  color: var(--ink);
+  color-scheme: light;
+}

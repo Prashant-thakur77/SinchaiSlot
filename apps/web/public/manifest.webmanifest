@@ -1,0 +1,11 @@
+{
+  "name": "SinchaiSlot Saur Mitra",
+  "short_name": "Saur Mitra",
+  "lang": "hi",
+  "start_url": "/mitra",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F3EEE2",
+  "theme_color": "#13201A",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
