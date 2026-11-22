@@ -4,7 +4,6 @@ crop-water caps respected, secondary loads never take energy the pump needs."""
 import numpy as np
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
-
 from sinchai_planner.optimizer import Loads, PlanInput, Request, scenarios_from_quantiles, solve
 from sinchai_planner.replan import explain_diff, replan
 

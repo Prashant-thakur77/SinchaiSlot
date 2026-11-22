@@ -3,7 +3,6 @@
 from datetime import datetime, timedelta
 
 import pytest
-
 from sinchai_devices.adapter import InProcessAltivar
 from sinchai_devices.altivar_model import AltivarModel
 from sinchai_edge.controller import EdgeController, MemoryUplink, unlock_code

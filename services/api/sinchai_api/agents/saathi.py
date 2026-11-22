@@ -29,16 +29,31 @@ def _farmer(fid: str) -> db.Farmer:
 
 def callback_message(f: db.Farmer, change: dict) -> str:
     lang = f.language if f.language in ("hi", "mai", "bho", "en") else "hi"
-    old = "-".join([change["old_slots"][0], change["old_slots"][-1]]) if change.get("old_slots") else "-"
-    new = "-".join([change["new_slots"][0], change["new_slots"][-1]]) if change.get("new_slots") else "-"
+    old = fmt_range(change.get("old_slots") or [])
+    new = fmt_range(change.get("new_slots") or [])
     key = {"moved": "callback_moved", "dropped": "callback_dropped", "added": "callback_added"}[change["kind"]]
-    return i18n.say(key, lang, name=f.display_name.split()[0], old=old, new=new)
+    short = change.get("old_m3", 0) - change.get("new_m3", 0)
+    if key == "callback_moved" and short > 2:
+        # Never tell a farmer they get the same water when they do not.
+        key = "callback_moved_partial"
+    return i18n.say(key, lang, name=f.display_name.split()[0], old=old, new=new,
+                    today=round(change.get("new_m3", 0)), rest=round(max(short, 0)))
 
 
 def _offer_text(lang: str, r: dict, name: str) -> str:
-    return i18n.say("offer", lang, crop=i18n.crop_name(r["crop"], lang), m3=round(r["need_m3"]), start=r["window_start"],
-                    end=r["window_end"], price=int(r["price_rs"]),
-                    saving=int(r["diesel_equivalent_rs"] - r["price_rs"]))
+    key = "offer_partial" if r.get("carry_over_m3", 0) > 3 else "offer"
+    return i18n.say(key, lang, crop=i18n.crop_name(r["crop"], lang), m3=round(r["need_m3"]), start=r["window_start"],
+                    end=r["window_end"], price=int(r["price_rs"]), today=round(r.get("expected_m3_p50", 0)),
+                    rest=round(r.get("carry_over_m3", 0)), saving=int(r["diesel_equivalent_rs"] - r["price_rs"]))
+
+
+def fmt_range(slots: list[str]) -> str:
+    """'13:00','13:30' -> '13:00-14:00' (slot starts to the end of the last 30-minute slot)."""
+    if not slots:
+        return "-"
+    h, m = map(int, slots[-1].split(":"))
+    m += 30
+    return f"{slots[0]}-{h + m // 60:02d}:{m % 60:02d}"
 
 
 def handle(session_id: str, farmer_id: str, text: str, channel: str = "ivr", opening: bool = False) -> dict:
@@ -77,7 +92,8 @@ def handle(session_id: str, farmer_id: str, text: str, channel: str = "ivr", ope
                 return done(i18n.say("status", lang, list=f"{r.get('booking_id')} {r.get('slot_start')}-{r.get('slot_end')}"))
             runtime.remember(farmer_id, "last_booking", r["booking_id"])
             return done(i18n.say("booked", lang, booking_id=r["booking_id"], start=r.get("slot_start") or "-",
-                                 end=r.get("slot_end") or "-", m3=round(r["m3"]), price=int(r["price_rs"])))
+                                 end=r.get("slot_end") or "-", m3=round(r.get("expected_today_m3") or r["m3"]),
+                                 price=int(r["price_rs"])))
         if pend.tool == "cancel_slot":
             return done(i18n.say("cancelled", lang, booking_id=r["booking_id"], refund=int(r["refund_to_balance_rs"])))
         if pend.tool == "book_seller":
@@ -107,6 +123,7 @@ def handle(session_id: str, farmer_id: str, text: str, channel: str = "ivr", ope
             if pending.tool == "book_slot":
                 r = run.call("find_slots", {"farmer_id": farmer_id, "m3": pending.args.get("m3")}, ctx)
                 if r.get("available"):
+                    sess.pending.args = {**pending.args, "offer_token": r["offer_token"]}
                     return done(_offer_text(lang, r, name))
                 sess.pending = None
                 return done(i18n.say("no_sun", lang))
@@ -127,7 +144,8 @@ def handle(session_id: str, farmer_id: str, text: str, channel: str = "ivr", ope
             if r.get("reason") == "crop_need_met":
                 return done(prefix + i18n.say("need_met", lang, crop=i18n.crop_name(r["crop"], lang)))
             return done(prefix + i18n.say("no_sun", lang))
-        sess.pending = runtime.Pending("book_slot", {"farmer_id": farmer_id, "plot_id": r["plot_id"], "m3": r["need_m3"]}, r)
+        sess.pending = runtime.Pending("book_slot", {"farmer_id": farmer_id, "plot_id": r["plot_id"], "m3": r["need_m3"],
+                                                     "offer_token": r["offer_token"]}, r)
         run.propose("book_slot", sess.pending.args)
         return done(prefix + _offer_text(lang, r, name))
     if intent == "price":
@@ -165,8 +183,8 @@ def handle(session_id: str, farmer_id: str, text: str, channel: str = "ivr", ope
         c = r.get("change")
         if not c:
             return done(i18n.say("why_none", lang))
-        old = c["old_slots"][0] if c["old_slots"] else "-"
-        new = c["new_slots"][0] if c["new_slots"] else "-"
+        old = fmt_range(c["old_slots"])
+        new = fmt_range(c["new_slots"])
         return done(i18n.say("why", lang, at=r["at"], old=old, new=new))
     if intent == "status":
         r = run.call("my_bookings", {"farmer_id": farmer_id}, ctx)

@@ -17,7 +17,6 @@ from datetime import date, timedelta
 
 import numpy as np
 import pandas as pd
-
 from sinchai_devices.physics import PumpModel, default_pump
 from sinchai_jal.budget import WaterBudget
 from sinchai_schemas import constants as C

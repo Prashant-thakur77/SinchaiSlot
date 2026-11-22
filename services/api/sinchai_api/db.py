@@ -231,32 +231,24 @@ def init_db(drop: bool = False) -> None:
         Base.metadata.drop_all(eng)
     Base.metadata.create_all(eng)
     if eng.dialect.name == "postgresql":
+        # Each step in its own transaction: in Postgres a failed statement aborts its transaction.
+        # TimescaleDB for telemetry, PostGIS geometry for plots, a read-only analyst role; each is
+        # optional and the platform works on plain Postgres without them.
+        _try(eng, "CREATE EXTENSION IF NOT EXISTS timescaledb")
+        _try(eng, "CREATE EXTENSION IF NOT EXISTS postgis")
+        _try(eng, "ALTER TABLE telemetry DROP CONSTRAINT IF EXISTS telemetry_pkey",
+             "SELECT create_hypertable('telemetry', 'ts', if_not_exists => TRUE, migrate_data => TRUE)")
+        _try(eng, "ALTER TABLE plots ADD COLUMN IF NOT EXISTS geom geometry(Polygon, 4326)",
+             "UPDATE plots SET geom = ST_SetSRID(ST_GeomFromGeoJSON(geojson::text), 4326) WHERE geom IS NULL")
+        _try(eng, "DO $$ BEGIN CREATE ROLE sinchai_analyst NOLOGIN; EXCEPTION WHEN duplicate_object THEN NULL; END $$",
+             *[f"GRANT SELECT ON {t} TO sinchai_analyst" for t in sorted(ANALYST_TABLES)])
+
+
+def _try(eng, *stmts: str) -> bool:
+    try:
         with eng.begin() as c:
-            # TimescaleDB for telemetry, PostGIS geometry for plots, when the extensions exist.
-            for stmt in (
-                "CREATE EXTENSION IF NOT EXISTS timescaledb",
-                "CREATE EXTENSION IF NOT EXISTS postgis",
-            ):
-                try:
-                    c.execute(text(stmt))
-                except Exception:  # extension not installed: carry on with plain Postgres
-                    pass
-        with eng.begin() as c:
-            try:
-                c.execute(text("ALTER TABLE telemetry DROP CONSTRAINT IF EXISTS telemetry_pkey"))
-                c.execute(text("SELECT create_hypertable('telemetry', 'ts', if_not_exists => TRUE, migrate_data => TRUE)"))
-            except Exception:
-                pass
-        with eng.begin() as c:
-            try:
-                c.execute(text("ALTER TABLE plots ADD COLUMN IF NOT EXISTS geom geometry(Polygon, 4326)"))
-                c.execute(text("UPDATE plots SET geom = ST_SetSRID(ST_GeomFromGeoJSON(geojson::text), 4326) WHERE geom IS NULL"))
-            except Exception:
-                pass
-        with eng.begin() as c:
-            try:
-                c.execute(text("DO $$ BEGIN CREATE ROLE sinchai_analyst NOLOGIN; EXCEPTION WHEN duplicate_object THEN NULL; END $$"))
-                for t in ANALYST_TABLES:
-                    c.execute(text(f"GRANT SELECT ON {t} TO sinchai_analyst"))
-            except Exception:
-                pass
+            for st in stmts:
+                c.execute(text(st))
+        return True
+    except Exception:
+        return False

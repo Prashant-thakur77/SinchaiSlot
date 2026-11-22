@@ -11,10 +11,9 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+from sinchai_devices import altivar_map as M
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
-from sinchai_devices import altivar_map as M
 
 # Field checks that come before the manual's remedies (observations the agent asks for).
 FIELD_CHECKS: dict[str, list[dict]] = {

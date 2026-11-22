@@ -69,6 +69,38 @@ def crop_on(plot, day: date) -> tuple[str, str]:
     return "fallow", "-"
 
 
+SNAPSHOT_COLS = ("id", "farmer_id", "plot_id", "pump_id", "day", "m3_requested", "price_rs", "status", "channel", "paid")
+
+
+def save_snapshot(s) -> None:
+    """Remember the seeded state so a demo reset can restore it exactly (demo mode only)."""
+    snap = {
+        "ledger_seq": max([r.seq for r in s.query(db.LedgerRow).all()] or [0]),
+        "bookings": [{c: getattr(b, c) for c in SNAPSHOT_COLS} for b in s.query(db.Booking).all()],
+        "balances": {f.id: f.balance_rs for f in s.query(db.Farmer).all()},
+    }
+    s.merge(db.Memory(farmer_id="H00", key="__demo_snapshot__", value=snap))
+    s.commit()
+
+
+def restore_snapshot() -> None:
+    with db.session() as s:
+        m = s.get(db.Memory, ("H00", "__demo_snapshot__"))
+        if m is None:
+            return
+        snap = m.value
+        s.query(db.LedgerRow).filter(db.LedgerRow.seq > snap["ledger_seq"]).delete()
+        s.query(db.Booking).delete()
+        for b in snap["bookings"]:
+            s.add(db.Booking(**b))
+        for fid, bal in snap["balances"].items():
+            f = s.get(db.Farmer, fid)
+            if f is not None:
+                f.balance_rs = bal
+        s.query(db.Memory).filter(db.Memory.key != "__demo_snapshot__").delete()
+        s.commit()
+
+
 def seed(ledger_from: date = date(2024, 1, 1), verbose: bool = True) -> dict:
     db.reset_engine()
     db.init_db(drop=True)
@@ -103,7 +135,7 @@ def seed(ledger_from: date = date(2024, 1, 1), verbose: bool = True) -> dict:
         # Demo-day bookings: the FAO-56 requests falling due around the demo day (Ramesh books live).
         n = 0
         for r in reqs:
-            if not (day - timedelta(days=1) <= r.day <= day + timedelta(days=4)) or r.household == RAMESH_ID:
+            if not (day - timedelta(days=1) <= r.day <= day + timedelta(days=2)) or r.household == RAMESH_ID:
                 continue
             n += 1
             s.add(db.Booking(id=f"B{day:%m%d}{n:03d}", farmer_id=r.household, plot_id=r.plot, pump_id="P1",
@@ -158,6 +190,7 @@ def seed(ledger_from: date = date(2024, 1, 1), verbose: bool = True) -> dict:
                     m3=0.0, quantity=round(qty, 2), amount_rs=round(amount, 2), method="drive-energy"))
         n_ledger = s.query(db.LedgerRow).count()
         n_book = s.query(db.Booking).count()
+        save_snapshot(s)
     out = {"demo_day": day.isoformat(), "farmers": len(vil.households), "plots": len(vil.plots), "bookings": n_book,
            "ledger_rows": n_ledger, "label": "SIMULATED village on REAL weather"}
     if verbose:

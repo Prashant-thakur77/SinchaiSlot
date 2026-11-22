@@ -1,0 +1,65 @@
+# docker compose up  ->  web :3000, api :8000, drive simulator (Modbus) :5020, MQTT :1883
+name: sinchaislot
+
+services:
+  db:
+    image: timescale/timescaledb-ha:pg16
+    environment:
+      POSTGRES_USER: sinchai
+      POSTGRES_PASSWORD: sinchai
+      POSTGRES_DB: sinchai
+    ports: ["5432:5432"]
+    volumes: [dbdata:/home/postgres/pgdata/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sinchai -d sinchai"]
+      interval: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    ports: ["1883:1883"]
+    volumes: [./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro]
+
+  api:
+    build: {context: ., dockerfile: services/Dockerfile}
+    environment:
+      DATABASE_URL: postgresql+psycopg://sinchai:sinchai@db:5432/sinchai
+      REDIS_URL: redis://redis:6379/0
+      MQTT_HOST: mqtt
+    env_file: [{path: .env, required: false}]
+    ports: ["8000:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+      mqtt: {condition: service_started}
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8000/health"]
+      interval: 10s
+      retries: 30
+      start_period: 120s
+
+  drive-sim:
+    build: {context: ., dockerfile: services/Dockerfile}
+    command: ["python", "-m", "sinchai_devices.sim_server", "--port", "5020", "--profile", "demo", "--speed", "60"]
+    ports: ["5020:5020"]
+
+  edge:
+    build: {context: ., dockerfile: services/Dockerfile}
+    command: ["python", "-m", "sinchai_edge.run", "--pump", "P2", "--drive", "tcp://drive-sim:5020", "--mqtt", "mqtt:1883"]
+    environment:
+      EDGE_STATE_DIR: /tmp/edge
+    depends_on: [drive-sim, mqtt]
+
+  web:
+    build: {context: ., dockerfile: apps/web/Dockerfile}
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      API_INTERNAL_URL: http://api:8000
+    ports: ["3000:3000"]
+    depends_on: [api]
+
+volumes:
+  dbdata:

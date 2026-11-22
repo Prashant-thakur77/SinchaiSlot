@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-
 from sinchai_planner import fao56
 from sinchai_schemas import constants as C
 

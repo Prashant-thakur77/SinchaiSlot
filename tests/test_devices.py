@@ -4,7 +4,6 @@ import threading
 import time
 
 import pytest
-
 from sinchai_devices import altivar_map as M
 from sinchai_devices.adapter import AltivarModbusAdapter, InProcessAltivar
 from sinchai_devices.altivar_model import AltivarModel
@@ -117,7 +116,6 @@ def _free_port():
 
 def test_modbus_tcp_end_to_end():
     from pymodbus.server import StartAsyncTcpServer
-
     from sinchai_devices.sim_server import SIM_CTRL_FAULT, build_device
 
     port = _free_port()

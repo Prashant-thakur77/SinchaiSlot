@@ -21,7 +21,6 @@ import lightgbm as lgb
 import numpy as np
 import pandas as pd
 import pvlib
-
 from sinchai_schemas import constants as C
 
 SNAP = Path(__file__).resolve().parents[2] / "data" / "snapshots"

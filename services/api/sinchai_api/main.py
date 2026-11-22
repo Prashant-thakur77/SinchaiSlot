@@ -17,7 +17,6 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import BaseModel
-
 from sinchai_channels.ivr import SimulatedIVR
 from sinchai_channels.ussd import SimulatedUSSD
 from sinchai_channels.whatsapp import SimulatedWhatsApp
@@ -26,8 +25,8 @@ from sinchai_schemas import constants as C
 from sinchai_speech.adapters import make_asr, make_tts
 
 from . import db, ledger_service, state, tools
-from .agents import operator, saathi
 from .agents import hisaab as hisaab_agent
+from .agents import operator, saathi
 from .settings import ROOT, settings
 
 AUTOPLAY = {"on": False, "speed": 60.0}
@@ -59,6 +58,8 @@ async def _ticker():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     db.init_db()
+    from . import bridge
+    bridge.start()
     with db.session() as s:
         empty = s.query(db.Farmer).count() == 0
     if empty:
@@ -195,6 +196,9 @@ def demo_reset(reseed: bool = False) -> dict:
     if reseed:
         from .seed import seed
         seed(verbose=False)
+    else:
+        from .seed import restore_snapshot
+        restore_snapshot()
     st = state.reset_state()
     from .agents import runtime
     runtime.SESSIONS.clear()
@@ -416,7 +420,6 @@ def drive() -> dict:
 def drive_calibration() -> dict:
     """Drive-as-meter curve: estimated flow vs power, and a simulated flow-meter calibration set."""
     import numpy as np
-
     from sinchai_devices.physics import default_pump
     pm = default_pump()
     p = np.linspace(0, pm.rated_kw, 40)

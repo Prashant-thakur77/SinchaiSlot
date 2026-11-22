@@ -68,18 +68,36 @@ def _slots_of(plan: Plan, action: str) -> list[str]:
     return [s.start[11:16] for s in plan.slots if s.action == action]
 
 
+def ranges(labels: list[str]) -> str:
+    """['10:00','10:30','11:00','14:00'] -> '10:00-11:30, 14:00-14:30' (step inferred, default 60 min)."""
+    if not labels:
+        return "-"
+    mins = [int(x[:2]) * 60 + int(x[3:5]) for x in labels]
+    step = min((b - a for a, b in zip(mins, mins[1:], strict=False) if b > a), default=60)
+    out, start, prev = [], mins[0], mins[0]
+    for m in mins[1:] + [None]:
+        if m is not None and m == prev + step:
+            prev = m
+            continue
+        end = prev + step
+        out.append(f"{start // 60:02d}:{start % 60:02d}-{end // 60:02d}:{end % 60:02d}")
+        if m is not None:
+            start = prev = m
+    return ", ".join(out)
+
+
 def explain_diff(old: Plan, new: Plan, old_scen: list[Scenario], new_scen: list[Scenario]) -> list[Change]:
     """Compare two plans and attach a reason drawn from the forecast change."""
     o50 = next(s for s in old_scen if s.name == "P50").pv_kw
     n50 = next(s for s in new_scen if s.name == "P50").pv_kw
-    drops = [old.slots[t].start[11:16] for t in range(len(o50)) if n50[t] < 0.7 * o50[t] and o50[t] > 0.5]
-    rises = [old.slots[t].start[11:16] for t in range(len(o50)) if n50[t] > 1.3 * o50[t] + 0.2]
+    drops = [old.slots[t].start[11:16] for t in range(len(o50)) if n50[t] < 0.85 * o50[t] and o50[t] > 0.3]
+    rises = [old.slots[t].start[11:16] for t in range(len(o50)) if n50[t] > 1.15 * o50[t] + 0.2]
     if drops:
-        cause_en = f"cloud band forecast at {drops[0]}" + (f"-{drops[-1]}" if len(drops) > 1 else "")
-        cause_hi = f"{drops[0]} बजे बादल का अनुमान"
+        cause_en = f"less sun now expected {ranges(drops)}"
+        cause_hi = f"{ranges(drops)} बजे बादल / कम धूप का अनुमान"
     elif rises:
-        cause_en = f"more sun now forecast at {rises[0]}"
-        cause_hi = f"{rises[0]} बजे ज़्यादा धूप का अनुमान"
+        cause_en = f"more sun now expected {ranges(rises)}"
+        cause_hi = f"{ranges(rises)} बजे ज़्यादा धूप का अनुमान"
     else:
         cause_en, cause_hi = "updated bookings and delivered water", "बुकिंग और दिए गए पानी में बदलाव"
 
@@ -94,19 +112,19 @@ def explain_diff(old: Plan, new: Plan, old_scen: list[Scenario], new_scen: list[
             kind = "moved" if os_ and ns_ else ("added" if ns_ else "dropped")
             subj = a[4:]
             if kind == "moved":
-                en = f"{cause_en}: water slot moved from {', '.join(os_)} to {', '.join(ns_)}"
-                hi = f"{cause_hi}: पानी का समय {', '.join(os_)} से {', '.join(ns_)} किया गया"
+                en = f"{cause_en}: water moved from {ranges(os_)} to {ranges(ns_)}"
+                hi = f"{cause_hi}: पानी का समय {ranges(os_)} से {ranges(ns_)} किया गया"
             elif kind == "added":
-                en = f"{cause_en}: water slot added at {', '.join(ns_)}"
-                hi = f"{cause_hi}: {', '.join(ns_)} बजे पानी का समय जोड़ा गया"
+                en = f"{cause_en}: water added {ranges(ns_)}"
+                hi = f"{cause_hi}: {ranges(ns_)} बजे पानी का समय जोड़ा गया"
             else:
-                en = f"{cause_en}: slot at {', '.join(os_)} released, booking carried to next sunny window"
-                hi = f"{cause_hi}: {', '.join(os_)} का समय अगली धूप वाली खिड़की में जाएगा"
+                en = f"{cause_en}: {ranges(os_)} released, booking carried to the next sunny window"
+                hi = f"{cause_hi}: {ranges(os_)} का समय अगली धूप वाली खिड़की में जाएगा"
             changes.append(Change(kind, subj, hh_of.get(a), os_, ns_, en, hi))
         else:
             name_hi = {"mill": "चक्की", "chaff": "कुट्टी मशीन"}.get(a, a)
-            en = f"{cause_en}: {a} moved from {', '.join(os_) or '-'} to {', '.join(ns_) or '-'}"
-            hi = f"{cause_hi}: {name_hi} {', '.join(os_) or '-'} से {', '.join(ns_) or '-'} पर"
+            en = f"{cause_en}: {a} moved from {ranges(os_)} to {ranges(ns_)}"
+            hi = f"{cause_hi}: {name_hi} {ranges(os_)} से {ranges(ns_)} पर"
             changes.append(Change("load_moved", a, None, os_, ns_, en, hi))
     ob, nb = old.total("battery"), new.total("battery")
     if abs(nb - ob) > 0.2:

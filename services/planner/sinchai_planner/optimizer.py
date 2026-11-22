@@ -30,7 +30,6 @@ from dataclasses import dataclass, field
 
 import highspy
 import numpy as np
-
 from sinchai_devices.physics import PumpModel, default_pump
 
 W_WATER = 1000.0  # per m3 * priority; dominates any secondary-load value per kWh

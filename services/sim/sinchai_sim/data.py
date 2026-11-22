@@ -7,7 +7,6 @@ from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
-
 from sinchai_devices.physics import default_array
 from sinchai_planner import fao56
 from sinchai_planner import forecast as F

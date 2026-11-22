@@ -15,7 +15,6 @@ Ablations
 from __future__ import annotations
 
 import numpy as np
-
 from sinchai_planner.optimizer import Loads, PlanInput, Request, Scenario, solve
 
 from .engine import SLOT_HOURS, DayInputs, Policy, State
@@ -114,7 +113,7 @@ class SinchaiSlot(Policy):
 
     def _solve(self, st: State, di: DayInputs, from_slot: int, frozen_action: dict[int, str] | None = None):
         cfg = st.cfg
-        T = len(SLOT_HOURS)
+        len(SLOT_HOURS)
         reqs = []
         pend = [p for p in st.pending.values() if p.remaining > 1e-6]
         for p in pend:

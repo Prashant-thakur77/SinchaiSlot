@@ -32,6 +32,16 @@ T: dict[str, dict[str, str]] = {
         "en": "Your {crop} field needs about {m3} cubic metres today. The solar pump can water it from {start} to {end}. "
               "Price Rs {price}, Rs {saving} cheaper than diesel. Shall I book it? Press 1 for yes, 2 for no.",
     },
+    "offer_partial": {
+        "hi": "आपके {crop} के खेत को लगभग {m3} घन मीटर पानी चाहिए। आज सोलर से {start} से {end} बजे तक लगभग {today} घन मीटर मिलेगा, "
+              "बाकी {rest} कल सुबह पहले। कुल दाम {price} रुपये, डीज़ल से {saving} रुपये सस्ता। बुक करूँ? हाँ के लिए 1, नहीं के लिए 2।",
+        "mai": "अहाँक {crop} खेत के करीब {m3} घन मीटर पानि चाही। आइ सोलर सँ {start} सँ {end} बजे धरि करीब {today} घन मीटर भेटत, "
+               "बाँकी {rest} काल्हि भोरे पहिने। कुल दाम {price} टाका, डीजल सँ {saving} टाका सस्त। बुक करी? हँ लेल 1, नै लेल 2।",
+        "bho": "रउरा {crop} के खेत के करीब {m3} घन मीटर पानी चाहीं। आज सोलर से {start} से {end} बजे ले करीब {today} घन मीटर मिली, "
+               "बाकी {rest} काल्ह बिहान पहिले। कुल दाम {price} रुपया, डीजल से {saving} रुपया सस्ता। बुक कर दीं? हाँ खातिर 1, ना खातिर 2।",
+        "en": "Your {crop} field needs about {m3} cubic metres. Today the solar pump can give about {today} from {start} to {end}, "
+              "the remaining {rest} first thing tomorrow. Total Rs {price}, Rs {saving} cheaper than diesel. Book it? 1 yes, 2 no.",
+    },
     "booked": {
         "hi": "बुक हो गया। बुकिंग नंबर {booking_id}, समय {start} से {end}, {m3} घन मीटर, {price} रुपये। "
               "पैसा सुनीता दीदी को नकद दें या यूपीआई से भेजें, फिर कोड मिलेगा।",
@@ -143,6 +153,12 @@ T: dict[str, dict[str, str]] = {
         "mai": "प्रणाम {name} जी। मेघक कारण अहाँक पानिक समय {old} सँ बदलि क {new} बजे कएल गेल अछि। पानि ओतबे भेटत।",
         "bho": "प्रणाम {name} जी। बादर के चलते रउरा पानी के समय {old} से बदल के {new} बजे कइल गइल बा। पानी ओतने मिली।",
         "en": "Hello {name}. Because of cloud, your water time moved from {old} to {new}. You still get the same water.",
+    },
+    "callback_moved_partial": {
+        "hi": "नमस्ते {name} जी। बादल की वजह से धूप कम है। आपका पानी अब {new} बजे, आज लगभग {today} घन मीटर मिलेगा, बाकी {rest} कल सुबह पहले नंबर पर।",
+        "mai": "प्रणाम {name} जी। मेघक कारण रौद कम अछि। अहाँक पानि आब {new} बजे, आइ करीब {today} घन मीटर भेटत, बाँकी {rest} काल्हि भोरे पहिल नम्बर पर।",
+        "bho": "प्रणाम {name} जी। बादर के चलते घाम कम बा। रउरा पानी अब {new} बजे, आज करीब {today} घन मीटर मिली, बाकी {rest} काल्ह बिहान पहिला नंबर पर।",
+        "en": "Hello {name}. Cloud has cut the sun. Your water is now {new}: about {today} cubic metres today, the remaining {rest} first thing tomorrow.",
     },
     "callback_dropped": {
         "hi": "नमस्ते {name} जी। बादल की वजह से आज {old} बजे का समय नहीं हो पाएगा। आपकी बुकिंग कल सुबह पहले नंबर पर है।",

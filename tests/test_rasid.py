@@ -1,7 +1,6 @@
 from datetime import date
 
 import pytest
-
 from sinchai_rasid.audit import audit
 from sinchai_rasid.ledger import Ledger, make_water_receipt, merkle_proof, merkle_root, verify_proof
 from sinchai_rasid.reports import claim_pack, summarise, to_csv, write_pdf

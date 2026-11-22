@@ -11,7 +11,6 @@ from datetime import date, timedelta
 
 import numpy as np
 import pandas as pd
-
 from sinchai_planner import fao56
 from sinchai_schemas import constants as C
 
@@ -117,7 +116,7 @@ def demand_trace(village: Village, daily: pd.DataFrame, start: date, end: date,
     k = 0
     for p in village.plots:
         for y, seasons in sorted(p.crops.items()):
-            for season, crop_key in seasons.items():
+            for _season, crop_key in seasons.items():
                 if crop_key == "fallow":
                     continue
                 base = fao56.CROPS[crop_key]

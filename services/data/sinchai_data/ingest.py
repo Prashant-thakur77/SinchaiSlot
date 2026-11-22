@@ -16,7 +16,6 @@ from pathlib import Path
 
 import httpx
 import pandas as pd
-
 from sinchai_schemas import constants as C
 
 SNAP_DIR = Path(__file__).resolve().parents[1] / "snapshots"

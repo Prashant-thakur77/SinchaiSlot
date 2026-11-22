@@ -15,9 +15,8 @@ from dataclasses import dataclass
 from datetime import datetime
 
 import numpy as np
-from sklearn.ensemble import IsolationForest
-
 from sinchai_devices.physics import PumpModel, default_pump
+from sklearn.ensemble import IsolationForest
 
 from .ledger import Receipt
 

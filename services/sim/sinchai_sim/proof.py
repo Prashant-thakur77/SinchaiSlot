@@ -290,7 +290,7 @@ def figures(proof: dict, out_dir) -> list[str]:
             rows.append((name, min(vals), max(vals)))
         base = pol["D"]["utilisation_kwh_per_kwp"]["p50"]
         fig, ax = plt.subplots(figsize=(7, 3.2))
-        for i, (n, lo, hi) in enumerate(rows):
+        for i, (_n, lo, hi) in enumerate(rows):
             ax.barh(i, hi - lo, left=lo, color="#3BA7E5", alpha=0.7)
         ax.axvline(base, color="#E39B12", lw=1.2)
         ax.set_yticks(range(len(rows)), [r[0] for r in rows], fontsize=8)

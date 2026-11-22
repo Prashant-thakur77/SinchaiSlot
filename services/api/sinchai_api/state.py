@@ -10,6 +10,7 @@ explains the change, and Saathi calls the farmers whose slots moved.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import threading
 import time
@@ -19,14 +20,13 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import numpy as np
-
 from sinchai_devices.adapter import InProcessAltivar
 from sinchai_devices.altivar_model import AltivarModel
 from sinchai_devices.physics import default_pump
 from sinchai_edge.controller import EdgeController, EdgePlan, EdgeSlot, MemoryUplink
 from sinchai_jal.budget import WaterBudget
 from sinchai_planner.optimizer import Loads, Plan, PlanInput, Request, Scenario, solve
-from sinchai_planner.replan import explain_diff
+from sinchai_planner.replan import explain_diff, ranges
 from sinchai_schemas import constants as C
 
 from . import db
@@ -72,10 +72,8 @@ class EventBus:
             self.log.append(ev)
             subs = list(self.subscribers)
         for q in subs:
-            try:
+            with contextlib.suppress(asyncio.QueueFull):
                 q.put_nowait(ev)
-            except asyncio.QueueFull:
-                pass
 
 
 @dataclass
@@ -103,6 +101,8 @@ class VillageState:
     mill_backlog_kg: float = 120.0
     chaff_hours: float = 2.0
     battery_kwh: float = 6.0
+    offers: dict = field(default_factory=dict)
+    _display_scen: list = field(default_factory=list)
 
     # ---------------- time ----------------
     def slot_index(self, t: datetime | None = None) -> int:
@@ -143,46 +143,60 @@ class VillageState:
             q90[k0:] = np.minimum(obs[k0:] * 1.12, self.q90[k0:])
         return [Scenario("P10", 0.3, q10), Scenario("P50", 0.4, q50), Scenario("P90", 0.3, q90)]
 
+    def build_input(self, s, freeze_from_now: bool = False, extra: list[Request] | None = None) -> PlanInput:
+        """Plan input from the bookings and the current forecast. Past slots get zero sun in the copy the
+        solver sees; the display and the plan-diff explainer keep the real forecast (self.scenarios)."""
+        reqs = self._requests(s) + list(extra or [])
+        scen = self.scenarios_now()
+        solver_scen = [Scenario(x.name, x.prob, x.pv_kw.copy()) for x in scen]
+        frozen: dict[int, str] = {}
+        now_k = self.slot_index()
+        if freeze_from_now and self.plan is not None:
+            for t in range(min(now_k, N_SLOTS)):
+                frozen[t] = "idle"
+                for sc in solver_scen:
+                    sc.pv_kw[t] = 0.0
+            # Freeze the running slot and the next one (60 min) so nobody is moved at the last moment.
+            ids = {r.id for r in reqs}
+            for t in range(now_k, min(now_k + 60 // SLOT_MIN, N_SLOTS)):
+                a = self.plan.slots[t].action
+                if a.startswith("req:") and a[4:] not in ids:
+                    a = "idle"
+                frozen[t] = a
+        op = [k for k in range(N_SLOTS) if 7 * 60 <= DAY_START_H * 60 + k * SLOT_MIN < 17 * 60]
+        self._display_scen = scen
+        return PlanInput(
+            slot_starts=[f"{self.day}T{self.slot_label(k)}" for k in range(N_SLOTS)], slot_h=SLOT_MIN / 60,
+            scenarios=solver_scen, requests=reqs,
+            loads=Loads(mill_backlog_kg=self.mill_backlog_kg, mill_kwh_per_kg=C.get("mill_kwh_per_kg"),
+                        mill_max_kw=C.get("mill_rated_kw"),
+                        mill_value_rs_per_kwh=C.get("mill_rs_per_kg") / C.get("mill_kwh_per_kg"),
+                        chaff_hours=self.chaff_hours, chaff_kw=C.get("chaff_cutter_kw"),
+                        chaff_value_rs_per_kwh=C.get("chaff_cutter_rs_per_hour") / C.get("chaff_cutter_kw"),
+                        battery_kwh_demand=self.battery_kwh,
+                        battery_value_rs_per_kwh=C.get("battery_pack_rs_per_charge") / C.get("battery_pack_kwh")),
+            budget_remaining_m3=self.budget.remaining(datetime.fromisoformat(self.day).date()),
+            operator_slots=op, frozen=frozen or None, time_limit_s=8.0,
+        )
+
     def solve_plan(self, reason: str = "initial", freeze_from_now: bool = False) -> dict:
         with self.lock, db.session() as s:
-            reqs = self._requests(s)
-            scen = self.scenarios_now()
-            frozen: dict[int, str] = {}
+            inp = self.build_input(s, freeze_from_now)
+        plan = solve(inp)
+        return self.adopt(plan, inp, reason, self._display_scen)
+
+    def adopt(self, plan: Plan, inp: PlanInput, reason: str, display_scen: list[Scenario]) -> dict:
+        """Make `plan` the current plan: keep past slots as they ran, write slot times to bookings,
+        explain the change, push it to the edge and publish it."""
+        with self.lock, db.session() as s:
             now_k = self.slot_index()
-            if freeze_from_now and self.plan is not None:
-                for t in range(min(now_k, N_SLOTS)):
-                    frozen[t] = "idle"
-                    for sc in scen:
-                        sc.pv_kw[t] = 0.0
-                # Freeze the running slot and the next one (60 min) so nobody is moved at the last moment.
-                for t in range(now_k, min(now_k + 60 // SLOT_MIN, N_SLOTS)):
-                    a = self.plan.slots[t].action
-                    if a.startswith("req:") and a[4:] not in {r.id for r in reqs}:
-                        a = "idle"
-                    frozen[t] = a
-            op = [k for k in range(N_SLOTS) if 7 * 60 <= DAY_START_H * 60 + k * SLOT_MIN < 17 * 60]
-            inp = PlanInput(
-                slot_starts=[f"{self.day}T{self.slot_label(k)}" for k in range(N_SLOTS)], slot_h=SLOT_MIN / 60,
-                scenarios=scen, requests=reqs,
-                loads=Loads(mill_backlog_kg=self.mill_backlog_kg, mill_kwh_per_kg=C.get("mill_kwh_per_kg"),
-                            mill_max_kw=C.get("mill_rated_kw"),
-                            mill_value_rs_per_kwh=C.get("mill_rs_per_kg") / C.get("mill_kwh_per_kg"),
-                            chaff_hours=self.chaff_hours, chaff_kw=C.get("chaff_cutter_kw"),
-                            chaff_value_rs_per_kwh=C.get("chaff_cutter_rs_per_hour") / C.get("chaff_cutter_kw"),
-                            battery_kwh_demand=self.battery_kwh,
-                            battery_value_rs_per_kwh=C.get("battery_pack_rs_per_charge") / C.get("battery_pack_kwh")),
-                budget_remaining_m3=self.budget.remaining(datetime.fromisoformat(self.day).date()),
-                operator_slots=op, frozen=frozen or None, time_limit_s=8.0,
-            )
             old_plan, old_scen = self.plan, self.scenarios
-            plan = solve(inp)
-            if freeze_from_now and old_plan is not None:
+            if old_plan is not None:
                 for t in range(min(now_k, N_SLOTS)):
                     plan.slots[t].action = old_plan.slots[t].action
                     plan.slots[t].household = old_plan.slots[t].household
-            self.plan, self.plan_input, self.scenarios = plan, inp, scen
+            self.plan, self.plan_input, self.scenarios = plan, inp, display_scen
             self.plan_version += 1
-            # Write slot times back to bookings.
             booking_slots: dict[str, list[int]] = {}
             for sp in plan.slots:
                 if sp.action.startswith("req:"):
@@ -197,7 +211,42 @@ class VillageState:
             s.commit()
             changes = []
             if old_plan is not None:
-                changes = [c.__dict__ for c in explain_diff(old_plan, plan, old_scen, scen)]
+                changes = [c.__dict__ for c in explain_diff(old_plan, plan, old_scen, display_scen)]
+                # Slots that already ran cannot have moved; drop artefacts from the frozen past.
+                cutoff = self.slot_label(now_k)
+
+                def future_m3(pl: Plan, action: str) -> float:
+                    return sum(sp.water_m3.get("P50", 0.0) for sp in pl.slots
+                               if sp.action == action and self.slot_label(sp.slot) >= cutoff)
+
+                kept = []
+                for c in changes:
+                    c["old_slots"] = [x for x in c["old_slots"] if x >= cutoff]
+                    c["new_slots"] = [x for x in c["new_slots"] if x >= cutoff]
+                    if c["old_slots"] == c["new_slots"]:
+                        continue
+                    if c["kind"] in ("moved", "added", "dropped"):
+                        a = f"req:{c['subject']}"
+                        c["old_m3"] = round(future_m3(old_plan, a), 1)
+                        c["new_m3"] = round(future_m3(plan, a), 1)
+                        if not c["old_slots"] and c["new_slots"]:
+                            c["kind"] = "added"
+                        elif c["old_slots"] and not c["new_slots"]:
+                            c["kind"] = "dropped"
+                    cause_en, cause_hi = c["reason_en"].split(": ")[0], c["reason_hi"].split(": ")[0]
+                    if c["kind"] == "load_moved" and c["subject"] == "battery":
+                        pass
+                    elif c["kind"] == "added":
+                        c["reason_en"] = f"{cause_en}: water added {ranges(c['new_slots'])}"
+                        c["reason_hi"] = f"{cause_hi}: {ranges(c['new_slots'])} बजे पानी का समय जोड़ा गया"
+                    elif c["kind"] == "dropped":
+                        c["reason_en"] = f"{cause_en}: {ranges(c['old_slots'])} released, carried to the next sunny window"
+                        c["reason_hi"] = f"{cause_hi}: {ranges(c['old_slots'])} का समय अगली धूप वाली खिड़की में"
+                    else:
+                        c["reason_en"] = f"{cause_en}: {c['subject']} {ranges(c['old_slots'])} -> {ranges(c['new_slots'])}"
+                        c["reason_hi"] = f"{cause_hi}: {ranges(c['old_slots'])} से {ranges(c['new_slots'])}"
+                    kept.append(c)
+                changes = kept
                 self.diffs.append({"version": self.plan_version, "at": self.clock.strftime("%H:%M"), "reason": reason,
                                    "changes": changes})
             self._push_edge_plan()
@@ -233,8 +282,11 @@ class VillageState:
                 slots.append(EdgeSlot(start, end, "water", bid, m3.get(bid, 0.0), paid.get(bid, False)))
             else:
                 slots.append(EdgeSlot(start, end, sp.action if sp.action != "idle" else "idle"))
-        self.edge.receive_plan(EdgePlan(self.pump_id, self.plan_version, slots,
-                                        self.budget.remaining(datetime.fromisoformat(self.day).date())).to_json())
+        ep = EdgePlan(self.pump_id, self.plan_version, slots,
+                      self.budget.remaining(datetime.fromisoformat(self.day).date())).to_json()
+        self.edge.receive_plan(ep)
+        from . import bridge
+        bridge.publish_plan("P2", {**ep, "pump_id": "P2"})
 
     # ---------------- simulation ----------------
     def advance(self, minutes: float, step_s: float = 20.0) -> None:

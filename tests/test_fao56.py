@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import pytest
-
 from sinchai_planner import fao56
 
 

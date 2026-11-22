@@ -23,7 +23,6 @@ from functools import lru_cache
 import numpy as np
 import pandas as pd
 import pvlib
-
 from sinchai_schemas import constants as C
 
 RHO_G = 1000 * 9.81

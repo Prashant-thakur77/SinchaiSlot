@@ -1,7 +1,6 @@
 from datetime import date
 
 import pytest
-
 from sinchai_jal.budget import DryRunGuard, WaterBudget, awd_irrigate, season_of
 
 

@@ -14,7 +14,6 @@ from datetime import date, datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
-
 from sinchai_edge.controller import unlock_code
 from sinchai_jal.budget import awd_irrigate
 from sinchai_planner.optimizer import Request, solve
@@ -126,6 +125,10 @@ class FindSlotsIn(BaseModel):
 @tool("find_slots", "Find when the shared solar pump can water a plot today, sized to the crop's need.",
       ("farmer", "operator", "system"))
 def find_slots(ctx: ToolContext, inp: FindSlotsIn) -> dict:
+    """Solves a what-if plan with the new request and keeps it as an offer: if the farmer says yes
+    before the plan changes, exactly this plan is adopted, so what was offered is what is booked."""
+    import uuid
+
     st = get_state()
     with db.session() as s:
         p = _farmer_plot(s, inp.farmer_id, inp.plot_id)
@@ -135,21 +138,26 @@ def find_slots(ctx: ToolContext, inp: FindSlotsIn) -> dict:
         if m3 <= 0.5:
             return {"available": False, "reason": "crop_need_met", "need_m3": round(cap, 1), "plot_id": p.id,
                     "crop": p.crop}
-        reqs = st._requests(s)
-    reqs.append(Request("NEW", p.farmer_id, m3, 1.2, due_today=True, tenant=bool(f.tenant)))
-    inp_plan = st.plan_input
-    from dataclasses import replace
-    k0 = st.slot_index()
-    frozen = {t: "idle" for t in range(max(k0, 0))}
-    plan = solve(replace(inp_plan, requests=reqs, frozen=frozen or None, time_limit_s=4.0))
+        prio = 1.0 + (0.5 if p.stage == "mid" else 0.0)
+        new = Request("NEW", p.farmer_id, m3, prio, due_today=True, tenant=bool(f.tenant))
+        with st.lock:
+            plan_inp = st.build_input(s, freeze_from_now=st.slot_index() > 0, extra=[new])
+            display = st._display_scen
+            version = st.plan_version
+    plan = solve(plan_inp)
     ks = [sp.slot for sp in plan.slots if sp.action == "req:NEW"]
     if not ks:
         return {"available": False, "reason": "no_sun_left_today", "need_m3": round(m3, 1), "plot_id": p.id,
                 "crop": p.crop, "next": "tomorrow morning"}
-    return {"available": True, "plot_id": p.id, "crop": p.crop, "stage": p.stage, "need_m3": round(m3, 1),
-            "window_start": st.slot_label(min(ks)), "window_end": st.slot_label(max(ks) + 1),
-            "expected_m3_p50": round(plan.served_m3["NEW"]["P50"], 1),
-            "expected_m3_p10": round(plan.served_m3["NEW"]["P10"], 1),
+    token = uuid.uuid4().hex[:10]
+    st.offers[token] = {"plan": plan, "inp": plan_inp, "display": display, "version": version,
+                        "farmer_id": p.farmer_id, "plot_id": p.id, "m3": round(m3, 1)}
+    today = plan.served_m3["NEW"]["P50"]
+    return {"available": True, "offer_token": token, "plot_id": p.id, "crop": p.crop, "stage": p.stage,
+            "need_m3": round(m3, 1), "window_start": st.slot_label(min(ks)), "window_end": st.slot_label(max(ks) + 1),
+            "slots": [st.slot_label(k) for k in ks],
+            "expected_m3_p50": round(today, 1), "expected_m3_p10": round(plan.served_m3["NEW"]["P10"], 1),
+            "carry_over_m3": round(max(m3 - today, 0.0), 1),
             "price_rs": round(m3 * _tariff(), 0), "diesel_equivalent_rs": round(m3 * _diesel_rs_per_m3(), 0)}
 
 
@@ -175,15 +183,19 @@ class BookIn(BaseModel):
     farmer_id: str | None = None
     plot_id: str | None = None
     m3: float | None = None
+    offer_token: str | None = Field(None, description="Token from find_slots; books exactly the offered slots")
 
 
 @tool("book_slot", "Book solar water for a plot today (needs the farmer's confirmation).",
       ("farmer", "operator", "system"), confirm=True)
 def book_slot(ctx: ToolContext, inp: BookIn) -> dict:
     st = get_state()
+    offer = st.offers.pop(inp.offer_token, None) if inp.offer_token else None
     with db.session() as s:
+        if offer is not None:
+            inp.plot_id, m3_fixed = offer["plot_id"], offer["m3"]
         p = _farmer_plot(s, inp.farmer_id, inp.plot_id)
-        m3 = min(inp.m3, p.need_m3) if inp.m3 else p.need_m3
+        m3 = m3_fixed if offer is not None else (min(inp.m3, p.need_m3) if inp.m3 else p.need_m3)
         if m3 <= 0.5:
             raise ToolError("the crop's water need is already met")
         existing = s.query(db.Booking).filter(db.Booking.plot_id == p.id, db.Booking.day == st.day,
@@ -197,10 +209,24 @@ def book_slot(ctx: ToolContext, inp: BookIn) -> dict:
         s.add(b)
         s.commit()
         bid = b.id
-    st.solve_plan(reason=f"new booking {bid}")
+    if offer is not None and offer["version"] == st.plan_version:
+        plan, pinp = offer["plan"], offer["inp"]
+        for sp in plan.slots:
+            if sp.action == "req:NEW":
+                sp.action, sp.household = f"req:{bid}", p.farmer_id
+        plan.served_m3[bid] = plan.served_m3.pop("NEW", {})
+        for r in pinp.requests:
+            if r.id == "NEW":
+                r.id = bid
+        st.adopt(plan, pinp, f"new booking {bid}", offer["display"])
+        honoured = True
+    else:
+        st.solve_plan(reason=f"new booking {bid}", freeze_from_now=st.slot_index() > 0)
+        honoured = False
     with db.session() as s:
         b = s.get(db.Booking, bid)
-        return {"booked": True, **_booking_view(s, b)}
+        return {"booked": True, "offer_honoured": honoured,
+                "expected_today_m3": round(st.plan.served_m3.get(bid, {}).get("P50", 0.0), 1), **_booking_view(s, b)}
 
 
 class BookingRef(BaseModel):
