@@ -1,0 +1,309 @@
+# SinchaiSlot constants. Single source for every real-world value used by the code.
+#
+# kind:
+#   published  - taken from a cited publication (source URL required)
+#   assumption - modelling parameter not found in a publication; reasoning given,
+#                covered by the sensitivity sweep in Prayogshala where it matters
+#   config     - site configuration (coordinates, sizing) to confirm on the ground
+
+sources:
+  india_forum: https://www.theindiaforum.in/public-policy/solar-pumps-are-key-bihars-rural-electrification-strategy
+  chakhaji: https://ngobox.org/detail_impax_Chakhaji-Model---Catalyzing-%E2%80%98Buyer-Friendly%E2%80%99-Solar-Irrigation-Service-Markets_164
+  iwmi_shg: https://cgspace.cgiar.org/server/api/core/bitstreams/1ad4f8d3-4c1d-42dc-99ea-cdd4ad07a10c/content
+  iwmi_holding: https://cgspace.cgiar.org/server/api/core/bitstreams/ca974c06-3a0d-490e-8ee6-fc2fc2cb50e6/content
+  aciar: https://research.aciar.gov.au/sdip/wp-content/uploads/2023/03/ElectrifyingAgricultureinBihar_postreview_Final.pdf
+  india_ghg: https://indiaghgp.org/sites/default/files/Road%20Transport%20Technical%20Paper.pdf
+  ceew: https://www.ceew.in/publications/solar-pumps-underutilization-and-usage-patterns-in-india
+  dhundi: https://cdkn.org/wp-content/uploads/2020/06/Dhundi-solar-pumps-case-study-2.pdf
+  bihar_subsidy: https://indianmasterminds.com/news/bihar-diesel-subsidy-farmers-irrigation-2026-225902/
+  cgwb_2025: https://pib.gov.in/PressReleasePage.aspx?PRID=2220203
+  kusum_progress: https://ianslive.in/over-10-lakh-standalone-solar-pumps-installed-13-lakh-grid-connected-pumps-solarised--20260311092345
+  kusum_iisd: https://www.iisd.org/system/files/2026-02/beyond-irrigation-solar-pumps-india.pdf
+  oorja_solve: https://solve.mit.edu/challenges/2024-global-climate-challenge/solutions/89851?hsLang=en
+  oorja_agfund: https://www.arabnews.com/node/2651514/world
+  se_impact: https://www.se.com/ww/en/about-us/sustainability/impact-investing
+  se_astha: https://blog.se.com/sustainability/2024/10/30/powering-systemic-sustainable-change-with-smart-village-solutions
+  altivar_solar: https://www.se.com/za/en/product-range/247470166-altivar-solar
+  heftcom: https://arxiv.org/html/2507.01579v2
+  fao56: https://www.fao.org/4/x0490e/x0490e00.htm
+  nasa_power: https://power.larc.nasa.gov/
+  open_meteo: https://open-meteo.com/
+
+constants:
+  # ---- Prices and costs ----
+  diesel_water_rs_per_hour:
+    value: 120
+    unit: Rs/h
+    kind: published
+    source: chakhaji
+    note: Diesel pump water price in Chakhaji, Samastipur (also India Forum).
+  solar_water_rs_per_hour:
+    value: 100
+    unit: Rs/h
+    kind: published
+    source: chakhaji
+    note: Solar water price charged by Chakhaji solar pump owners.
+  oorja_tariff_rs_per_m3_low:
+    value: 3
+    unit: Rs/m3
+    kind: published
+    source: oorja_solve
+  oorja_tariff_rs_per_m3_high:
+    value: 4
+    unit: Rs/m3
+    kind: published
+    source: oorja_solve
+  unit_capex_rs:
+    value: 600000
+    unit: Rs
+    kind: published
+    source: iwmi_shg
+    note: About Rs 6 lakh for a 5 HP / 5 kWp shared solar irrigation unit.
+  seller_markup_low:
+    value: 1.5
+    unit: x diesel cost
+    kind: published
+    source: india_forum
+  seller_markup_high:
+    value: 2.5
+    unit: x diesel cost
+    kind: published
+    source: india_forum
+
+  # ---- Diesel and climate ----
+  diesel_l_per_hour_5hp:
+    value: 1.0
+    unit: L/h
+    kind: published
+    source: aciar
+  co2_kg_per_l_diesel:
+    value: 2.6444
+    unit: kg CO2/L
+    kind: published
+    source: india_ghg
+
+  # ---- Context statistics ----
+  ceew_solar_pump_utilisation:
+    value: 0.27
+    unit: fraction
+    kind: published
+    source: ceew
+    note: Chhattisgarh owner pumps, remote-monitoring data on 1,131 pumps. Context only, not a Bihar baseline.
+  ceew_pumps_transmitting_share:
+    value: 0.34
+    unit: fraction
+    kind: published
+    source: ceew
+    note: 446 of 1,306 pumps still transmitting, December 2020.
+  dhundi_pumping_share:
+    value: 0.26
+    unit: fraction
+    kind: published
+    source: dhundi
+  bihar_diesel_structures_share:
+    value: 0.79
+    unit: fraction
+    kind: published
+    source: iwmi_shg
+  bihar_farmers_buying_irrigation:
+    value: 0.719
+    unit: fraction
+    kind: published
+    source: india_forum
+  bihar_irrigation_market_rs_crore:
+    value: 2000
+    unit: Rs crore/yr
+    kind: published
+    source: iwmi_shg
+  bihar_avg_holding_ha:
+    value: 0.22
+    unit: ha
+    kind: published
+    source: iwmi_holding
+  india_gw_extraction_stage:
+    value: 0.6063
+    unit: fraction
+    kind: published
+    source: cgwb_2025
+  chakhaji_farmers:
+    value: 550
+    unit: farmers
+    kind: published
+    source: chakhaji
+  kusum_standalone_pumps:
+    value: 1000000
+    unit: pumps
+    kind: published
+    source: kusum_progress
+    note: More than 10 lakh standalone solar pumps installed by March 2026.
+
+  # ---- Bihar diesel subsidy, Kharif 2026 ----
+  bihar_diesel_subsidy_rs_per_l:
+    value: 75
+    unit: Rs/L
+    kind: published
+    source: bihar_subsidy
+  bihar_diesel_subsidy_rs_per_acre_irrigation:
+    value: 750
+    unit: Rs/acre/irrigation
+    kind: published
+    source: bihar_subsidy
+  bihar_diesel_subsidy_max_irrigations:
+    value: 3
+    unit: irrigations
+    kind: published
+    source: bihar_subsidy
+  bihar_diesel_subsidy_max_acres:
+    value: 8
+    unit: acres
+    kind: published
+    source: bihar_subsidy
+
+  # ---- Forecast benchmark context ----
+  heftcom_winner_pinball:
+    value: 22.18
+    unit: pinball
+    kind: published
+    source: heftcom
+  heftcom_benchmark_pinball:
+    value: 53.58
+    unit: pinball
+    kind: published
+    source: heftcom
+
+  # ---- Site configuration ----
+  site_lat:
+    value: 25.86
+    unit: deg N
+    kind: config
+    source: nasa_power
+    note: Samastipur town, approximate. Confirm the pilot cluster coordinates on the ground.
+  site_lon:
+    value: 85.78
+    unit: deg E
+    kind: config
+    source: nasa_power
+  pump_hp:
+    value: 5
+    unit: HP
+    kind: published
+    source: iwmi_shg
+  pv_kwp:
+    value: 5
+    unit: kWp
+    kind: published
+    source: iwmi_shg
+  command_area_acres:
+    value: 20
+    unit: acres
+    kind: published
+    source: iwmi_shg
+
+  # ---- Modelling assumptions (see docs/decisions/0003-model-assumptions.md) ----
+  pump_rated_kw:
+    value: 3.7
+    unit: kW
+    kind: assumption
+    note: Motor shaft rating of a 5 HP pump (5 x 0.746 kW).
+  pump_rated_flow_m3h:
+    value: 30
+    unit: m3/h
+    kind: assumption
+    note: Chosen so that Rs 100/h solar water equals about Rs 3.3/m3, inside the published Rs 3-4/m3 band.
+  pump_rated_head_m:
+    value: 20
+    unit: m
+    kind: assumption
+    note: Total dynamic head for shallow Gangetic-plain aquifer plus field delivery losses.
+  pump_min_freq_hz:
+    value: 30
+    unit: Hz
+    kind: assumption
+    note: Below about 60% speed a centrifugal pump at this head delivers no water.
+  diesel_pump_flow_m3h:
+    value: 30
+    unit: m3/h
+    kind: assumption
+    note: Same delivery as the solar pump, so one diesel hour equals one solar pump hour at rated flow.
+  pv_system_derate:
+    value: 0.80
+    unit: fraction
+    kind: assumption
+    note: Wiring, soiling, temperature-independent losses, drive conversion.
+  pv_temp_coeff_per_c:
+    value: -0.004
+    unit: 1/degC
+    kind: assumption
+    note: Typical crystalline silicon power temperature coefficient.
+  mill_kwh_per_kg:
+    value: 0.07
+    unit: kWh/kg
+    kind: assumption
+    note: Small stone/plate flour mill (atta chakki). Swept in the sensitivity analysis.
+  mill_rated_kw:
+    value: 3.7
+    unit: kW
+    kind: assumption
+  mill_rs_per_kg:
+    value: 3
+    unit: Rs/kg
+    kind: assumption
+    note: Village grinding charge. Swept in the sensitivity analysis.
+  mill_demand_kg_per_day:
+    value: 120
+    unit: kg/day
+    kind: assumption
+    note: Swept in the sensitivity analysis.
+  chaff_cutter_kw:
+    value: 1.5
+    unit: kW
+    kind: assumption
+  chaff_cutter_hours_per_day:
+    value: 2
+    unit: h/day
+    kind: assumption
+  chaff_cutter_rs_per_hour:
+    value: 40
+    unit: Rs/h
+    kind: assumption
+  battery_pack_kwh:
+    value: 1.0
+    unit: kWh
+    kind: assumption
+    note: Swappable lithium pack for lights, phone charging and small loads.
+  battery_packs_per_day:
+    value: 6
+    unit: packs/day
+    kind: assumption
+  battery_pack_rs_per_charge:
+    value: 20
+    unit: Rs/charge
+    kind: assumption
+  saur_mitra_revenue_share:
+    value: 0.25
+    unit: fraction
+    kind: assumption
+  platform_revenue_share:
+    value: 0.10
+    unit: fraction
+    kind: assumption
+  sinchaislot_tariff_rs_per_m3:
+    value: 3.0
+    unit: Rs/m3
+    kind: assumption
+    note: Set at the low end of the published Oorja band and under the diesel price per m3.
+  application_efficiency:
+    value: 0.65
+    unit: fraction
+    kind: assumption
+    note: Surface (flood/furrow) irrigation application efficiency, FAO typical range 0.6-0.7.
+  seasonal_budget_mm:
+    value: 450
+    unit: mm/yr over command area
+    kind: assumption
+    note: Annual extraction cap for the cluster. Set from block recharge; confirm against the CGWB block report for the pilot block.
+  samastipur_block_category:
+    value: Safe
+    unit: category
+    kind: assumption
+    note: UNVERIFIED. Most Samastipur blocks are assessed Safe; confirm the pilot block category from the CGWB dynamic groundwater assessment.

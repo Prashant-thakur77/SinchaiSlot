@@ -28,3 +28,6 @@ test-results/
 data_cache/
 *.parquet.tmp
 .DS_Store
+
+# Vendor manuals are fetched locally, not redistributed
+docs/schneider/manuals/
