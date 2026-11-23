@@ -110,11 +110,13 @@ export default function Home() {
       dayKw.forEach((k, i) => cum.push(cum[i] + k));
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         gsap.to(".hero-sun", { yPercent: -70, scale: 1.12, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
-        motion.ScrollTrigger.create({
-          start: 0, end: "max",
-          onUpdate: (self) => paintSky(self.progress, skyRef.current, sunRef.current, hudRef.current, cum),
-        });
-        paintSky(0, skyRef.current, sunRef.current, hudRef.current, cum);
+        let progress = 0;
+        motion.ScrollTrigger.create({ start: 0, end: "max", onUpdate: (self) => { progress = self.progress; } });
+        // Repaint every frame: the pinned chapter's clock eases after the scroll, and the nav clock reads it.
+        const tick = () => paintSky(progress, skyRef.current, sunRef.current, hudRef.current, cum);
+        gsap.ticker.add(tick);
+        tick();
+        return () => gsap.ticker.remove(tick);
       });
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         // Hero: the sun rises as you start scrolling; the wordmark settles.
@@ -278,7 +280,7 @@ export default function Home() {
       </section>
 
       {/* 13:40 THE CLOUD (signature) */}
-      <section className="day relative z-10 flex h-[100svh] min-h-[600px] flex-col justify-center overflow-hidden pb-6 pt-20 md:py-10" aria-labelledby="t-cloud">
+      <section className="day relative z-10 flex h-[100svh] min-h-[600px] flex-col justify-center overflow-hidden pb-6 pt-28 md:py-10" aria-labelledby="t-cloud">
         {plots.length > 0 && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.07]" aria-hidden>
             <div className="w-[120vmin]"><PlotMosaic features={plots} /></div>
