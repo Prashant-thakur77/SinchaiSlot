@@ -211,5 +211,9 @@ body {
   .art-swim { animation: art-swim 14s ease-in-out infinite; }
 }
 
-.art-sunpos { transform: translate(1065px, 170px); }
+.art-sunpos { transform: translate(1065px, 232px); }
+/* Wide, short screens: the opening text sits where the left trees would be. */
+@media (min-aspect-ratio: 17/10) { .art-lefttrees { display: none; } }
+@media (max-aspect-ratio: 1/1), (max-width: 767px) { .art-parrot { display: none; } }
+@media (max-aspect-ratio: 1/1) { .art-sunpos { transform: translate(860px, 232px); } }
 @media (max-width: 767px) { .art-sunpos { transform: translate(760px, 215px) scale(0.82); } }

@@ -210,8 +210,8 @@ export default function Home() {
 
       {/* HERO */}
       <section className="hero relative z-10 flex min-h-[100svh] flex-col overflow-hidden bg-gradient-to-b from-[#f9dfa8] via-night to-night" aria-label="Introduction">
-        <div className="relative z-10 mx-auto w-full max-w-[1240px] px-5 pt-28 md:px-10 md:pt-[17vh]">
-          <h1 className="max-w-[17ch] font-display text-[clamp(2.3rem,5vw,4.4rem)] font-medium leading-[1.04]">
+        <div className="relative z-10 mx-auto w-full max-w-[1240px] px-5 pt-28 md:px-10 md:pt-[max(5.2rem,14vh)]">
+          <h1 className="max-w-[17ch] font-display text-[clamp(2.3rem,min(5vw,8.2vh),4.4rem)] max-md:text-[clamp(2.1rem,9.6vw,2.8rem)] font-medium leading-[1.04]">
             One solar pump, shared well, waters a whole village.
           </h1>
           <p className="mt-5 max-w-[46ch] text-[17px] leading-relaxed text-fog md:text-[19px]">

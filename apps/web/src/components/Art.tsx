@@ -259,17 +259,17 @@ export function Border({ className = "", id = "bd" }: { className?: string; id?:
 export function VillageScene({ className = "" }: { className?: string }) {
   const wheat = [...Array(17)].map((_, i) => [612 + i * 30, 452 + ((i * 37) % 22), 0.82 + ((i * 13) % 5) / 22] as const);
   return (
-    <svg viewBox="0 0 1440 620" preserveAspectRatio="xMidYMax slice" className={className} role="img" aria-label="A Mithila-style painting: the sun above a solar panel, a pump pouring water, a wheat field and a lotus pond with fish">
+    <svg viewBox="0 0 1440 620" preserveAspectRatio="xMidYMax slice" className={`overflow-visible ${className}`} role="img" aria-label="A Mithila-style painting: the sun above a solar panel, a pump pouring water, a wheat field and a lotus pond with fish">
       <ArtDefs />
-      <g className="art-sunpos"><g className="scene-sun"><SunFace r={92} /></g></g>
+      <g className="art-sunpos"><g className="scene-sun"><SunFace r={74} /></g></g>
       {/* ground bands */}
       <D d="M-20 432 Q240 372 520 420 T1010 408 T1460 396 V640 H-20Z" fill="var(--field)" hatch="h-ink2" w={5} />
       <D d="M-20 500 Q260 462 540 496 T1080 492 T1460 480 V640 H-20Z" fill="var(--wheatfield)" hatch="h-v" w={5} />
       {/* trees and birds */}
-      <g transform="translate(120 372) scale(1.15)"><Tree /></g>
-      <g transform="translate(330 388) scale(.82)"><Tree crown="var(--leaf-deep)" fruit="var(--sun)" /></g>
+      <g className="art-lefttrees"><g transform="translate(120 372) scale(1.15)"><Tree /></g>
+      <g transform="translate(330 388) scale(.82)"><Tree crown="var(--leaf-deep)" fruit="var(--sun)" /></g></g>
       <g transform="translate(1362 352) scale(1.05)"><Tree fruit="var(--sun)" /></g>
-      <g transform="translate(800 318) scale(.6)" className="max-md:hidden"><g className="art-bob"><Parrot /></g></g>
+      <g transform="translate(800 318) scale(.6)" className="art-parrot"><g className="art-bob"><Parrot /></g></g>
       {/* wheat */}
       {wheat.map(([x, y, s], i) => <g key={i} transform={`translate(${x} ${y}) scale(${s})`}><g className="art-sway" style={{ animationDelay: `${-i * 0.37}s` }}><Wheat /></g></g>)}
       {/* panels, pump */}
