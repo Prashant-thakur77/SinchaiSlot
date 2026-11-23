@@ -1,0 +1,28 @@
+{$API_HOST} {
+	# The event stream must not be buffered or compressed.
+	@plain not path /api/events
+	encode @plain gzip
+
+	# A full reseed takes minutes; keep it off the public address. The ordinary demo reset still works.
+	@reseed {
+		path /api/demo/reset*
+		query reseed=*
+	}
+	handle @reseed {
+		respond 403
+	}
+
+	# The web Worker passes the visitor's address so the API's rate limit counts visitors, not the Worker.
+	@viaWorker header X-Client-IP *
+	handle @viaWorker {
+		reverse_proxy api:8000 {
+			flush_interval -1
+			header_up X-Forwarded-For {header.X-Client-IP}
+		}
+	}
+	handle {
+		reverse_proxy api:8000 {
+			flush_interval -1
+		}
+	}
+}

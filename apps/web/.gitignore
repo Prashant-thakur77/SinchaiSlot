@@ -48,3 +48,7 @@ next-env.d.ts
 .overflow.mjs
 test-results/
 AGENTS.md
+
+# Cloudflare
+.wrangler
+.dev.vars*

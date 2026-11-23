@@ -1,0 +1,13 @@
+{
+  "name": "sinchaislot",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-11",
+  "assets": {
+    "directory": "out",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*", "/health"]
+  },
+  "vars": { "API_ORIGIN": "https://sinchaislot-api.prashantthakur.dev" },
+  "routes": [{ "pattern": "sinchaislot.prashantthakur.dev", "custom_domain": true }]
+}
