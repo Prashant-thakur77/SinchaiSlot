@@ -3,9 +3,9 @@ import type { ReactNode } from "react";
 export type Source = "real" | "simulated" | "published" | "assumption" | "model";
 
 const SRC: Record<Source, { label: string; cls: string; title: string }> = {
-  real: { label: "REAL", cls: "text-leaf border-leaf/40", title: "Measured data (NASA POWER, Open-Meteo)" },
-  simulated: { label: "SIMULATED", cls: "text-water border-water/40", title: "Produced by the Prayogshala simulation or a device simulator" },
-  published: { label: "PUBLISHED", cls: "text-sun border-sun/40", title: "Taken from a cited publication" },
+  real: { label: "REAL", cls: "text-leaf-ink border-leaf/40", title: "Measured data (NASA POWER, Open-Meteo)" },
+  simulated: { label: "SIMULATED", cls: "text-water-ink border-water/40", title: "Produced by the Prayogshala simulation or a device simulator" },
+  published: { label: "PUBLISHED", cls: "text-sun-ink border-sun/40", title: "Taken from a cited publication" },
   assumption: { label: "ASSUMPTION", cls: "text-mist border-mist/40", title: "Modelling assumption; see constants.yaml" },
   model: { label: "MODEL", cls: "text-fog border-fog/40", title: "Model output on real inputs" },
 };
@@ -15,7 +15,7 @@ export function SourceTag({ kind, className = "" }: { kind: Source; className?: 
   return (
     <span
       title={s.title}
-      className={`inline-flex items-center rounded-full border px-2 py-px text-[10px] font-medium tracking-wider num ${s.cls} ${className}`}
+      className={`inline-flex items-center rounded-full border px-2 py-px text-[12px] font-medium tracking-wider num ${s.cls} ${className}`}
     >
       {s.label}
     </span>
@@ -39,7 +39,7 @@ export function Stat({
   source?: Source;
   big?: boolean;
 }) {
-  const tones = { default: "text-white", sun: "text-sun", water: "text-water", leaf: "text-leaf", se: "text-se", fault: "text-fault" };
+  const tones = { default: "text-ink", sun: "text-sun-ink", water: "text-water-ink", leaf: "text-leaf-ink", se: "text-se-ink", fault: "text-fault" };
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2 text-[12px] text-mist">
@@ -57,14 +57,14 @@ export function Stat({
 
 export function Panel({ title, right, children, className = "" }: { title?: ReactNode; right?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={`min-w-0 rounded-[10px] border border-soil bg-night-2 ${className}`}>
+    <section className={`min-w-0 rounded-[20px] border border-soil bg-night-2 ${className}`}>
       {(title || right) && (
-        <header className="flex items-center justify-between gap-3 border-b border-soil px-4 py-2.5">
-          <h2 className="text-[13px] font-medium text-fog">{title}</h2>
+        <header className="flex items-center justify-between gap-3 border-b border-soil px-5 py-3">
+          <h2 className="font-display text-[18px]">{title}</h2>
           <div className="flex items-center gap-2">{right}</div>
         </header>
       )}
-      <div className="min-w-0 p-4">{children}</div>
+      <div className="min-w-0 p-5">{children}</div>
     </section>
   );
 }
@@ -89,7 +89,7 @@ export function Btn({
   const t = {
     ghost: "border-soil text-fog hover:bg-night-3",
     sun: "border-sun bg-sun text-ink hover:bg-sun-deep",
-    water: "border-water bg-water text-ink hover:bg-water-deep hover:text-white",
+    water: "border-water bg-water text-ink hover:bg-water-deep hover:text-paper",
     fault: "border-fault/60 text-fault hover:bg-fault/10",
   }[tone];
   return (
@@ -98,7 +98,7 @@ export function Btn({
       aria-label={ariaLabel}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex min-h-9 items-center justify-center gap-2 rounded-md border px-3 text-[13px] font-medium transition-colors duration-150 disabled:opacity-40 ${t} ${className}`}
+      className={`inline-flex min-h-9 items-center justify-center gap-2 rounded-full border px-4 text-[14px] font-medium transition-colors duration-150 disabled:opacity-40 ${t} ${className}`}
     >
       {children}
     </button>
@@ -122,13 +122,13 @@ export function ErrorNote({ error }: { error: string | null }) {
 /** Tabular numeral that rolls only the digits that change (instrument readout). Reduced motion: no roll. */
 export function Roll({ value, className = "" }: { value: string; className?: string }) {
   return (
-    <span className={`num inline-flex ${className}`}>
+    <span className={`num inline-flex items-baseline ${className}`}>
       <span className="sr-only">{value}</span>
       {value.split("").map((ch, i) => {
         const d = ch >= "0" && ch <= "9" ? Number(ch) : null;
         if (d === null) return <span key={i} aria-hidden>{ch}</span>;
         return (
-          <span key={i} aria-hidden className="relative inline-block h-[1em] overflow-hidden leading-none" style={{ width: "1ch" }}>
+          <span key={i} aria-hidden className="relative top-[.15em] inline-block h-[1em] overflow-hidden leading-none" style={{ width: "1ch" }}>
             <span className="absolute left-0 top-0 flex flex-col motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-[cubic-bezier(.2,.7,.1,1)]" style={{ transform: `translateY(-${d}em)` }}>
               {"0123456789".split("").map((n) => <span key={n} className="block h-[1em] leading-none">{n}</span>)}
             </span>
@@ -140,15 +140,15 @@ export function Roll({ value, className = "" }: { value: string; className?: str
 }
 
 /** One readout in an instrument strip: label, rolling value, unit; no card around it. */
-export function Readout({ label, value, unit, tone = "text-white", sub, source }: { label: ReactNode; value: string; unit?: string; tone?: string; sub?: ReactNode; source?: Source }) {
+export function Readout({ label, value, unit, tone = "text-ink", sub, source }: { label: ReactNode; value: string; unit?: string; tone?: string; sub?: ReactNode; source?: Source }) {
   return (
     <div className="min-w-0 px-4 py-3 first:pl-0">
-      <div className="flex items-center gap-2 text-[11.5px] text-mist">{label}{source && <SourceTag kind={source} />}</div>
-      <div className={`mt-1.5 flex items-baseline gap-1 text-[28px] leading-none md:text-[34px] ${tone}`}>
+      <div className="flex items-center gap-2 text-[13px] text-mist">{label}{source && <SourceTag kind={source} />}</div>
+      <div className={`mt-1.5 flex items-baseline gap-1 font-display text-[28px] leading-none md:text-[34px] ${tone}`}>
         <Roll value={value} />
         {unit && <span className="whitespace-nowrap text-sm text-mist">{unit}</span>}
       </div>
-      {sub && <div className="mt-1.5 text-[11.5px] text-mist">{sub}</div>}
+      {sub && <div className="mt-1.5 text-[13px] text-mist">{sub}</div>}
     </div>
   );
 }

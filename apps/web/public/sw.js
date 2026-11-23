@@ -1,6 +1,6 @@
 // Saur Mitra offline support: app shell cache-first, API network-first with the last good response.
-const SHELL = "sinchai-shell-v1";
-const DATA = "sinchai-data-v1";
+const SHELL = "sinchai-shell-v2";
+const DATA = "sinchai-data-v2";
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(SHELL).then((c) => c.addAll(["/mitra", "/icon.svg", "/manifest.webmanifest"])).then(() => self.skipWaiting()));
 });

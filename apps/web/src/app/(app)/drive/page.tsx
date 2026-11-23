@@ -55,32 +55,32 @@ export default function DrivePage() {
       <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="flex min-w-0 flex-col gap-4">
           {/* Faceplate */}
-          <div className="rounded-xl border border-[#3a4540] bg-gradient-to-b from-[#2c3531] to-[#1c2420] p-5 shadow-xl">
+          <div className="device rounded-xl border border-ink bg-[#344a3f] p-5 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[12px] font-semibold tracking-wide text-se">Schneider Electric</div>
+                <div className="text-[12px] font-semibold tracking-wide text-se-ink">Schneider Electric</div>
                 <div className="font-display text-xl">Altivar Solar ATV320</div>
               </div>
-              <div className="text-right text-[11px] text-mist">
+              <div className="text-right text-[12px] text-mist">
                 Modbus ID 1 · 19200 8E1
                 <br />
-                <span className="text-water">simulated drive</span> <SourceTag kind="simulated" />
+                <span className="text-water-ink">simulated drive</span> <SourceTag kind="simulated" />
               </div>
             </div>
             <div className="mt-4 grid grid-cols-[1fr_auto] gap-4">
               <div className="rounded-md border border-black/50 bg-[#0a1210] p-4 shadow-inner" aria-live="polite">
-                <div className="num text-[11px] text-se/80">{d?.fault ? "FLT" : running ? (d?.extras.low_light ? "LOW LIGHT" : "RUN") : "RDY"}</div>
-                <div className="num text-5xl tracking-tight text-se" style={{ textShadow: "0 0 12px rgba(61,205,88,.45)" }}>
+                <div className="num text-[12px] text-se-ink/80">{d?.fault ? "FLT" : running ? (d?.extras.low_light ? "LOW LIGHT" : "RUN") : "RDY"}</div>
+                <div className="num text-5xl tracking-tight text-se-ink" style={{ textShadow: "0 0 12px rgba(61,205,88,.45)" }}>
                   {d?.fault ? d.fault : `${(d?.freq_hz ?? 0).toFixed(1)}`}
                   {!d?.fault && <span className="ml-1 text-xl">Hz</span>}
                 </div>
-                <div className="num mt-2 grid grid-cols-3 gap-2 text-[13px] text-se/90">
+                <div className="num mt-2 grid grid-cols-3 gap-2 text-[13px] text-se-ink/90">
                   <span>{(d?.power_kw ?? 0).toFixed(2)} kW</span>
                   <span>{(d?.current_a ?? 0).toFixed(1)} A</span>
                   <span>{(d?.energy_kwh ?? 0).toFixed(0)} kWh</span>
                 </div>
               </div>
-              <div className="flex flex-col justify-center gap-2 text-[11px]">
+              <div className="flex flex-col justify-center gap-2 text-[12px]">
                 {[
                   { l: "RDY", on: !!d && !d.fault, c: "bg-se" },
                   { l: "RUN", on: running && !d?.extras.low_light, c: "bg-se" },
@@ -106,13 +106,13 @@ export default function DrivePage() {
               <Btn disabled={busy} onClick={() => act(() => postJSON("/api/drive/dry_run", { on: true }))}>Well runs dry</Btn>
               <Btn disabled={busy} onClick={() => act(() => postJSON("/api/drive/dry_run", { on: false }))}>Water back</Btn>
             </div>
-            <p className="mt-2 text-[11px] text-mist">{d?.extras.note}</p>
+            <p className="mt-2 text-[12px] text-mist">{d?.extras.note}</p>
           </div>
 
-          <Panel title="Telemetry, register by register" right={<span className="text-[11px] text-mist">addresses from the ATV320 Modbus manual NVE41308</span>}>
+          <Panel title="Telemetry, register by register" right={<span className="text-[12px] text-mist">addresses from the ATV320 Modbus manual NVE41308</span>}>
             <table className="num w-full text-[13px]">
               <thead>
-                <tr className="text-left text-[11px] text-mist">
+                <tr className="text-left text-[12px] text-mist">
                   <th className="pb-2 font-normal">Value</th>
                   <th className="pb-2 font-normal">Register</th>
                   <th className="pb-2 text-right font-normal">Reading</th>
@@ -124,7 +124,7 @@ export default function DrivePage() {
                   return (
                     <tr key={r.reg} className="border-t border-soil">
                       <td className="py-1.5 font-sans">{r.label}</td>
-                      <td className="py-1.5 text-mist">{r.reg} <span className="text-[11px]">@{r.addr}</span></td>
+                      <td className="py-1.5 text-mist">{r.reg} <span className="text-[12px]">@{r.addr}</span></td>
                       <td className="py-1.5 text-right">
                         {typeof v === "number" ? v.toFixed(r.digits ?? 0) : String(v ?? "–").replaceAll("_", " ")} <span className="text-mist">{r.unit}</span>
                       </td>
@@ -156,7 +156,7 @@ export default function DrivePage() {
             {d?.fault && !diag && <Btn tone="sun" onClick={() => ask(0)}>Start the guided fix</Btn>}
             {diag && (
               <div className="flex flex-col gap-3">
-                <div className="num text-[11px] text-mist">
+                <div className="num text-[12px] text-mist">
                   Step {(diag.step ?? 0) + 1} of {diag.of ?? 1} · {diag.source}
                 </div>
                 {diag.instruction_hi && <p className="deva text-lg" lang="hi">{diag.instruction_hi}</p>}

@@ -5,7 +5,7 @@ export function Receipt({ r, fresh = false, stamp = "verified" }: { r: LedgerRow
   const water = r.kind === "water";
   return (
     <article
-      className={`paper perforated relative rounded-b-md px-4 pb-4 pt-5 shadow-[0_10px_30px_-12px_rgba(0,0,0,.6)] ${fresh ? "print-in" : ""}`}
+      className={`paper perforated relative rounded-b-md px-4 pb-4 pt-5 shadow-[0_10px_30px_-12px_rgba(110,80,30,.22)] ${fresh ? "print-in" : ""}`}
       aria-label={`Receipt ${r.receipt_id}`}
     >
       <div className="flex items-baseline justify-between gap-2">

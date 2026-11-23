@@ -30,7 +30,7 @@ function Track({ label, sub, children, n, nowIndex, h }: { label: string; sub?: 
     <div className="flex items-center gap-3">
       <div className="w-[128px] shrink-0 truncate text-[12px] text-fog">
         {label}
-        {sub && <span className="ml-1.5 text-[10px] text-mist">{sub}</span>}
+        {sub && <span className="ml-1.5 text-[12px] text-mist">{sub}</span>}
       </div>
       <div className={`relative ${h} flex-1 rounded-[3px] bg-night-3/70`}>
         {Array.from({ length: n / 2 }, (_, i) => (
@@ -86,7 +86,7 @@ export function Gantt({
           <div className="relative h-4 flex-1">
             {slots.map((s, k) =>
               k % 4 === 0 ? (
-                <span key={s.start} className="num absolute -translate-x-1/2 text-[10px] text-mist" style={{ left: `${(k / n) * 100}%` }}>
+                <span key={s.start} className="num absolute -translate-x-1/2 text-[12px] text-mist" style={{ left: `${(k / n) * 100}%` }}>
                   {s.start}
                 </span>
               ) : null,
@@ -112,7 +112,7 @@ export function Gantt({
           })}
           {keys.length === 0 && (
             <Track n={n} nowIndex={nowIndex} h={h} label="Water">
-              <span className="absolute inset-0 flex items-center pl-2 text-[11px] text-mist">No bookings today</span>
+              <span className="absolute inset-0 flex items-center pl-2 text-[12px] text-mist">No bookings today</span>
             </Track>
           )}
           <Track n={n} nowIndex={nowIndex} h={h} label="Flour mill">
@@ -122,7 +122,7 @@ export function Gantt({
           </Track>
           <Track n={n} nowIndex={nowIndex} h={h} label="Chaff cutter">
             {segments(slots, (s) => s.action === "chaff").map((seg, i) => (
-              <Block n={n} tr={tr} key={`chaff-${i}`} id={`chaff-${i}`} seg={seg} cls="bg-[#c98b4a]" title={`Chaff cutter from ${slots[seg.start].start}`} />
+              <Block n={n} tr={tr} key={`chaff-${i}`} id={`chaff-${i}`} seg={seg} cls="bg-chaff" title={`Chaff cutter from ${slots[seg.start].start}`} />
             ))}
           </Track>
           <Track n={n} nowIndex={nowIndex} h={h} label="Battery packs">

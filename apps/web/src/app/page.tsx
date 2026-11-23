@@ -4,6 +4,7 @@ import Link from "next/link";
 import { area, curveMonotoneX, line } from "d3-shape";
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { Border, Motif, VillageScene } from "@/components/Art";
 import type { PlotFeature } from "@/components/PlotMosaic";
 import { Receipt } from "@/components/Receipt";
 import { Mark, NAV } from "@/components/Shell";
@@ -36,9 +37,9 @@ type Story = {
   } | null;
 };
 
-const SLOT_CLS: Record<string, string> = { req: "bg-water", mill: "bg-sun", chaff: "bg-[#c98b4a]", battery: "bg-mist/70", idle: "bg-white/[.06]" };
+const SLOT_CLS: Record<string, string> = { req: "bg-water", mill: "bg-sun", chaff: "bg-chaff", battery: "bg-mist/70", idle: "bg-ink/[.08]" };
 
-const FARMER_SHADES = ["bg-water", "bg-[#8fd0f5]", "bg-[#2c7bb0]", "bg-[#b9e3fa]"];
+const FARMER_SHADES = ["bg-water", "bg-[#a9d3dc]", "bg-water-deep", "bg-[#cfe6ea]"];
 
 function SlotStrip({ slots, order, className = "" }: { slots: { start: string; action: string; farmer: string | null }[]; order: string[]; className?: string }) {
   return (
@@ -49,7 +50,7 @@ function SlotStrip({ slots, order, className = "" }: { slots: { start: string; a
         return (
           <div key={s.start} title={`${s.start} ${s.action === "req" ? s.farmer : s.action}`}
             className={`relative rounded-[2px] ${s.action === "req" ? FARMER_SHADES[Math.max(0, order.indexOf(s.farmer ?? "")) % FARMER_SHADES.length] : SLOT_CLS[s.action] ?? "bg-soil"}`}>
-            {head && <span className="absolute -top-4 left-0 hidden whitespace-nowrap text-[10px] text-fog md:block">{s.farmer?.split(" ")[0]}</span>}
+            {head && <span className="absolute -top-4 left-0 hidden whitespace-nowrap text-[12px] text-fog md:block">{s.farmer?.split(" ")[0]}</span>}
           </div>
         );
       })}
@@ -109,7 +110,7 @@ export default function Home() {
       const cum: number[] = [0];
       dayKw.forEach((k, i) => cum.push(cum[i] + k));
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.to(".hero-sun", { yPercent: -70, scale: 1.12, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+        gsap.to(".scene-sun", { y: 40, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
         let progress = 0;
         motion.ScrollTrigger.create({ start: 0, end: "max", onUpdate: (self) => { progress = self.progress; } });
         // Repaint every frame: the pinned chapter's clock eases after the scroll, and the nav clock reads it.
@@ -121,7 +122,7 @@ export default function Home() {
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         // Hero: the sun rises as you start scrolling; the wordmark settles.
         // 06:00 statement fills word by word.
-        gsap.fromTo(".fill-word", { color: "#6b7b72" }, { color: "#eef3ee", stagger: 0.08, ease: "none", scrollTrigger: { trigger: ".problem", start: "top 70%", end: "bottom 60%", scrub: true } });
+        gsap.fromTo(".fill-word", { color: "#8a7d5c" }, { color: "#2b2a1b", stagger: 0.08, ease: "none", scrollTrigger: { trigger: ".problem", start: "top 70%", end: "bottom 60%", scrub: true } });
         // The beam: a wedge of morning sun sweeps across and becomes the gold chapter.
         gsap.fromTo(
           ".beam",
@@ -186,60 +187,54 @@ export default function Home() {
   const dieselShare = c?.bihar_diesel_structures_share;
 
   return (
-    <div ref={root} className="grain relative overflow-x-clip bg-night text-[#eef3ee]">
+    <div ref={root} className="relative overflow-x-clip bg-night text-ink">
       <div ref={skyRef} className="pointer-events-none fixed inset-0 z-0" aria-hidden />
 
       <a href="#story" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-sun focus:px-3 focus:py-1 focus:text-ink">Skip to the story</a>
-      <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-white/5 bg-night/75 px-5 py-3 backdrop-blur-md md:px-10">
-        <Link href="/" className="flex items-center gap-2 text-white"><Mark /> <span className="font-display text-lg font-semibold">SinchaiSlot</span></Link>
+      <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-soil/60 bg-night/85 px-5 py-3 backdrop-blur-md md:px-10">
+        <Link href="/" className="flex items-center gap-2 text-ink"><Mark /> <span className="font-display text-lg font-medium">SinchaiSlot</span></Link>
 <div ref={hudRef} className="num pointer-events-none hidden items-center gap-3 text-[12px] text-mist lg:motion-safe:flex" aria-hidden>
         <svg width="64" height="26" viewBox="0 0 64 26" className="overflow-visible">
           <path d="M4 24 Q32 -8 60 24" fill="none" stroke="var(--soil)" strokeWidth="1.5" strokeDasharray="2 3" />
           <line x1="0" x2="64" y1="24" y2="24" stroke="var(--soil)" strokeWidth="1" />
           <circle ref={sunRef} cx="4" cy="24" r="4.5" fill="var(--sun)" />
         </svg>
-        <span data-hud="clock" className="text-[15px] text-sun">06:00</span><span data-hud="kwh">0.0 kWh of real sun so far</span>
+        <span data-hud="clock" className="text-[15px] text-sun-ink">06:00</span><span data-hud="kwh">0.0 kWh of real sun so far</span>
       </div>
-        <nav className="flex items-center gap-5 text-[13px] text-white">
+        <nav className="flex items-center gap-5 text-[13px] text-ink">
           <a href="#proof" className="hidden hover:underline sm:inline">Proof</a>
           <a href="#schneider" className="hidden hover:underline sm:inline">Schneider inside</a>
-          <Link href="/twin" className="rounded-full border border-white px-4 py-1.5 hover:bg-white hover:text-black">Run today live</Link>
+          <Link href="/twin" className="rounded-full border border-ink/70 px-4 py-1.5 hover:bg-ink hover:text-paper">See today live</Link>
         </nav>
       </header>
 
       {/* HERO */}
-      <section className="hero relative z-10 flex min-h-[100svh] flex-col justify-end overflow-hidden" aria-label="Introduction">
-        <div className="hero-sun absolute right-[8%] top-[16%] h-[18vmin] w-[18vmin] rounded-full bg-sun shadow-[0_0_120px_40px_rgba(245,184,61,.35)] md:right-[12%] md:top-[58%] md:h-[22vmin] md:w-[22vmin]" aria-hidden />
-        <div className="relative z-10 mx-auto w-full max-w-[1400px] px-5 pb-6 md:px-10">
-          <p className="max-w-3xl font-display text-[clamp(1.7rem,3.6vw,3.4rem)] font-semibold leading-[1.05] tracking-tight text-[#eef3ee]">
-            Every shared solar pump in Bihar is a 5&nbsp;kW power plant that sleeps most of the day.
-          </p>
-          <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-mist">
-            SinchaiSlot wakes it up: water first for the farmers who book it, then the flour mill, the chaff cutter and battery packs with the
-            sun that is left, all inside the village&apos;s groundwater budget. Planned on tomorrow&apos;s forecast, run and metered by a
-            Schneider Altivar Solar drive, receipted for every litre.
+      <section className="hero relative z-10 flex min-h-[100svh] flex-col overflow-hidden bg-gradient-to-b from-[#f9dfa8] via-night to-night" aria-label="Introduction">
+        <div className="relative z-10 mx-auto w-full max-w-[1240px] px-5 pt-28 md:px-10 md:pt-[17vh]">
+          <h1 className="max-w-[17ch] font-display text-[clamp(2.3rem,5vw,4.4rem)] font-medium leading-[1.04]">
+            One solar pump, shared well, waters a whole village.
+          </h1>
+          <p className="mt-5 max-w-[46ch] text-[17px] leading-relaxed text-fog md:text-[19px]">
+            SinchaiSlot plans each day of sun: water first for the farmers who book it, then the mill and batteries with what is left.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <Link href="/twin" className="rounded-full bg-sun px-6 py-3 text-[15px] font-semibold text-ink hover:bg-sun-deep">Run 2 March live</Link>
-            <a href="#story" className="rounded-full border border-fog/40 px-6 py-3 text-[15px] hover:bg-white/5">Follow one day ↓</a>
+            <Link href="/twin" className="rounded-full bg-ink px-6 py-3 text-[16px] font-medium text-paper hover:bg-fog">See today live</Link>
+            <a href="#story" className="rounded-full border border-ink/40 px-6 py-3 text-[16px] hover:bg-ink/5">Follow one day</a>
           </div>
         </div>
-        <h1 className="wm relative z-10 select-none overflow-hidden px-3 pb-2 font-display font-extrabold leading-[0.8] tracking-[-0.02em] text-sun" aria-label="SinchaiSlot">
-          <span className="flex justify-between text-[clamp(3.2rem,13.5vw,15rem)]" aria-hidden>
-            {"SINCHAISLOT".split("").map((ch, i) => <span key={i} className="wm-l inline-block" style={{ animationDelay: `${i * 40}ms` }}>{ch}</span>)}
-          </span>
-        </h1>
+        <VillageScene className="mt-6 h-[46svh] w-full flex-1 md:absolute md:inset-x-0 md:bottom-0 md:mt-0 md:h-[74svh]" />
       </section>
+      <Border className="relative z-10" id="bd-hero" />
 
       {/* 06:00 PROBLEM */}
-      <section id="story" className="problem relative z-10 mx-auto max-w-[1400px] px-5 py-[18vh] md:px-10" aria-labelledby="t-problem">
+      <section id="story" className="problem relative z-10 mx-auto max-w-[1400px] px-5 py-[15vh] md:px-10" aria-labelledby="t-problem">
         <Clock t="06:00" label="Dawn, Samastipur" />
-        <h2 id="t-problem" className="mt-8 max-w-5xl font-display text-[clamp(2.2rem,5.6vw,5.5rem)] font-semibold leading-[1.02] tracking-tight">
+        <h2 id="t-problem" className="mt-8 max-w-5xl font-display text-[clamp(1.9rem,4vw,3.6rem)] font-medium leading-[1.14] ">
           {`Solar pumps put about ${ceew ? Math.round(ceew.value * 100) : "…"}% of their sunshine to work. Next door, a tenant farmer pays a diesel seller ₹${dieselRate?.value ?? "…"} an hour for the same water.`
             .split(" ")
             .map((w, i) => <span key={i} className="fill-word">{w} </span>)}
         </h2>
-        <div className="mt-10 grid max-w-4xl gap-6 text-[14px] text-mist sm:grid-cols-3">
+        <div className="mt-10 grid max-w-4xl gap-6 text-[15px] text-fog sm:grid-cols-3">
           <p>
             <span className="num text-2xl text-fog">{ceew ? fmt.pct(ceew.value) : "…"}</span><br />of solar pump energy used (1,131 pumps, Chhattisgarh) <SourceTag kind="published" />
           </p>
@@ -253,12 +248,13 @@ export default function Home() {
       </section>
 
       {/* 10:00 THE BEAM */}
-      <section className="beam-wrap relative z-10 min-h-[110vh]" aria-labelledby="t-book">
-        <div className="beam absolute inset-0 bg-sun" style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }} aria-hidden />
-        <div className="relative mx-auto grid max-w-[1400px] items-center gap-10 px-5 py-[16vh] text-ink md:grid-cols-[1.1fr_0.9fr] md:px-10">
+      <section className="beam-wrap relative z-10 min-h-[80vh]" aria-labelledby="t-book">
+        <div className="beam absolute inset-0 bg-[#f3c469]" style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }} aria-hidden />
+        <div className="relative mx-auto grid max-w-[1400px] items-center gap-10 px-5 py-[12vh] text-ink md:grid-cols-[1.1fr_0.9fr] md:px-10">
           <div>
-            <Clock t="10:00" label="Ramesh gives a missed call" dark />
-            <h2 id="t-book" className="mt-8 font-display text-[clamp(2rem,5vw,4.6rem)] font-semibold leading-[1.02] tracking-tight">
+            <Motif name="parrot" size={120} />
+            <div className="mt-6"><Clock t="10:00" label="Ramesh gives a missed call" dark /></div>
+            <h2 id="t-book" className="mt-8 font-display text-[clamp(1.8rem,3.6vw,3.2rem)] font-medium leading-[1.14] ">
               The call is free. Saathi calls back in Maithili, already knowing what his wheat needs.
             </h2>
             <p className="mt-6 max-w-xl text-[16px] leading-relaxed">
@@ -266,37 +262,37 @@ export default function Home() {
               Saathi reads the offer back and books only after he says yes. Price per cubic metre, under diesel.
             </p>
           </div>
-          <div className="phone-card mx-auto w-full max-w-sm rounded-[28px] bg-ink p-5 text-paper shadow-[0_30px_60px_-20px_rgba(19,32,26,.6)]">
-            <div className="flex items-center justify-between text-[12px] opacity-70"><span>Saathi · callback</span><span className="num">{story?.day ?? ""}</span></div>
+          <div className="phone-card mx-auto w-full max-w-sm rounded-[28px] border-2 border-ink bg-paper p-5 text-ink shadow-[8px_8px_0_rgba(43,42,27,.16)]">
+            <div className="flex items-center justify-between text-[12px] text-mist"><span>Saathi · callback</span><span className="num">{story?.day ?? ""}</span></div>
             <p className="deva mt-4 text-[17px] leading-relaxed" lang="mai">{story?.offer ? `${story.offer.greet} ${story.offer.mai}` : "…"}</p>
-            <p className="mt-4 border-t border-paper/15 pt-3 text-[13px] leading-relaxed opacity-75">{story?.offer?.en}</p>
+            <p className="mt-4 border-t border-ink/15 pt-3 text-[13px] leading-relaxed text-fog">{story?.offer?.en}</p>
             <div className="mt-4 flex gap-2 text-[13px]">
-              <span className="rounded-full bg-sun px-3 py-1 font-semibold text-ink">1 · हँ</span>
-              <span className="rounded-full border border-paper/30 px-3 py-1">2 · नै</span>
+              <span className="rounded-full bg-sun px-3 py-1 font-medium text-ink">1 · हँ</span>
+              <span className="rounded-full border border-ink/30 px-3 py-1">2 · नै</span>
             </div>
-            <p className="mt-3 text-[11px] opacity-60">Live from the planner on the demo day. Voice simulated as text.</p>
+            <p className="mt-3 text-[13px] text-mist">Live from the planner on the demo day. Voice simulated as text.</p>
           </div>
         </div>
       </section>
 
       {/* 13:40 THE CLOUD (signature) */}
-      <section className="day relative z-10 flex h-[100svh] min-h-[600px] flex-col justify-center overflow-hidden pb-6 pt-28 md:py-10" aria-labelledby="t-cloud">
+      <section className="day relative z-10 flex h-[100svh] min-h-[600px] flex-col justify-center overflow-hidden pb-6 pt-28 md:pb-8 md:pt-24" aria-labelledby="t-cloud">
         {plots.length > 0 && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.07]" aria-hidden>
             <div className="w-[120vmin]"><PlotMosaic features={plots} /></div>
           </div>
         )}
-        <div className="cloud pointer-events-none absolute top-[10%] h-[60vh] w-[70vw] rounded-full bg-[radial-gradient(closest-side,rgba(4,8,7,.75),rgba(4,8,7,0))]" aria-hidden />
+        <div className="cloud pointer-events-none absolute top-[10%] h-[60vh] w-[70vw] rounded-full bg-[radial-gradient(closest-side,rgba(120,134,138,.6),rgba(120,134,138,0))]" aria-hidden />
         <div className="relative mx-auto w-full max-w-[1400px] px-5 md:px-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <Clock t="13:40" label="The day replays: watch the cloud arrive at 13:40" />
-              <h2 id="t-cloud" className="mt-4 max-w-3xl font-display text-[clamp(1.5rem,3vw,2.8rem)] font-semibold leading-[1.05] tracking-tight">
+              <h2 id="t-cloud" className="mt-4 max-w-3xl font-display text-[clamp(1.5rem,3vw,2.8rem)] font-medium leading-[1.14] ">
                 The forecast said sun. The sky said otherwise. The plan moves before the water stops.
               </h2>
             </div>
             <div className="text-left md:text-right">
-              <div className="num text-[clamp(2.6rem,6vw,5.5rem)] leading-none text-sun"><span className="day-clock">18</span>:00</div>
+              <div className="num text-[clamp(2.6rem,6vw,5.5rem)] leading-none text-sun-ink"><span className="day-clock">18</span>:00</div>
               <div className="text-[12px] text-mist">{day?.date} · real sun, held-out day <SourceTag kind="real" /></div>
             </div>
           </div>
@@ -306,11 +302,11 @@ export default function Home() {
               <svg viewBox={`0 0 ${chart.W} ${chart.H}`} preserveAspectRatio="none" className="aspect-[3/1] w-full overflow-visible md:aspect-auto md:h-[30vh]" role="img" aria-label="Solar power on the demo day: forecast band, forecast median and actual">
                 <path className="curve-band" d={chart.band} fill="var(--sun)" opacity="0.26" />
                 <path className="curve-p50" d={chart.p50} pathLength={1} strokeDasharray="1" fill="none" stroke="var(--sun-deep)" strokeWidth="3" strokeOpacity="0.8" vectorEffect="non-scaling-stroke" />
-                <path className="curve-actual" d={chart.actual} pathLength={1} strokeDasharray="1" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+                <path className="curve-actual" d={chart.actual} pathLength={1} strokeDasharray="1" fill="none" stroke="var(--ink)" strokeWidth="4" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
               </svg>
               <div className="cloud-note pointer-events-none absolute flex items-center gap-2" style={{ left: `${(chart.cloudX / chart.W) * 100}%`, top: `${(chart.cloudY / chart.H) * 100}%`, transform: chart.cloudX / chart.W > 0.6 ? "translate(calc(-100% + 7px), -7px)" : "translate(-7px, -7px)", flexDirection: chart.cloudX / chart.W > 0.6 ? "row-reverse" : "row" }}>
                 <span className="h-3.5 w-3.5 rounded-full bg-water ring-4 ring-water/25" />
-                <span className="hidden whitespace-nowrap rounded bg-night/80 px-2 py-0.5 text-[13px] text-water md:inline">actual sun below the P10 forecast</span>
+                <span className="hidden whitespace-nowrap rounded bg-night/80 px-2 py-0.5 text-[13px] text-water-ink md:inline">actual sun below the P10 forecast</span>
               </div>
               </div>
               {story?.replay && (
@@ -329,16 +325,15 @@ export default function Home() {
               <div className="mt-2 flex flex-wrap gap-4 text-[12px] text-mist">
                 <span><span className="mr-1.5 inline-block h-2 w-5 bg-sun/30 align-middle" />P10 to P90 forecast</span>
                 <span><span className="mr-1.5 inline-block w-5 border-t-2 border-sun-deep align-middle" />P50</span>
-                <span><span className="mr-1.5 inline-block w-5 border-t-[3px] border-white align-middle" />actual sun</span>
+                <span><span className="mr-1.5 inline-block w-5 border-t-[3px] border-ink align-middle" />actual sun</span>
                 {story?.replay && <span><span className="mr-1.5 inline-block h-2 w-5 bg-water align-middle" />water slots, re-planned at 13:40</span>}
               </div>
             </div>
           )}
           <div className="mt-5 grid gap-5 md:grid-cols-[1fr_minmax(0,380px)]">
-            <p className="max-w-2xl text-[14px] leading-relaxed text-mist">
-              Surya Planner re-solves the day from now with the nowcast. It never moves the slot that is running or the next one. Water still
-              comes first; the mill waits for the sun that is left. Every moved farmer gets a call in their own language, and if less water
-              fits today, Saathi says so and puts them first tomorrow.
+            <p className="max-w-2xl text-[16px] leading-relaxed text-fog">
+              Water still comes first and the mill waits. Every farmer whose time moved gets a call in their own language, and whoever is left
+              short goes first tomorrow.
             </p>
             <div className="ring-card rounded-2xl border border-water/40 bg-night-2 p-4">
               {(() => {
@@ -347,7 +342,7 @@ export default function Home() {
                 const last = list[list.length - 1];
                 return last ? (
                   <>
-                    <div className="num flex items-center gap-2 text-[12px] text-water">
+                    <div className="num flex items-center gap-2 text-[12px] text-water-ink">
                       <span className="ring-dot inline-block h-2.5 w-2.5 rounded-full bg-water" aria-hidden />
                       Saathi calls · {last.at} · {last.name}
                       {!live && <SourceTag kind="simulated" className="ml-auto" />}
@@ -357,9 +352,9 @@ export default function Home() {
                   </>
                 ) : (
                   <>
-                    <div className="text-[12px] text-water">Plan-change calls</div>
+                    <div className="text-[12px] text-water-ink">Plan-change calls</div>
                     <p className="mt-2 text-[14px] text-fog">Run the day in the Village Twin to hear who gets called, and what they are told.</p>
-                    <Link href="/twin" className="mt-3 inline-block text-[13px] text-sun underline">Open the live day</Link>
+                    <Link href="/twin" className="mt-3 inline-block text-[13px] text-sun-ink underline">Open the live day</Link>
                   </>
                 );
               })()}
@@ -369,14 +364,15 @@ export default function Home() {
       </section>
 
       {/* 18:00 DUSK RECEIPT */}
-      <section className="dusk relative z-10 py-[16vh]" aria-labelledby="t-receipt">
+      <section className="dusk relative z-10 py-[12vh]" aria-labelledby="t-receipt">
         <div className="mx-auto grid max-w-[1400px] items-center gap-12 px-5 md:grid-cols-2 md:px-10">
           <div>
-            <Clock t="18:00" label="The pump stops; the books close" />
-            <h2 id="t-receipt" className="mt-8 font-display text-[clamp(2rem,4.6vw,4.2rem)] font-semibold leading-[1.03] tracking-tight">
+            <Motif name="fish" size={120} />
+            <div className="mt-6"><Clock t="18:00" label="The pump stops; the books close" /></div>
+            <h2 id="t-receipt" className="mt-8 font-display text-[clamp(1.8rem,3.6vw,3.2rem)] font-medium leading-[1.14] ">
               Every booking leaves a receipt a funder can pay against.
             </h2>
-            <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-mist">
+            <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-fog">
               Litres, kilowatt-hours, diesel and CO₂ avoided, read from the drive and chained by hash to the receipt before it. Edit one and the
               chain breaks. Receipts become CSR claims, a lender&apos;s credit file, and, with a rule change, the state diesel subsidy.
             </p>
@@ -388,7 +384,7 @@ export default function Home() {
       {/* PROOF */}
       <section id="proof" className="relative z-10 mx-auto max-w-[1400px] px-5 py-[14vh] md:px-10" aria-labelledby="t-proof">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 id="t-proof" className="font-display text-[clamp(2rem,4.6vw,4.2rem)] font-semibold tracking-tight">The proof</h2>
+          <h2 id="t-proof" className="font-display text-[clamp(1.8rem,3.6vw,3.2rem)] font-medium ">The proof</h2>
           <p className="max-w-xl text-[13px] text-mist">
             {proof ? `${proof.setup.runs_per_policy} simulated years per policy on real NASA POWER weather (${proof.setup.years.join(", ")}, held out), real archived forecasts, ${proof.setup.seeds} synthetic villages. Bands are P10 to P90.` : "Loading reports/proof.json…"}{" "}
             <SourceTag kind="simulated" />
@@ -398,26 +394,34 @@ export default function Home() {
           <ol className="mt-12 border-t border-dashed border-fog/25">
             <Row what="Sun put to work" to={h.utilisation_D_kwh_per_kwp} unit="kWh per kWp a year" base={`first-come hourly sales: ${fmt.n(h.utilisation_B_kwh_per_kwp)}`} />
             <Row what="More solar used" to={h.utilisation_gain_vs_B * 100} prefix="+" unit="%" base={`P10 ${fmt.signedPct(proof!.gains.utilisation_D_vs_B.p10)} to P90 ${fmt.signedPct(proof!.gains.utilisation_D_vs_B.p90)} across runs`} />
-            <Row what="Farmer pays" to={h.farmer_rs_per_m3_D} dec={2} prefix="₹" unit="per m³" base={`baseline ₹${h.farmer_rs_per_m3_B.toFixed(2)} · diesel ₹${h.diesel_rs_per_m3.toFixed(2)}`} tone="text-water" />
+            <Row what="Farmer pays" to={h.farmer_rs_per_m3_D} dec={2} prefix="₹" unit="per m³" base={`baseline ₹${h.farmer_rs_per_m3_B.toFixed(2)} · diesel ₹${h.diesel_rs_per_m3.toFixed(2)}`} tone="text-water-ink" />
+          </ol>
+        )}
+        {h && pol && (
+          <details className="mt-4">
+            <summary className="cursor-pointer py-2 text-[16px] underline underline-offset-4">Three more measurements</summary>
+            <ol className="mt-2 border-t border-dashed border-fog/25">
             <Row what="Tenants' need met by solar" to={h.tenant_share_D * 100} unit="%" base={`baseline ${fmt.pct(h.tenant_share_B)} · Gini ${h.gini_D.toFixed(2)} vs ${h.gini_B.toFixed(2)}`} />
             <Row what="Diesel avoided" to={h.diesel_l_avoided_D} unit="litres a year" base={`${fmt.n(h.co2_kg_avoided_D)} kg CO₂ at 2.6444 kg/L`} />
             <Row what="Forecast skill" to={h.forecast_skill_vs_persistence * 100} unit="% over yesterday's sun" base={`held-out ${proof!.forecast.test_years.join("–")} · ${fmt.pct(h.forecast_skill_vs_climatology)} over climatology`} />
-          </ol>
+            </ol>
+          </details>
         )}
         {proof?.negative_results?.explanation && (
           <div className="mt-14 max-w-3xl border-l-2 border-sun/60 pl-5">
-            <div className="text-[13px] text-sun">What the planner does not add</div>
+            <div className="text-[13px] text-sun-ink">What the planner does not add</div>
             <p className="mt-2 font-serif text-[19px] leading-relaxed text-fog">{proof.negative_results.explanation}</p>
           </div>
         )}
-        <Link href="/lab" className="mt-10 inline-block rounded-full border border-fog/40 px-5 py-2.5 text-[14px] hover:bg-white/5">Every number, every band, every ablation →</Link>
+        <Link href="/lab" className="mt-10 inline-block rounded-full border border-fog/40 px-5 py-2.5 text-[14px] hover:bg-ink/5">Every number, every band, every ablation →</Link>
       </section>
 
+      <Border className="relative z-10" id="bd-se" />
       {/* SCHNEIDER */}
-      <section id="schneider" className="relative z-10 border-t border-soil bg-night-2" aria-labelledby="t-se">
+      <section id="schneider" className="relative z-10 bg-night-2" aria-labelledby="t-se">
         <div className="mx-auto max-w-[1400px] px-5 py-[12vh] md:px-10">
-          <h2 id="t-se" className="font-display text-[clamp(1.8rem,4vw,3.4rem)] font-semibold tracking-tight">
-            Remove the <span className="text-se">Altivar Solar</span> drive and nothing works.
+          <h2 id="t-se" className="font-display text-[clamp(1.8rem,4vw,3.4rem)] font-medium ">
+            Remove the <span className="text-se-ink">Altivar Solar</span> drive and nothing works.
           </h2>
           <ol className="relative mt-12 grid gap-10 md:grid-cols-3 md:gap-0">
             <div className="absolute left-[7px] top-2 bottom-2 w-[2px] bg-gradient-to-b from-se via-sun to-water md:left-0 md:right-0 md:top-[7px] md:bottom-auto md:h-[2px] md:w-auto md:bg-gradient-to-r" aria-hidden />
@@ -430,7 +434,7 @@ export default function Home() {
                 <span className={`absolute left-0 top-0 h-4 w-4 rounded-full ring-4 ring-night-2 ${dot}`} aria-hidden />
                 <div className="text-[13px] text-mist">{layer}</div>
                 <div className="mt-1 font-display text-2xl">{name}</div>
-                <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-mist">{text}</p>
+                <p className="mt-3 max-w-sm text-[16px] leading-relaxed text-fog">{text}</p>
               </li>
             ))}
           </ol>
@@ -439,7 +443,7 @@ export default function Home() {
 
       <footer className="relative z-10 mx-auto max-w-[1400px] px-5 py-16 md:px-10">
         <div className="flex flex-wrap items-center justify-between gap-6">
-          <Link href="/twin" className="rounded-full bg-sun px-7 py-3.5 text-[16px] font-semibold text-ink hover:bg-sun-deep">Run today live</Link>
+          <Link href="/twin" className="rounded-full bg-sun px-7 py-3.5 text-[16px] font-medium text-ink hover:bg-sun-deep">See today live</Link>
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-mist">
             {NAV.map((n) => <li key={n.href}><Link href={n.href} className="hover:text-fog">{n.label}</Link></li>)}
           </ul>
@@ -456,7 +460,7 @@ export default function Home() {
 
 function Clock({ t, label, dark = false }: { t: string; label: string; dark?: boolean }) {
   return (
-    <div className={`flex items-center gap-3 ${dark ? "text-ink" : "text-sun"}`}>
+    <div className={`flex items-center gap-3 ${dark ? "text-ink" : "text-sun-ink"}`}>
       <span className="num text-[15px] font-medium">{t}</span>
       <span className={`h-px w-10 ${dark ? "bg-ink/40" : "bg-sun/50"}`} />
       <span className={`text-[14px] ${dark ? "text-ink/80" : "text-mist"}`}>{label}</span>
@@ -464,27 +468,27 @@ function Clock({ t, label, dark = false }: { t: string; label: string; dark?: bo
   );
 }
 
-function Row({ what, to, dec = 0, prefix = "", unit, base, tone = "text-sun" }: { what: string; to: number; dec?: number; prefix?: string; unit: string; base: string; tone?: string }) {
+function Row({ what, to, dec = 0, prefix = "", unit, base, tone = "text-sun-ink" }: { what: string; to: number; dec?: number; prefix?: string; unit: string; base: string; tone?: string }) {
   return (
     <li className="grid items-baseline gap-x-8 gap-y-1 border-b border-dashed border-fog/25 py-5 md:grid-cols-[220px_minmax(0,1fr)_minmax(0,320px)] md:py-7">
       <div className="text-[14px] text-fog">{what}</div>
       <div className={`num flex items-baseline gap-3 leading-none ${tone}`}>
-        <span className="text-[clamp(3.2rem,8vw,7.5rem)] tracking-tight">{prefix}<span className="count" data-to={to} data-dec={dec}>{to.toLocaleString("en-IN", { maximumFractionDigits: dec, minimumFractionDigits: dec })}</span></span>
+        <span className="font-display text-[clamp(2.8rem,5.4vw,5rem)] ">{prefix}<span className="count" data-to={to} data-dec={dec}>{to.toLocaleString("en-IN", { maximumFractionDigits: dec, minimumFractionDigits: dec })}</span></span>
         <span className="text-[15px] text-mist">{unit}</span>
       </div>
-      <div className="num text-[12.5px] leading-relaxed text-mist md:text-right">{base}</div>
+      <div className="num text-[13px] leading-relaxed text-mist md:text-right">{base}</div>
     </li>
   );
 }
 
 const SKY: [number, number[], number[]][] = [
-  // [progress, horizon RGBA, zenith RGBA]: dawn rose, morning gold, noon haze, 13:40 cloud, dusk amber, night
-  [0.0, [214, 110, 92, 0.32], [14, 21, 18, 1]],
-  [0.18, [245, 184, 61, 0.26], [22, 30, 24, 1]],
-  [0.36, [250, 214, 140, 0.18], [24, 34, 28, 1]],
-  [0.52, [120, 140, 150, 0.24], [16, 24, 22, 1]],
-  [0.72, [227, 130, 40, 0.3], [20, 18, 14, 1]],
-  [1.0, [40, 60, 90, 0.18], [10, 14, 13, 1]],
+  // [progress, horizon RGBA, paper RGB]: dawn, morning, noon, 13:40 cloud, dusk, evening. Always light, always readable.
+  [0.0, [246, 196, 120, 0.5], [251, 245, 231, 1]],
+  [0.18, [246, 210, 130, 0.4], [252, 247, 235, 1]],
+  [0.36, [250, 224, 150, 0.35], [253, 249, 238, 1]],
+  [0.52, [150, 180, 188, 0.4], [243, 241, 231, 1]],
+  [0.72, [226, 140, 100, 0.34], [251, 241, 226, 1]],
+  [1.0, [185, 207, 143, 0.4], [248, 244, 230, 1]],
 ];
 
 /** Paint the sky, the sun on its arc and the corner clock for a scroll progress p (0..1). */

@@ -69,23 +69,23 @@ export default function PlannerPage() {
   return (
     <Shell title="Surya Planner">
       <ErrorNote error={error} />
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_280px]">
         <section aria-label="Today's plan" className="min-w-0">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <div className="flex items-center gap-2 text-[12px] text-mist">Plan v{snap?.plan_version ?? "–"} · two-stage stochastic MILP over P10 / P50 / P90 sun <SourceTag kind="model" /></div>
-              <h2 className="mt-1 font-display text-[clamp(1.6rem,2.6vw,2.3rem)] font-semibold leading-tight tracking-tight">
-                Water first: <span className="text-water"><Roll value={fmt.n(snap?.summary.water_m3_p50, 0)} /> m³</span> planned, then <span className="text-sun"><Roll value={fmt.n((snap?.summary.mill_kwh_p50 ?? 0) + (snap?.summary.chaff_kwh_p50 ?? 0) + (snap?.summary.battery_kwh_p50 ?? 0), 1)} /> kWh</span> for the mill and batteries.
+              <h2 className="mt-1 font-display text-[clamp(1.6rem,2.6vw,2.3rem)] font-medium leading-tight">
+                Water first: <span className="text-water-ink"><Roll value={fmt.n(snap?.summary.water_m3_p50, 0)} /> m³</span> planned, then <span className="text-sun-ink"><Roll value={fmt.n((snap?.summary.mill_kwh_p50 ?? 0) + (snap?.summary.chaff_kwh_p50 ?? 0) + (snap?.summary.battery_kwh_p50 ?? 0), 1)} /> kWh</span> for the mill and batteries.
               </h2>
             </div>
             <span className="num text-[12px] text-mist">P10 keeps {fmt.n(snap?.summary.water_m3_p10, 0)} m³ even on a dim day</span>
           </div>
 
           {/* The sky over the plan: drag to place a cloud */}
-          <div className="mt-5 rounded-[14px] border border-soil bg-night-2 p-4">
+          <div className="mt-5 rounded-[20px] border border-soil bg-night-2 p-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="text-[13px] font-medium text-fog">Sun the plan is built on</h3>
-              <span className="text-[11.5px] text-mist">Drag across the sky to place a cloud</span>
+              <span className="text-[12px] text-mist">Drag across the sky to place a cloud</span>
             </div>
             <div role="region" tabIndex={0} aria-label="Forecast chart, scrolls sideways on small screens" className="mt-2 overflow-x-auto">
             <div
@@ -100,13 +100,13 @@ export default function PlannerPage() {
               {fromI >= 0 && toI > fromI && (
                 <div className="pointer-events-none absolute top-[4%] h-[78%] transition-[left,width] duration-150" style={{ left: `${leftPct}%`, width: `${Math.max(1, rightPct - leftPct)}%` }} aria-hidden>
                   <div className="h-full w-full rounded-[40%] bg-[radial-gradient(closest-side,rgba(70,88,96,.78),rgba(70,88,96,0))]" style={{ opacity: 0.35 + cut / 140 }} />
-                  <span className="num absolute -top-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-night/85 px-1.5 text-[11px] text-fog">{from}–{to} · −{cut}% sun</span>
+                  <span className="num absolute -top-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-night/85 px-1.5 text-[12px] text-fog">{from}–{to} · −{cut}% sun</span>
                 </div>
               )}
             </div>
             </div>
             <div className="mt-1"><BandLegend /></div>
-            <form className="mt-3 flex flex-wrap items-end gap-3 text-[12.5px]" onSubmit={(e) => { e.preventDefault(); simulate(); }}>
+            <form className="mt-3 flex flex-wrap items-end gap-3 text-[13px]" onSubmit={(e) => { e.preventDefault(); simulate(); }}>
               <label className="flex flex-col gap-1 text-mist">From
                 <select value={from} onChange={(e) => setFrom(e.target.value)} className="num rounded border border-soil bg-night px-2 py-1.5 text-fog">{HOURS_ALL.map((h) => <option key={h}>{h}</option>)}</select>
               </label>
@@ -114,7 +114,7 @@ export default function PlannerPage() {
                 <select value={to} onChange={(e) => setTo(e.target.value)} className="num rounded border border-soil bg-night px-2 py-1.5 text-fog">{HOURS_ALL.map((h) => <option key={h}>{h}</option>)}</select>
               </label>
               <label className="flex min-w-[160px] flex-1 flex-col gap-1 text-mist">Sun lost under the cloud: <span className="num text-fog">{cut}%</span>
-                <input type="range" min={10} max={100} step={10} value={cut} onChange={(e) => setCut(Number(e.target.value))} className="accent-[var(--sun)]" />
+                <input type="range" min={10} max={100} step={10} value={cut} onChange={(e) => setCut(Number(e.target.value))} className="accent-[var(--sun-ink)]" />
               </label>
               <Btn type="submit" tone="sun" disabled={busy}>{busy ? "Solving…" : "What would move?"}</Btn>
             </form>
@@ -122,7 +122,7 @@ export default function PlannerPage() {
               <div className="mt-4 border-t border-soil pt-3" role="status">
                 <p className="num text-[12px] text-mist">Your cloud: {from}–{to}, {cut}% of the sun lost under it.</p>
                 <p className="mt-1 text-[14px] text-fog">
-                  Water <span className="num text-water">{fmt.n(whatIf.water_m3_p50_before)} → {fmt.n(whatIf.water_m3_p50_after)} m³</span>, mill <span className="num text-sun">{fmt.n(whatIf.mill_kwh_before, 1)} → {fmt.n(whatIf.mill_kwh_after, 1)} kWh</span>, batteries end at <span className="num">{fmt.n(whatIf.battery_kwh_after, 1)} kWh</span>. Nothing is changed until the real sky does this.
+                  Water <span className="num text-water-ink">{fmt.n(whatIf.water_m3_p50_before)} → {fmt.n(whatIf.water_m3_p50_after)} m³</span>, mill <span className="num text-sun-ink">{fmt.n(whatIf.mill_kwh_before, 1)} → {fmt.n(whatIf.mill_kwh_after, 1)} kWh</span>, batteries end at <span className="num">{fmt.n(whatIf.battery_kwh_after, 1)} kWh</span>. Nothing is changed until the real sky does this.
                 </p>
                 <ul className="mt-2 flex flex-col gap-1 text-[13px] text-mist">
                   {whatIf.changes.length === 0 && <li>No slot would move.</li>}
@@ -147,14 +147,14 @@ export default function PlannerPage() {
             {[...(snap?.diffs ?? [])].reverse().map((d) => (
               <li key={d.version} className="relative pb-5 pl-5">
                 <span className="absolute -left-[5px] top-1 h-[9px] w-[9px] rounded-full bg-water" aria-hidden />
-                <div className="num text-[12px] text-water">{d.at} · plan v{d.version}</div>
+                <div className="num text-[12px] text-water-ink">{d.at} · plan v{d.version}</div>
                 <div className="text-[12px] text-mist">{d.reason}</div>
                 <ul className="mt-2 flex flex-col gap-2 break-words text-[13px]">
                   {d.changes.length === 0 && <li className="text-mist">No slot moved.</li>}
                   {d.changes.map((c, i) => (
                     <li key={i} className="rounded-md bg-night-2 px-3 py-2">
                       <div>{c.reason_en}</div>
-                      <div className="deva mt-0.5 text-[12.5px] text-mist" lang="hi">{c.reason_hi}</div>
+                      <div className="deva mt-0.5 text-[13px] text-mist" lang="hi">{c.reason_hi}</div>
                     </li>
                   ))}
                 </ul>

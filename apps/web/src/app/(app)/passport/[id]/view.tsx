@@ -19,7 +19,7 @@ type Passport = {
 
 const KIND: Record<string, { label: string; cls: string }> = {
   water: { label: "Water", cls: "bg-water" }, mill: { label: "Flour mill", cls: "bg-sun" },
-  chaff: { label: "Chaff cutter", cls: "bg-[#c98b4a]" }, battery: { label: "Battery packs", cls: "bg-mist" },
+  chaff: { label: "Chaff cutter", cls: "bg-chaff" }, battery: { label: "Battery packs", cls: "bg-mist" },
 };
 const PART_LABEL: Record<string, string> = {
   utilisation: "Sun put to work (vs 1,000 kWh/kWp/yr)", uptime: "Uptime", repayment: "After-harvest repaid on time",
@@ -37,7 +37,7 @@ function ScoreBar({ value, grade }: { value: number; grade: string }) {
         <div className="h-3 rounded-full bg-[#c98b1a] motion-safe:transition-[width] motion-safe:duration-1000" style={{ width: `${value}%` }} />
         {[50, 65, 80].map((x) => <span key={x} className="absolute top-[-3px] h-[18px] w-px bg-ink/40" style={{ left: `${x}%` }} aria-hidden />)}
       </div>
-      <div className="num mt-1 flex justify-between text-[10px] text-ink/55"><span>0</span><span style={{ marginLeft: "40%" }}>C</span><span>B</span><span>A</span><span>100</span></div>
+      <div className="num mt-1 flex justify-between text-[12px] text-ink/55"><span>0</span><span style={{ marginLeft: "40%" }}>C</span><span>B</span><span>A</span><span>100</span></div>
     </div>
   );
 }
@@ -54,20 +54,20 @@ export default function PassportView({ id }: { id: string }) {
       <div className="mb-4 flex flex-wrap items-center gap-3 text-[13px]">
         {["P1", "P2", "P3"].map((x) => (
           <Link key={x} href={`/passport/${x}`} aria-current={x === id ? "page" : undefined}
-            className={`rounded-full px-3 py-1 ${x === id ? "bg-sun text-ink" : "bg-night-2 text-fog hover:text-white"}`}>{x}</Link>
+            className={`rounded-full px-3 py-1 ${x === id ? "bg-sun text-ink" : "bg-night-2 text-fog hover:text-ink"}`}>{x}</Link>
         ))}
         <Link href="/cluster" className="text-mist underline-offset-2 hover:underline">← cluster</Link>
-        <a href={`/api/pumps/${id}/passport.pdf`} className="ml-auto rounded-lg border border-soil px-3 py-1.5 text-fog hover:border-sun hover:text-white">Download one-page PDF</a>
+        <a href={`/api/pumps/${id}/passport.pdf`} className="ml-auto rounded-lg border border-soil px-3 py-1.5 text-fog hover:border-sun hover:text-ink">Download one-page PDF</a>
       </div>
       {!p ? <div className="h-64 animate-pulse rounded-xl bg-night-2" /> : (
         <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]">
-          <article className="paper perforated relative min-w-0 rounded-b-lg px-6 pb-6 pt-7 text-ink shadow-[0_24px_50px_-20px_rgba(0,0,0,.7)] xl:sticky xl:top-28 xl:self-start" aria-label={`Pump Passport ${p.pump.pump_id}`}>
+          <article className="paper perforated relative min-w-0 rounded-b-lg px-6 pb-6 pt-7 text-ink shadow-[0_24px_50px_-20px_rgba(110,80,30,.22)] xl:sticky xl:top-28 xl:self-start" aria-label={`Pump Passport ${p.pump.pump_id}`}>
             <div className="flex items-baseline justify-between gap-3 border-b border-ink/15 pb-3">
               <div>
                 <div className="font-serif text-2xl italic">Pump Passport</div>
                 <div className="num text-[12px] text-ink/60">{p.pump.pump_id} · {p.pump.name}</div>
               </div>
-              <span className="num rounded border border-ink/25 px-1.5 text-[10px] tracking-wider text-ink/60">SIMULATED</span>
+              <span className="num rounded border border-ink/25 px-1.5 text-[12px] tracking-wider text-ink/60">SIMULATED</span>
             </div>
             <div className="mt-5">
             <div className="flex flex-col gap-3">
@@ -105,7 +105,7 @@ export default function PassportView({ id }: { id: string }) {
                 <Stat label="Energy" value={fmt.n(p.energy_kwh)} unit="kWh" />
               </div>
             </Panel>
-            <Panel title="Revenue by month" right={<span className="text-[11px] text-mist">from receipts</span>}>
+            <Panel title="Revenue by month" right={<span className="text-[12px] text-mist">from receipts</span>}>
               <div className="flex h-40 items-end gap-1" role="img" aria-label="Monthly revenue bars">
                 {months.map(([m, v]) => (
                   <div key={m} className="flex min-w-0 flex-1 flex-col items-center gap-1" title={`${m}: ₹${v}`}>
@@ -115,7 +115,7 @@ export default function PassportView({ id }: { id: string }) {
                         return x > 0 ? <div key={k} className={KIND[k].cls} style={{ height: `${(x / v) * 100}%` }} /> : null;
                       })}
                     </div>
-                    <span className="num text-[10px] text-mist">{m.slice(5)}</span>
+                    <span className="num text-[12px] text-mist">{m.slice(5)}</span>
                   </div>
                 ))}
               </div>
@@ -130,7 +130,7 @@ export default function PassportView({ id }: { id: string }) {
                 <table className="w-full text-[13px]">
                   <thead><tr className="text-left text-mist"><th className="py-1 font-normal">Date</th><th className="font-normal">Code</th><th className="text-right font-normal">Downtime</th></tr></thead>
                   <tbody>{p.fault_log.map((f, i) => (
-                    <tr key={i} className="border-t border-soil"><td className="num py-1.5 text-fog">{f.at}</td><td className="num text-white">{f.code}</td><td className="num text-right text-fog">{f.downtime_h} h</td></tr>
+                    <tr key={i} className="border-t border-soil"><td className="num py-1.5 text-fog">{f.at}</td><td className="num text-ink">{f.code}</td><td className="num text-right text-fog">{f.downtime_h} h</td></tr>
                   ))}</tbody>
                 </table>
               )}

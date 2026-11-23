@@ -146,7 +146,7 @@ export default function MitraPage() {
           const clock = snap?.clock ?? "";
           const now = (bookings ?? []).find((b) => b.slot_start && b.slot_end && b.slot_start <= clock && clock < b.slot_end);
           return (
-            <section aria-live="polite" className="overflow-hidden rounded-2xl bg-[#145b85] p-4 text-white">
+            <section aria-live="polite" className="overflow-hidden rounded-2xl bg-[#1d6478] p-4 text-white">
               <div className="deva text-[13px] opacity-80">{lang === "hi" ? "अभी चल रहा है" : "Running now"} · <span className="num">{clock}</span></div>
               <div className="deva mt-1 text-[20px] font-semibold">{now ? now.farmer : lang === "hi" ? "चक्की / बैटरी" : "Mill / batteries"}</div>
               <div className="num mt-2 flex gap-4 text-[15px]"><span>{drive.freq_hz.toFixed(0)} Hz</span><span>{drive.power_kw.toFixed(2)} kW</span>{now && <span>{now.m3_delivered.toFixed(0)}/{now.m3.toFixed(0)} {t.m3}</span>}</div>
@@ -160,7 +160,7 @@ export default function MitraPage() {
         })()}
         {tab === "today" &&
           (bookings ?? []).map((b) => (
-            <article key={b.id} className="rounded-2xl border border-ink/15 bg-[#fbf8ef] bg-[repeating-linear-gradient(0deg,transparent_0_27px,rgba(20,40,30,.06)_27px_28px)] p-4">
+            <article key={b.id} className="rounded-2xl border border-ink/15 bg-[#fffcf4] bg-[repeating-linear-gradient(0deg,transparent_0_27px,rgba(20,40,30,.06)_27px_28px)] p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="deva text-[18px] font-semibold">{b.farmer}</div>
@@ -168,10 +168,10 @@ export default function MitraPage() {
                     {lang === "hi" ? CROP_HI[b.crop ?? ""] ?? b.crop : b.crop} {b.tenant ? `· ${t.tenant}` : ""} · {lang === "hi" ? CHANNEL_HI[b.channel] ?? b.channel : b.channel}
                   </div>
                 </div>
-                <div className="num text-right text-[22px] font-semibold text-[#145b85]">{b.slot_start ? `${b.slot_start}–${b.slot_end}` : <span className="deva text-[14px] opacity-60">{t.noSlot}</span>}</div>
+                <div className="num text-right text-[22px] font-semibold text-[#1d6478]">{b.slot_start ? `${b.slot_start}–${b.slot_end}` : <span className="deva text-[14px] opacity-60">{t.noSlot}</span>}</div>
               </div>
               <div className="num mt-2 flex items-center gap-4 text-[15px]">
-                <span className="flex items-center gap-1 text-[#145b85]"><Icon d={ICON.drop} className="h-4 w-4" /> <span className="text-ink">{b.m3_delivered.toFixed(0)}/{b.m3.toFixed(0)} {t.m3}</span></span>
+                <span className="flex items-center gap-1 text-[#1d6478]"><Icon d={ICON.drop} className="h-4 w-4" /> <span className="text-ink">{b.m3_delivered.toFixed(0)}/{b.m3.toFixed(0)} {t.m3}</span></span>
                 <span>₹{b.price_rs.toFixed(0)}</span>
               </div>
               <div className="mt-3">
@@ -197,7 +197,7 @@ export default function MitraPage() {
               [t.due, cashBook.due_rs],
               [t.share, cashBook.saur_mitra_share_rs],
             ].map(([k, v]) => (
-              <div key={k as string} className="rounded-2xl border border-ink/15 bg-[#fbf8ef] p-4">
+              <div key={k as string} className="rounded-2xl border border-ink/15 bg-[#fffcf4] p-4">
                 <div className="deva text-[14px] opacity-70">{k}</div>
                 <div className="num text-[30px] font-semibold">₹{Number(v).toLocaleString("en-IN")}</div>
               </div>
@@ -208,11 +208,11 @@ export default function MitraPage() {
         {tab === "alerts" && (
           <section className="flex flex-col gap-3">
             {alerts.map((a) => (
-              <div key={a.k} className={`deva rounded-2xl p-4 text-[16px] ${a.red ? "bg-fault text-white" : "border border-ink/15 bg-[#fbf8ef]"}`}>{a.text}</div>
+              <div key={a.k} className={`deva rounded-2xl p-4 text-[16px] ${a.red ? "bg-fault text-white" : "border border-ink/15 bg-[#fffcf4]"}`}>{a.text}</div>
             ))}
             <h2 className="deva mt-2 text-[15px] font-semibold">{t.issues}</h2>
             {(issues ?? []).map((i) => (
-              <div key={i.id} className="deva rounded-xl border border-ink/15 bg-[#fbf8ef] p-3 text-[14px]">
+              <div key={i.id} className="deva rounded-xl border border-ink/15 bg-[#fffcf4] p-3 text-[14px]">
                 <span className="num opacity-60">#{i.id} {i.at.slice(11, 16)}</span> {i.kind}: {i.note}
               </div>
             ))}
@@ -220,7 +220,7 @@ export default function MitraPage() {
         )}
 
         {tab === "soil" && (
-          <section className="flex flex-col gap-3 rounded-2xl border border-ink/15 bg-[#fbf8ef] p-5">
+          <section className="flex flex-col gap-3 rounded-2xl border border-ink/15 bg-[#fffcf4] p-5">
             <label className="deva flex items-center justify-between gap-3 text-[15px]">
               {t.farmerPick}
               <select value={soilFarmer} onChange={(e) => setSoilFarmer(e.target.value)} className="min-h-11 flex-1 rounded-xl border border-ink/20 bg-paper px-3">
@@ -247,7 +247,7 @@ export default function MitraPage() {
                       className="num min-h-10 rounded-lg border border-ink/20 bg-paper px-2 text-[15px]" />
                   </label>
                 ))}
-                <button onClick={applyCard} className="deva col-span-2 mt-1 min-h-12 rounded-xl bg-[#145b85] text-[16px] font-semibold text-white">{t.useCard}</button>
+                <button onClick={applyCard} className="deva col-span-2 mt-1 min-h-12 rounded-xl bg-[#1d6478] text-[16px] font-semibold text-white">{t.useCard}</button>
               </div>
             )}
             {soil && (
@@ -262,7 +262,7 @@ export default function MitraPage() {
         )}
 
         {tab === "fix" && (
-          <section className="rounded-2xl border border-ink/15 bg-[#fbf8ef] p-5">
+          <section className="rounded-2xl border border-ink/15 bg-[#fffcf4] p-5">
             {!drive?.fault && !diag && <p className="deva text-[17px]">{t.nofault}</p>}
             {drive?.fault && !diag && (
               <>
@@ -301,7 +301,7 @@ export default function MitraPage() {
               {lang === "hi" ? `${confirm.farmer} से ₹${confirm.price_rs.toFixed(0)} नकद लिया?` : `Received ₹${confirm.price_rs.toFixed(0)} cash from ${confirm.farmer}?`}
             </p>
             {offer?.eligible && (
-              <button onClick={() => payLater(confirm)} className="deva mt-4 min-h-12 w-full rounded-xl border-2 border-[#145b85] text-[16px] font-semibold text-[#145b85]">
+              <button onClick={() => payLater(confirm)} className="deva mt-4 min-h-12 w-full rounded-xl border-2 border-[#1d6478] text-[16px] font-semibold text-[#1d6478]">
                 {t.harvest}: ₹{offer.pay_now_rs.toFixed(0)} + ₹{(offer.after_harvest_rs + offer.fee_rs).toFixed(0)} {offer.due ? `${offer.due.slice(8, 10)}/${offer.due.slice(5, 7)}` : ""}
               </button>
             )}

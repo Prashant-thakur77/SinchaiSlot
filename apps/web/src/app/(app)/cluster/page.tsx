@@ -22,7 +22,7 @@ const HEALTH: Record<Health["status"], { cls: string; en: string; hi: string }> 
   stalled: { cls: "bg-fault", en: "Stalled", hi: "रुका" },
   never: { cls: "bg-mist", en: "Never reported", hi: "कभी नहीं" },
 };
-const QUAL: Record<Quality["restriction"], string> = { none: "text-leaf", slight_moderate: "text-sun", severe: "text-fault" };
+const QUAL: Record<Quality["restriction"], string> = { none: "text-leaf-ink", slight_moderate: "text-sun-ink", severe: "text-fault" };
 const PUMP_COLOR: Record<string, string> = { P1: "#F2B33D", P2: "#5FB3E6", P3: "#9BC46A" };
 
 /** Heartbeat of a pump's telemetry: a pulse every half hour it reported today, flat once it went quiet. Drawn
@@ -61,7 +61,7 @@ function SiteMap({ pumps, village, bounds, layer }: { pumps: Pump[]; village: Vi
         {village?.plots.features.map((f) => {
           const ring = f.geometry.coordinates[0];
           const d = ring.map(([lo, la], i) => `${i ? "L" : "M"}${x(lo).toFixed(1)},${y(la).toFixed(1)}`).join("") + "Z";
-          return <path key={f.properties.plot_id} d={d} fill={PUMP_COLOR[f.properties.pump_id] ?? "#fff"} fillOpacity={f.properties.booking ? 0.6 : 0.08} stroke={PUMP_COLOR[f.properties.pump_id] ?? "#fff"} strokeOpacity={0.95} strokeWidth={1.6} strokeLinejoin="round" />;
+          return <path key={f.properties.plot_id} d={d} fill={PUMP_COLOR[f.properties.pump_id] ?? "var(--ink)"} fillOpacity={f.properties.booking ? 0.6 : 0.08} stroke={PUMP_COLOR[f.properties.pump_id] ?? "var(--ink)"} strokeOpacity={0.95} strokeWidth={1.6} strokeLinejoin="round" />;
         })}
         {pumps.map((p) => (
           <g key={p.pump_id} transform={`translate(${x(p.lon)},${y(p.lat)})`}>
@@ -71,7 +71,7 @@ function SiteMap({ pumps, village, bounds, layer }: { pumps: Pump[]; village: Vi
           </g>
         ))}
       </svg>
-      <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-mist">
+      <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-mist">
         <SourceTag kind="real" /> Sentinel-2 L2A, 26 Jan 2025, 10 m
         <SourceTag kind="simulated" /> pumps and plots placed on the image
       </div>
@@ -153,24 +153,24 @@ export default function ClusterPage() {
 
           {data?.pumps.map((p) => (
             <Panel key={p.pump_id} title={<span className="flex items-center gap-2"><span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: PUMP_COLOR[p.pump_id] }} />{p.name}</span>}
-              right={<Link href={`/passport/${p.pump_id}`} className="text-[12px] text-sun underline-offset-2 hover:underline">Pump Passport →</Link>}>
+              right={<Link href={`/passport/${p.pump_id}`} className="text-[12px] text-sun-ink underline-offset-2 hover:underline">Pump Passport →</Link>}>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2 text-[12px] text-mist">Data health</div>
                   <div className="flex items-center gap-2">
                     <span className={`h-2.5 w-2.5 rounded-full ${HEALTH[p.health.status].cls} ${p.health.status === "live" ? "motion-safe:animate-pulse" : ""}`} aria-hidden />
-                    <span className={`text-lg ${p.health.alert ? "text-fault" : "text-white"}`}>{HEALTH[p.health.status].en}</span>
+                    <span className={`text-lg ${p.health.alert ? "text-fault" : "text-ink"}`}>{HEALTH[p.health.status].en}</span>
                     <span className="text-[13px] text-mist" lang="hi">{HEALTH[p.health.status].hi}</span>
                   </div>
                   <div className="text-[12px] text-mist">{p.health.reason_en}</div>
                   {data && <Heartbeat h={p.health} clock={data.clock} />}
-                  <div className="text-[11px] text-mist/80">{p.health.source}</div>
+                  <div className="text-[12px] text-mist">{p.health.source}</div>
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2 text-[12px] text-mist">Today <SourceTag kind="simulated" /></div>
-                  <div className="num text-lg text-water">{fmt.n(p.water_m3_p50)} <span className="text-[13px] text-mist">of {fmt.n(p.requested_m3)} m³</span></div>
+                  <div className="num text-lg text-water-ink">{fmt.n(p.water_m3_p50)} <span className="text-[13px] text-mist">of {fmt.n(p.requested_m3)} m³</span></div>
                   <div className="text-[12px] text-mist">{p.bookings_today} bookings · {p.plots} plots{p.fault ? <span className="text-fault"> · fault {p.fault}</span> : null}</div>
-                  {p.short_today.length > 0 && <div className="text-[12px] text-sun">{p.short_today.length} bookings short today</div>}
+                  {p.short_today.length > 0 && <div className="text-[12px] text-sun-ink">{p.short_today.length} bookings short today</div>}
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2 text-[12px] text-mist">Borewell water <SourceTag kind="simulated" /></div>
@@ -188,13 +188,13 @@ export default function ClusterPage() {
           ))}
 
           {sugg && (
-            <Panel title={`Transfers from ${sugg.pump_id}`} right={<span className="text-[11px] text-mist">within {700} m of field channel · needs confirmation</span>}>
+            <Panel title={`Transfers from ${sugg.pump_id}`} right={<span className="text-[12px] text-mist">within {700} m of field channel · needs confirmation</span>}>
               {sugg.suggestions.length === 0 ? <p className="text-[13px] text-mist">No reachable pump has spare sun for these bookings today.</p> : (
                 <ul className="flex flex-col gap-2">
                   {sugg.suggestions.map((s) => (
                     <li key={s.booking_id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-night px-3 py-2">
                       <span className="num text-[13px]">{s.booking_id} · needs {fmt.n(s.need_m3)} m³ · here ~{fmt.n(s.expected_here_m3)}</span>
-                      <span className="num text-[13px] text-water">{s.to_pump} ({fmt.n(s.distance_m)} m): ~{fmt.n(s.expected_today_m3)} m³ {s.slots ?? ""}</span>
+                      <span className="num text-[13px] text-water-ink">{s.to_pump} ({fmt.n(s.distance_m)} m): ~{fmt.n(s.expected_today_m3)} m³ {s.slots ?? ""}</span>
                       <Btn tone="sun" onClick={() => setPending(s)}>Move</Btn>
                     </li>
                   ))}
@@ -202,22 +202,22 @@ export default function ClusterPage() {
               )}
             </Panel>
           )}
-          {done && <p role="status" className="rounded-lg border border-leaf/40 bg-leaf/10 px-3 py-2 text-[13px] text-leaf">Moved: {done}</p>}
+          {done && <p role="status" className="rounded-lg border border-leaf/40 bg-leaf/10 px-3 py-2 text-[13px] text-leaf-ink">Moved: {done}</p>}
 
           {recharge && (
-            <Panel title="Recharge pairing" right={<span className="text-[11px] text-mist">{recharge.period}</span>}>
-              <p className="text-[13px] text-mist">The cluster drew <span className="num text-white">{fmt.n(recharge.extraction_m3_per_year)} m³</span> of groundwater in the last year (drive-metered receipts). To put it back:</p>
+            <Panel title="Recharge pairing" right={<span className="text-[12px] text-mist">{recharge.period}</span>}>
+              <p className="text-[13px] text-mist">The cluster drew <span className="num text-ink">{fmt.n(recharge.extraction_m3_per_year)} m³</span> of groundwater in the last year (drive-metered receipts). To put it back:</p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {recharge.options.map((o) => (
                   <div key={o.kind} className={`rounded-lg border p-3 ${recharge.cheapest === o.kind ? "border-water/60" : "border-soil"}`}>
-                    <div className="flex items-center justify-between gap-2"><span className="text-white">{o.name_en}</span><SourceTag kind={o.source_kind.startsWith("published") ? "published" : "assumption"} /></div>
+                    <div className="flex items-center justify-between gap-2"><span className="text-ink">{o.name_en}</span><SourceTag kind={o.source_kind.startsWith("published") ? "published" : "assumption"} /></div>
                     <div className="text-[12px] text-mist" lang="hi">{o.name_hi}</div>
-                    <div className="num mt-2 text-2xl text-water">{o.count} <span className="text-[13px] text-mist">× {fmt.n(o.m3_per_year_each)} m³/yr</span></div>
+                    <div className="num mt-2 text-2xl text-water-ink">{o.count} <span className="text-[13px] text-mist">× {fmt.n(o.m3_per_year_each)} m³/yr</span></div>
                     <div className="num text-[13px] text-mist">{fmt.rs(o.total_cost_rs)} · {fmt.rs(o.rs_per_m3_year, 1)} per m³ of yearly recharge</div>
                   </div>
                 ))}
               </div>
-              <p className="mt-2 text-[11px] text-mist">The shaft figure is a CGWB planning norm from a Rajasthan block plan; confirm a Bihar value before funding.</p>
+              <p className="mt-2 text-[12px] text-mist">The shaft figure is a CGWB planning norm from a Rajasthan block plan; confirm a Bihar value before funding.</p>
             </Panel>
           )}
         </div>
@@ -226,7 +226,7 @@ export default function ClusterPage() {
       {pending && (
         <div role="dialog" aria-modal="true" aria-labelledby="mv-t" className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-md rounded-xl border border-soil bg-night-2 p-5">
-            <h2 id="mv-t" className="text-lg text-white">Move {pending.booking_id} to {pending.to_pump}?</h2>
+            <h2 id="mv-t" className="text-lg text-ink">Move {pending.booking_id} to {pending.to_pump}?</h2>
             <p className="mt-2 text-[13px] text-mist">The farmer is told the new time and gets a new unlock code; the code for the old pump stops working.</p>
             <div className="mt-4 flex justify-end gap-2">
               <Btn tone="ghost" onClick={() => setPending(null)}>Keep it</Btn>

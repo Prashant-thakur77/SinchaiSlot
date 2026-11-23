@@ -79,7 +79,7 @@ export function BandChart({
       {nowcast && nowcast.length === n && (
         <path d={mk(nowcast)} fill="none" stroke="var(--water)" strokeWidth="1.5" strokeDasharray="2 4" opacity="0.8" />
       )}
-      {actual && <path d={mk(actual, actualUpTo)} fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" />}
+      {actual && <path d={mk(actual, actualUpTo)} fill="none" stroke="var(--ink)" strokeWidth="2.6" strokeLinecap="round" />}
       {nowIndex !== undefined && nowIndex >= 0 && nowIndex < n && (
         <g>
           <line x1={x(nowIndex)} x2={x(nowIndex)} y1={pad.t} y2={H - pad.b} stroke="var(--water)" strokeWidth="1.5" />
@@ -116,7 +116,7 @@ export function BandLegend() {
         <span className="h-0 w-5 border-t-2 border-dashed border-sun-deep" /> P50 forecast
       </span>
       <span className="inline-flex items-center gap-1.5">
-        <span className="h-0 w-5 border-t-[3px] border-white" /> Actual sun
+        <span className="h-0 w-5 border-t-[3px] border-ink" /> Actual sun
       </span>
       <span className="inline-flex items-center gap-1.5">
         <span className="h-3 w-px bg-water" /> Now

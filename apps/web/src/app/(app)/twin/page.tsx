@@ -100,16 +100,16 @@ export default function TwinPage() {
   return (
     <Shell title="Village Twin">
       <ErrorNote error={error} />
-      <div className="grid min-w-0 gap-x-6 gap-y-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="grid min-w-0 gap-x-6 gap-y-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         {/* Stage: the command area itself, lit by the hour */}
-        <section aria-label="Command area of pump P1" className="relative min-w-0 overflow-hidden rounded-[14px] border border-soil bg-night-2">
+        <section aria-label="Command area of pump P1" className="relative min-w-0 overflow-hidden rounded-[20px] border border-soil bg-night-2">
           <div className="pointer-events-none absolute inset-0 transition-[background] duration-1000"
             style={{ background: `radial-gradient(70% 60% at ${15 + ((nowMin - 360) / 720) * 70}% 0%, ${skyAt(nowMin, snap?.cloud_applied)}, transparent 70%)` }} aria-hidden />
           <div className="relative flex flex-wrap items-start justify-between gap-3 px-5 pt-4">
             <div>
               <div className="flex items-center gap-2 text-[12px] text-mist">Command area · pump P1 <SourceTag kind="simulated" /></div>
-              <div className="mt-1 font-display text-[22px] font-semibold leading-tight tracking-tight md:text-[26px]">
-                {running && cur?.farmer ? <>Water is going to <span className="text-water">{cur.farmer}</span></> : cur?.action === "mill" ? <>The sun is turning the <span className="text-sun">flour mill</span></> : cur?.action === "battery" ? <>Leftover sun is <span className="text-sun">charging battery packs</span></> : <>{village ? village.plots.features.length : "–"} plots, one pump</>}
+              <div className="mt-1 font-display text-[22px] font-medium leading-tight md:text-[26px]">
+                {running && cur?.farmer ? <>Water is going to <span className="text-water-ink">{cur.farmer}</span></> : cur?.action === "mill" ? <>The sun is turning the <span className="text-sun-ink">flour mill</span></> : cur?.action === "battery" ? <>Leftover sun is <span className="text-sun-ink">charging battery packs</span></> : <>{village ? village.plots.features.length : "–"} plots, one pump</>}
               </div>
             </div>
             <CropLegend />
@@ -125,7 +125,7 @@ export default function TwinPage() {
             </div>
             <div className="self-end text-[13px]" aria-live="polite">
               {selected ? (
-                <div className="rounded-lg border border-ink/10 bg-paper p-3 text-ink shadow-[0_10px_30px_rgba(0,0,0,.35)]">
+                <div className="rounded-lg border border-ink/10 bg-paper p-3 text-ink shadow-[0_10px_30px_rgba(110,80,30,.22)]">
                   <div className="deva text-[16px] font-semibold">{selected.properties.farmer}</div>
                   <div className="text-[12px] text-ink/70">{selected.properties.tenant ? "Tenant" : selected.properties.owner ? "Pump owner" : "Landholder"} · {selected.properties.language}</div>
                   <dl className="num mt-2 grid grid-cols-2 gap-y-1 border-t border-ink/10 pt-2 text-[12px]">
@@ -143,13 +143,13 @@ export default function TwinPage() {
         </section>
 
         {/* Energy: where the sun is going right now */}
-        <section aria-label="Energy now" className="flex min-w-0 flex-col rounded-[14px] border border-soil bg-night-2 p-4">
+        <section aria-label="Energy now" className="flex min-w-0 flex-col rounded-[20px] border border-soil bg-night-2 p-4">
           <div className="flex items-baseline justify-between gap-2">
             <h2 className="text-[13px] font-medium text-fog">Where the sun is going</h2>
-            <span className="num text-[11px] text-mist">drive telemetry, 20 s steps</span>
+            <span className="num text-[12px] text-mist">drive telemetry, 20 s steps</span>
           </div>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-[44px] leading-none text-sun md:text-[56px]"><Roll value={pv.toFixed(2)} /></span>
+            <span className="text-[44px] leading-none text-sun-ink md:text-[56px]"><Roll value={pv.toFixed(2)} /></span>
             <span className="text-sm text-mist">kW of sun</span>
           </div>
           <div className="mt-2 flex-1 overflow-x-auto" role="region" tabIndex={0} aria-label="Energy flow diagram">
@@ -162,35 +162,34 @@ export default function TwinPage() {
         </section>
 
         {/* Instrument strip */}
-        <section aria-label="Today in numbers" className="grid min-w-0 grid-cols-2 divide-soil border-y border-soil sm:grid-cols-3 sm:divide-x lg:grid-cols-5 xl:col-span-2">
-          <Readout label="Water planned, rest of day" value={fmt.n(snap?.summary.water_m3_p50, 0)} unit="m³" tone="text-water" sub="P50 of the forecast" />
-          <Readout label="Mill, cutter, batteries" value={fmt.n((snap?.summary.mill_kwh_p50 ?? 0) + (snap?.summary.chaff_kwh_p50 ?? 0) + (snap?.summary.battery_kwh_p50 ?? 0), 1)} unit="kWh" tone="text-sun" sub="leftover sun, planned" />
-          <Readout label="Verified today" value={fmt.n(today.m3, 0)} unit="m³" tone="text-white" sub={`${today.n} receipts on the ledger`} />
+        <section aria-label="Today in numbers" className="grid min-w-0 grid-cols-2 divide-soil border-y border-soil sm:grid-cols-3 sm:divide-x lg:grid-cols-4 xl:col-span-2">
+          <Readout label="Water planned, rest of day" value={fmt.n(snap?.summary.water_m3_p50, 0)} unit="m³" tone="text-water-ink" sub="middle of the forecast (P50)" />
+          <Readout label="Verified today" value={fmt.n(today.m3, 0)} unit="m³" tone="text-ink" sub={`${today.n} receipts on the ledger`} />
           <Readout label="Diesel avoided today" value={fmt.n(today.diesel, 1)} unit="L" sub="vs a 5 HP diesel pump" />
           <div className="col-span-2 min-w-0 px-4 py-3 sm:col-span-1">
-            <div className="flex items-center gap-2 text-[11.5px] text-mist">Groundwater, zaid season <SourceTag kind="assumption" /></div>
+            <div className="flex items-center gap-2 text-[12px] text-mist">Groundwater, zaid season <SourceTag kind="assumption" /></div>
             <div className="num mt-1.5 text-[28px] leading-none md:text-[34px]"><Roll value={fmt.pct(zaidUsed / zaidCap, 0)} /></div>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-night-3" role="meter" aria-valuemin={0} aria-valuemax={zaidCap} aria-valuenow={zaidUsed} aria-label="Season budget used">
               <div className="h-full rounded-full bg-water transition-[width] duration-500" style={{ width: `${Math.min(100, (zaidUsed / zaidCap) * 100)}%` }} />
             </div>
-            <div className="num mt-1 text-[11.5px] text-mist">{fmt.n(zaidUsed, 0)} of {fmt.n(zaidCap, 0)} m³, hard cap</div>
+            <div className="num mt-1 text-[12px] text-mist">{fmt.n(zaidUsed, 0)} of {fmt.n(zaidCap, 0)} m³, hard cap</div>
           </div>
         </section>
 
         {/* Log */}
-        <section aria-label="What happened today" className="min-w-0 xl:col-span-2">
-          <h2 className="mb-2 text-[13px] font-medium text-fog">What happened today</h2>
-          <ol className="num flex max-h-56 flex-col overflow-y-auto border-l border-soil text-[12.5px]" aria-live="polite" tabIndex={0}>
+        <details className="min-w-0 xl:col-span-2">
+          <summary className="cursor-pointer py-1 font-display text-[18px]">What happened today <span className="text-[14px] text-mist">({feed.length})</span></summary>
+          <ol className="num flex mt-2 max-h-64 flex-col overflow-y-auto border-l border-soil text-[14px]" aria-live="polite" tabIndex={0}>
             {feed.length === 0 && <li className="pl-4 text-mist">The day has not started. Click the day bar above, or press Jump to 13:45.</li>}
             {feed.map((f, i) => (
               <li key={i} className="relative flex gap-3 py-1 pl-4">
                 <span className={`absolute -left-[4px] top-[9px] h-[7px] w-[7px] rounded-full ${f.kind === "nowcast" || f.kind === "callback" ? "bg-water" : f.kind === "receipt" ? "bg-sun" : f.text.startsWith("Drive fault") ? "bg-fault" : "bg-soil"}`} aria-hidden />
                 <span className="shrink-0 text-mist">{f.ts}</span>
-                <span className={f.kind === "nowcast" ? "text-water" : "text-fog"}>{f.text}</span>
+                <span className={f.kind === "nowcast" ? "text-water-ink" : "text-fog"}>{f.text}</span>
               </li>
             ))}
           </ol>
-        </section>
+        </details>
       </div>
     </Shell>
   );

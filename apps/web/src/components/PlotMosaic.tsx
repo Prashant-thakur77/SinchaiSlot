@@ -1,5 +1,6 @@
 "use client";
 
+import { ArtDefs } from "@/components/Art";
 import { Delaunay } from "d3-delaunay";
 import { useMemo } from "react";
 
@@ -49,13 +50,15 @@ export type PlotFeature = {
   };
 };
 
+const HATCH: Record<string, string> = { wheat: "h-v", maize: "h-ink", potato: "h-scale", paddy: "h-wave", veg_summer: "h-ink2" };
+
 const CROP_FILL: Record<string, string> = {
-  wheat: "#B8A15A",
-  maize: "#7FA65A",
-  potato: "#8C7A5B",
-  paddy: "#5BBF6A",
-  veg_summer: "#4F9E70",
-  fallow: "#2A3A30",
+  wheat: "#E8C465",
+  maize: "#A9C77C",
+  potato: "#CFAE86",
+  paddy: "#8DB86B",
+  veg_summer: "#7DA67A",
+  fallow: "#E6DABD",
 };
 
 /** The command area's plots (synthetic village, SIMULATED) as a schematic field mosaic, coloured by crop. */
@@ -128,14 +131,15 @@ export function PlotMosaic({
 
   return (
     <svg viewBox="0 0 1000 1000" className="block h-auto w-full" role="group" aria-label="Plots in the pump's command area">
+      <ArtDefs />
       <defs>
         <radialGradient id="cloudShade" cx="50%" cy="50%" r="50%">
-          <stop offset="0" stopColor="#0b1110" stopOpacity="0.55" />
-          <stop offset="1" stopColor="#0b1110" stopOpacity="0" />
+          <stop offset="0" stopColor="#5f6b68" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#5f6b68" stopOpacity="0" />
         </radialGradient>
         <pattern id="wet" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
           <rect width="8" height="8" fill="var(--water)" />
-          <line x1="0" y1="0" x2="0" y2="8" stroke="#bfe6ff" strokeWidth="2" opacity="0.5" />
+          <line x1="0" y1="0" x2="0" y2="8" stroke="#ffffff" strokeWidth="2" opacity="0.5" />
         </pattern>
       </defs>
       {features.map((f, i) => {
@@ -152,14 +156,20 @@ export function PlotMosaic({
             aria-label={`${p.farmer}, ${p.crop}, ${p.area_ha.toFixed(2)} hectares${booked ? `, booked ${p.slot ?? ""}` : ""}`}
             onClick={() => onSelect?.(f)}
             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelect?.(f)}
-            fill={active ? "url(#wet)" : booked ? "var(--water)" : CROP_FILL[p.crop] ?? "#2A3A30"}
-            fillOpacity={booked || active ? 0.95 : 0.75}
-            stroke={selected === p.plot_id ? "#fff" : "var(--night)"}
-            strokeWidth={selected === p.plot_id ? 6 : 5}
+            fill={active ? "url(#wet)" : booked ? "var(--water)" : CROP_FILL[p.crop] ?? "#E6DABD"}
+            fillOpacity={booked || active ? 1 : 0.9}
+            stroke="var(--ink)"
+            strokeWidth={selected === p.plot_id ? 8 : 2.5}
             strokeLinejoin="round"
             className="cursor-pointer transition-[fill-opacity] duration-300 hover:fill-opacity-100 focus:outline-none"
           />
         );
+      })}
+      {/* Hatching inside each field, the way wall painters fill a shape; direction varies by crop. */}
+      {features.map((f, i) => {
+        const p = f.properties;
+        if (!cells[i] || (p.booking && p.booking !== "cancelled") || p.crop === "fallow") return null;
+        return <polygon key={`h${p.plot_id}`} points={cells[i]} fill={`url(#${HATCH[p.crop] ?? "h-ink"})`} className="pointer-events-none" />;
       })}
       {features.map((f, i) => {
         if (!f.properties.tenant || !cells[i]) return null;
@@ -184,7 +194,7 @@ export function PlotMosaic({
             <g transform={`translate(${x},${y})`}>
               <circle r="26" fill="var(--sun)" opacity="0.25" />
               <circle r="14" fill="var(--sun)" stroke="var(--night)" strokeWidth="3" />
-              <text y="44" textAnchor="middle" fontSize="20" fill="#fff">Pump P1</text>
+              <text y="44" textAnchor="middle" fontSize="20" fill="var(--ink)">Pump P1</text>
             </g>
           );
         })()}
@@ -195,7 +205,7 @@ export function PlotMosaic({
 
 export function CropLegend() {
   return (
-    <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-mist">
+    <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-mist">
       {Object.entries(CROP_FILL).map(([k, c]) => (
         <span key={k} className="inline-flex items-center gap-1">
           <span className="h-2.5 w-2.5 rounded-sm" style={{ background: c }} /> {k.replace("_", " ")}

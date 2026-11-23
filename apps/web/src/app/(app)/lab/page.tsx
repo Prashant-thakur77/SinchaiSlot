@@ -52,26 +52,26 @@ export default function LabPage() {
             <div className="grid gap-6 p-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-end">
               <div>
                 <div className="text-[12px] text-mist">Sun put to work by SinchaiSlot, per kWp of panels per year</div>
-                <div className="num mt-2 text-6xl leading-none text-sun md:text-8xl">{fmt.n(pol.D.utilisation_kwh_per_kwp.p50)}<span className="ml-2 whitespace-nowrap text-lg text-mist">kWh/kWp·yr</span></div>
+                <div className="num mt-2 text-6xl leading-none text-sun-ink md:text-8xl">{fmt.n(pol.D.utilisation_kwh_per_kwp.p50)}<span className="ml-2 whitespace-nowrap text-lg text-mist">kWh/kWp·yr</span></div>
                 <div className="mt-3 text-[13px] text-fog">
-                  vs <span className="num text-white">{fmt.n(pol.B.utilisation_kwh_per_kwp.p50)}</span> for first-come hourly sales (Chakhaji baseline):{" "}
-                  <span className="num text-sun">{fmt.signedPct(g?.utilisation_D_vs_B.p50)}</span> <span className="text-mist">({bandTxt(g?.utilisation_D_vs_B, true)})</span>
+                  vs <span className="num text-ink">{fmt.n(pol.B.utilisation_kwh_per_kwp.p50)}</span> for first-come hourly sales (Chakhaji baseline):{" "}
+                  <span className="num text-sun-ink">{fmt.signedPct(g?.utilisation_D_vs_B.p50)}</span> <span className="text-mist">({bandTxt(g?.utilisation_D_vs_B, true)})</span>
                 </div>
               </div>
               <dl className="grid grid-cols-1 divide-y divide-soil border-y border-soil sm:grid-cols-3 sm:divide-x sm:divide-y-0">
                 <div className="px-0 py-3 sm:px-4">
                   <dt className="text-[12px] text-mist">Farmer price, solar water</dt>
-                  <dd className="num mt-1 text-3xl text-water">₹{pol.D.farmer_rs_per_m3_solar.p50.toFixed(2)}<span className="ml-1 text-sm text-mist">/m³</span></dd>
+                  <dd className="num mt-1 text-3xl text-water-ink">₹{pol.D.farmer_rs_per_m3_solar.p50.toFixed(2)}<span className="ml-1 text-sm text-mist">/m³</span></dd>
                   <dd className="num mt-1 text-[12px] text-mist">B ₹{pol.B.farmer_rs_per_m3_solar.p50.toFixed(2)} · diesel ₹{p.headline.diesel_rs_per_m3.toFixed(2)}</dd>
                 </div>
                 <div className="px-0 py-3 sm:px-4">
                   <dt className="text-[12px] text-mist">Tenant need met by solar</dt>
-                  <dd className="num mt-1 text-3xl text-white">{fmt.pct(pol.D.tenant_share_served_by_solar.p50)}</dd>
+                  <dd className="num mt-1 text-3xl text-ink">{fmt.pct(pol.D.tenant_share_served_by_solar.p50)}</dd>
                   <dd className="num mt-1 text-[12px] text-mist">B {fmt.pct(pol.B.tenant_share_served_by_solar.p50)}</dd>
                 </div>
                 <div className="px-0 py-3 sm:px-4">
                   <dt className="text-[12px] text-mist">Fairness (Gini, lower is fairer)</dt>
-                  <dd className="num mt-1 text-3xl text-white">{pol.D.gini_solar_share_by_household.p50.toFixed(2)}</dd>
+                  <dd className="num mt-1 text-3xl text-ink">{pol.D.gini_solar_share_by_household.p50.toFixed(2)}</dd>
                   <dd className="num mt-1 text-[12px] text-mist">B {pol.B.gini_solar_share_by_household.p50.toFixed(2)}</dd>
                 </div>
               </dl>
@@ -79,7 +79,7 @@ export default function LabPage() {
           </Panel>
 
           <div className="grid min-w-0 gap-4 xl:grid-cols-2">
-            <Panel title={<Finding kicker="Solar kWh used per kWp per year">SinchaiSlot puts {fmt.n(pol.D.utilisation_kwh_per_kwp.p50)} to work; first-come hourly sales, {fmt.n(pol.B.utilisation_kwh_per_kwp.p50)}.</Finding>} right={<span className="text-[11px] text-mist">bars P50, whiskers P10-P90</span>}>
+            <Panel title={<Finding kicker="Solar kWh used per kWp per year">SinchaiSlot puts {fmt.n(pol.D.utilisation_kwh_per_kwp.p50)} to work; first-come hourly sales, {fmt.n(pol.B.utilisation_kwh_per_kwp.p50)}.</Finding>} right={<span className="text-[12px] text-mist">bars P50, whiskers P10-P90</span>}>
               <Bars rows={keys.map((k) => ({ k, b: pol[k].utilisation_kwh_per_kwp }))} digits={0} />
             </Panel>
             <Panel title={<Finding kicker="Share of tenant water need met by solar">Tenants get {fmt.pct(pol.D.tenant_share_served_by_solar.p50)} of their need from the sun, against {fmt.pct(pol.B.tenant_share_served_by_solar.p50)}.</Finding>}>
@@ -90,7 +90,7 @@ export default function LabPage() {
             </Panel>
             <Panel title="Pump owner / FPO income and Saur Mitra income">
               <table className="num w-full text-[13px]">
-                <thead className="text-left text-[11px] text-mist">
+                <thead className="text-left text-[12px] text-mist">
                   <tr><th className="pb-1 font-normal">Policy</th><th className="pb-1 text-right font-normal">Revenue ₹/yr</th><th className="pb-1 text-right font-normal">Owner/FPO ₹/yr</th><th className="pb-1 text-right font-normal">Saur Mitra ₹/mo</th><th className="pb-1 text-right font-normal">Payback yr</th></tr>
                 </thead>
                 <tbody>
@@ -124,7 +124,7 @@ export default function LabPage() {
           </div>
 
           <div className="grid min-w-0 gap-4 xl:grid-cols-2">
-            <Panel title={<Finding kicker="Honest results: what the planner does and does not add">Not everything wins, and the report says where.</Finding>} right={<span className="rounded bg-sun/10 px-2 py-0.5 text-[11px] text-sun">negative result</span>}>
+            <Panel title={<Finding kicker="Honest results: what the planner does and does not add">Not everything wins, and the report says where.</Finding>} right={<span className="rounded bg-sun/10 px-2 py-0.5 text-[12px] text-sun-ink">negative result</span>}>
               <div className="grid grid-cols-2 gap-4">
                 <Stat value={fmt.signedPct(p.negative_results.gain_vs_Cloads_monsoon, 1)} label="Gain vs greedy loads, monsoon weeks" />
                 <Stat value={fmt.signedPct(p.negative_results.gain_vs_Cloads_dry, 1)} label="Gain vs greedy loads, dry season" />
@@ -134,7 +134,7 @@ export default function LabPage() {
               </ul>
             </Panel>
             <Panel title="Sensitivity of the headline to assumptions" right={<SourceTag kind="assumption" />}>
-              <table className="num w-full text-[12.5px]">
+              <table className="num w-full text-[13px]">
                 <tbody>
                   {Object.entries(p.sensitivity).map(([name, pts]) => (
                     <tr key={name} className="border-t border-soil">
@@ -185,8 +185,8 @@ export default function LabPage() {
             </Panel>
             <Panel title="Optimiser benchmark">
               {ev?.optimiser_benchmark && (
-                <table className="num w-full text-[12.5px]">
-                  <thead className="text-left text-[11px] text-mist"><tr><th className="font-normal">Bookings</th><th className="text-right font-normal">Binaries</th><th className="text-right font-normal">Median s</th><th className="text-right font-normal">Gap max</th></tr></thead>
+                <table className="num w-full text-[13px]">
+                  <thead className="text-left text-[12px] text-mist"><tr><th className="font-normal">Bookings</th><th className="text-right font-normal">Binaries</th><th className="text-right font-normal">Median s</th><th className="text-right font-normal">Gap max</th></tr></thead>
                   <tbody>
                     {Object.entries(ev.optimiser_benchmark.by_size).map(([n, r]) => (
                       <tr key={n} className="border-t border-soil"><td className="py-1">{n}</td><td className="text-right">{r.binaries_median}</td><td className="text-right">{r.solve_s_median}</td><td className="text-right">{(r.gap_max * 100).toFixed(2)}%</td></tr>
@@ -215,11 +215,11 @@ function Bars({ rows, digits = 1, pct = false, unit = "" }: { rows: { k: string;
   return (
     <ul className="flex flex-col gap-2.5" role="list">
       {rows.map(({ k, b }) => (
-        <li key={k} className="grid grid-cols-[150px_minmax(0,1fr)_72px] items-center gap-3 text-[12.5px]">
-          <span className={k === "D" ? "font-medium text-sun" : "text-fog"}>{NAMES[k] ?? k}</span>
+        <li key={k} className="grid grid-cols-[150px_minmax(0,1fr)_72px] items-center gap-3 text-[13px]">
+          <span className={k === "D" ? "font-medium text-sun-ink" : "text-fog"}>{NAMES[k] ?? k}</span>
           <span className="relative h-5 rounded-sm bg-night-3/60" aria-hidden>
             <span className="absolute inset-y-0 left-0 rounded-sm" style={{ width: `${(b.p50 / max) * 100}%`, background: COLOR[k] ?? "var(--sun-deep)", opacity: k === "D" ? 1 : 0.8 }} />
-            <span className="absolute top-1/2 h-px -translate-y-1/2 bg-white/80" style={{ left: `${(b.p10 / max) * 100}%`, width: `${Math.max(((b.p90 - b.p10) / max) * 100, 0.4)}%` }} />
+            <span className="absolute top-1/2 h-px -translate-y-1/2 bg-ink/80" style={{ left: `${(b.p10 / max) * 100}%`, width: `${Math.max(((b.p90 - b.p10) / max) * 100, 0.4)}%` }} />
           </span>
           <span className="num text-right">{f(b.p50)}</span>
         </li>
@@ -264,8 +264,8 @@ function Weekly({ p }: { p: Proof }) {
 function Finding({ kicker, children }: { kicker: string; children: React.ReactNode }) {
   return (
     <span className="block py-1">
-      <span className="block text-[11.5px] font-normal text-mist">{kicker}</span>
-      <span className="mt-1 block font-serif text-[19px] font-normal leading-snug text-white">{children}</span>
+      <span className="block text-[12px] font-normal text-mist">{kicker}</span>
+      <span className="mt-1 block font-serif text-[19px] font-normal leading-snug text-ink">{children}</span>
     </span>
   );
 }

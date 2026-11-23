@@ -62,7 +62,7 @@ export default function LedgerPage() {
         <div className="flex min-w-0 flex-col gap-6 xl:sticky xl:top-28 xl:self-start">
           <div className="min-h-[150px] md:min-h-[170px]">
             <div className="text-[12px] text-mist">Solar water on receipts, each chained to the one before</div>
-            <div className="num mt-2 text-[clamp(3.4rem,7vw,6.5rem)] leading-none text-water"><Roll value={fmt.n(s?.m3)} /><span className="ml-2 text-lg text-mist">m³</span></div>
+            <div className="num mt-2 text-[clamp(3.4rem,7vw,6.5rem)] leading-none text-water-ink"><Roll value={fmt.n(s?.m3)} /><span className="ml-2 text-lg text-mist">m³</span></div>
             <div className="num mt-2 text-[12px] text-mist">{fmt.n(s?.receipts)} receipts · 3 pumps{s ? ` · ${s.first?.slice(0, 10)} to ${s.last?.slice(0, 10)}` : ""} <SourceTag kind="simulated" /></div>
           </div>
           <dl className="grid grid-cols-2 border-y border-dashed border-fog/25 sm:grid-cols-4">
@@ -73,8 +73,8 @@ export default function LedgerPage() {
               ["Farmers served", `${s?.farmers_served ?? "–"}`, `${s?.tenant_farmers_served ?? "–"} tenants`],
             ].map(([k, v, u]) => (
               <div key={k} className="py-3 pr-3">
-                <dt className="text-[11.5px] text-mist">{k}</dt>
-                <dd className="num mt-1 text-xl text-white">{v}<span className="ml-1 whitespace-nowrap text-[12px] text-mist">{u}</span></dd>
+                <dt className="text-[12px] text-mist">{k}</dt>
+                <dd className="num mt-1 text-xl text-ink">{v}<span className="ml-1 whitespace-nowrap text-[12px] text-mist">{u}</span></dd>
               </div>
             ))}
           </dl>
@@ -87,14 +87,14 @@ export default function LedgerPage() {
               <Btn onClick={async () => setAudit(await getJSON<Audit>("/api/ledger/audit"))}>Run anomaly audit</Btn>
             </div>
             {scan !== null && (
-              <div className="num mt-3 text-[13px] text-sun" aria-live="off">
+              <div className="num mt-3 text-[13px] text-sun-ink" aria-live="off">
                 checking <Roll value={fmt.n(Math.round(((data?.total ?? 0) * scan) / Math.max(1, roll.length)))} /> of {fmt.n(data?.total)} receipts…
               </div>
             )}
             {verify && (
-              <div role="status" className={`num mt-3 rounded-md border px-3 py-2 text-[13px] ${verify.ok ? "border-se/50 text-se" : "border-fault/60 text-fault"}`}>
+              <div role="status" className={`num mt-3 rounded-md border px-3 py-2 text-[13px] ${verify.ok ? "border-se/50 text-se-ink" : "border-fault/60 text-fault"}`}>
                 {verify.ok ? `Verified: ${verify.checked} receipts, chain intact` : `Broken at receipt #${verify.first_bad_seq}`}
-                {verify.head && <div className="truncate text-[11px] opacity-80">head {verify.head}</div>}
+                {verify.head && <div className="truncate text-[12px] opacity-80">head {verify.head}</div>}
               </div>
             )}
             {audit && (
@@ -102,12 +102,12 @@ export default function LedgerPage() {
                 <div className="text-mist">{audit.n_findings} findings (physical rules + Isolation Forest)</div>
                 <ul className="mt-1 max-h-40 overflow-y-auto" tabIndex={0}>
                   {audit.findings.map((f, i) => (
-                    <li key={i} className="num text-[12px]"><span className={f.severity === "high" ? "text-fault" : "text-sun"}>{f.rule}</span> {f.receipt_id ?? ""} {f.detail}</li>
+                    <li key={i} className="num text-[12px]"><span className={f.severity === "high" ? "text-fault" : "text-sun-ink"}>{f.rule}</span> {f.receipt_id ?? ""} {f.detail}</li>
                   ))}
                 </ul>
               </div>
             )}
-            <div className="num mt-3 truncate text-[11px] text-mist">Merkle root {s?.merkle_root}</div>
+            <div className="num mt-3 truncate text-[12px] text-mist">Merkle root {s?.merkle_root}</div>
           </section>
 
           <section aria-label="Claim pack for a funder">
@@ -121,14 +121,14 @@ export default function LedgerPage() {
             </form>
             {claim && (
               <div className="paper mt-4 rounded-md p-4 text-ink">
-                <div className="flex items-baseline justify-between"><span className="font-serif text-lg italic">Claim</span><span className="num text-[11px] opacity-70">{claim.funder} · {claim.period.join(" → ")}</span></div>
+                <div className="flex items-baseline justify-between"><span className="font-serif text-lg italic">Claim</span><span className="num text-[12px] opacity-70">{claim.funder} · {claim.period.join(" → ")}</span></div>
                 <dl className="num mt-2 grid grid-cols-2 gap-y-1 text-[13px]">
                   <dt className="opacity-70">Water</dt><dd className="text-right">{fmt.n(claim.totals.m3)} m³</dd>
                   <dt className="opacity-70">Diesel avoided</dt><dd className="text-right">{fmt.n(claim.totals.diesel_l_avoided, 1)} L</dd>
                   <dt className="opacity-70">Subsidy equivalent</dt><dd className="text-right">{fmt.rs(claim.subsidy_equivalent_rs)}</dd>
                   <dt className="opacity-70">Receipts with hashes</dt><dd className="text-right">{fmt.n(claim.totals.receipts)}</dd>
                 </dl>
-                <p className="mt-2 border-t border-dashed border-ink/25 pt-2 text-[11.5px] opacity-75">{claim.status}. Diesel-subsidy equivalent at ₹75/L needs a rule change.</p>
+                <p className="mt-2 border-t border-dashed border-ink/25 pt-2 text-[12px] opacity-75">{claim.status}. Diesel-subsidy equivalent at ₹75/L needs a rule change.</p>
               </div>
             )}
           </section>
@@ -145,7 +145,7 @@ export default function LedgerPage() {
             {!data && [0, 1, 2].map((k) => <li key={k} className="paper h-[268px] rounded-b-md opacity-20" aria-hidden />)}
             {roll.map((r, i) => (
               <li key={r.seq} className="relative">
-                <span className={`num absolute -left-14 top-5 flex h-10 w-10 items-center justify-center rounded-full border text-[9px] ${stampFor(i) === "verified" ? "border-sun/60 bg-night text-sun" : "border-soil bg-night text-mist"}`} title={`hash ${r.hash}`} aria-hidden>{r.hash.slice(0, 4)}</span>
+                <span className={`num absolute -left-14 top-5 flex h-10 w-10 items-center justify-center rounded-full border text-[9px] ${stampFor(i) === "verified" ? "border-sun/60 bg-night text-sun-ink" : "border-soil bg-night text-mist"}`} title={`hash ${r.hash}`} aria-hidden>{r.hash.slice(0, 4)}</span>
                 <Receipt r={r} fresh={i === 0} stamp={stampFor(i)} />
               </li>
             ))}
@@ -166,7 +166,7 @@ export default function LedgerPage() {
                   <td className="py-1 text-mist">{r.seq}</td>
                   <td>{r.receipt_id}</td>
                   <td className="text-mist">{r.pump_id}</td>
-                  <td className={r.kind === "water" ? "text-water" : "text-sun"}>{r.kind}</td>
+                  <td className={r.kind === "water" ? "text-water-ink" : "text-sun-ink"}>{r.kind}</td>
                   <td>{r.start.replace("T", " ")}</td>
                   <td>{r.farmer_ref ?? "–"}{r.tenant ? " ·T" : ""}</td>
                   <td>{r.m3.toFixed(1)}</td>

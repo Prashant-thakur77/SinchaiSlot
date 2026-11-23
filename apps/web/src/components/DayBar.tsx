@@ -1,7 +1,7 @@
 "use client";
 
 import { area, curveMonotoneX, line } from "d3-shape";
-import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { postJSON, useApi } from "@/lib/api";
 import type { Snapshot } from "@/lib/types";
 
@@ -13,7 +13,7 @@ const toHHMM = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${
 /** Sky tint for a minute of the day: dawn rose -> noon white-gold -> dusk amber (the app's one light source). */
 export function skyAt(min: number, cloud = false): string {
   const t = Math.min(1, Math.max(0, (min - DAY0) / (DAY1 - DAY0)));
-  if (cloud && min >= 13 * 60 + 40 && min < 16 * 60 + 30) return "rgba(120,140,150,.22)";
+  if (cloud && min >= 13 * 60 + 40 && min < 16 * 60 + 30) return "rgba(120,150,160,.22)";
   if (t < 0.18) return "rgba(232,140,120,.20)";
   if (t < 0.7) return "rgba(245,184,61,.16)";
   return "rgba(227,130,40,.24)";
@@ -24,7 +24,7 @@ export function skyAt(min: number, cloud = false): string {
  * draw across it; the sun disc sits at "now" on the actual curve. Click (or arrow keys) to move the simulated
  * clock; going back replays the day from 06:00.
  */
-export function DayBar({ title, actions }: { title: string; actions?: ReactNode }) {
+export function DayBar() {
   const { data, reload } = useApi<Snapshot>("/api/state", 2000);
   const [busy, setBusy] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -86,12 +86,11 @@ export function DayBar({ title, actions }: { title: string; actions?: ReactNode 
   return (
     <header className="sticky top-0 z-10 border-b border-soil bg-night/92 backdrop-blur">
       <div className="pointer-events-none absolute inset-0 transition-[background] duration-700" style={{ background: `linear-gradient(90deg, transparent, ${skyAt(now, data?.cloud_applied)} ${((now - DAY0) / (DAY1 - DAY0)) * 100}%, transparent)` }} aria-hidden />
-      <div className="relative flex flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2 md:px-5">
-        <h1 className="font-display text-base font-semibold tracking-tight md:text-lg">{title}</h1>
+      <div className="relative flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 md:px-8">
         <div className="num flex items-baseline gap-2 text-fog" aria-live="polite">
-          <span className="text-2xl leading-none text-sun md:text-[28px]">{data?.clock ?? "--:--"}</span>
-          <span className="hidden text-[11px] text-mist sm:inline">{data?.day} · Samastipur · real sun</span>
-          {data?.cloud_applied && <span className="rounded bg-water/15 px-1.5 py-px text-[11px] text-water">nowcast</span>}
+          <span className="font-display text-2xl leading-none text-sun-ink md:text-[28px]">{data?.clock ?? "--:--"}</span>
+          <span className="hidden text-[13px] text-mist sm:inline">{data?.day} · real sun</span>
+          {data?.cloud_applied && <span className="rounded bg-water/15 px-1.5 py-px text-[12px] text-water-ink">nowcast</span>}
         </div>
 
         {/* The day strip */}
@@ -123,37 +122,36 @@ export function DayBar({ title, actions }: { title: string; actions?: ReactNode 
                 return <line key={h} x1={x} x2={x} y1={0} y2={H} stroke="var(--soil)" strokeWidth={1} vectorEffect="non-scaling-stroke" />;
               })}
               {geo && <path d={geo.band} fill="var(--sun)" opacity={0.28} />}
-              {geo && <path d={geo.actual} fill="none" stroke="#fff" strokeWidth={1.6} vectorEffect="non-scaling-stroke" />}
+              {geo && <path d={geo.actual} fill="none" stroke="var(--ink)" strokeWidth={1.6} vectorEffect="non-scaling-stroke" />}
               {geo && <line x1={geo.x} x2={geo.x} y1={0} y2={H} stroke="var(--sun)" strokeWidth={1} vectorEffect="non-scaling-stroke" />}
             </svg>
             {geo && (
-              <span className="pointer-events-none absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sun shadow-[0_0_14px_4px_rgba(245,184,61,.55)] transition-[left,top] duration-500 ease-[cubic-bezier(.2,.7,.1,1)]"
+              <span className="pointer-events-none absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sun ring-2 ring-ink transition-[left,top] duration-500 ease-[cubic-bezier(.2,.7,.1,1)]"
                 style={{ left: `${(geo.x / W) * 100}%`, top: `${(geo.y / H) * 100}%` }} aria-hidden />
             )}
             {hover !== null && (
-              <span className="num pointer-events-none absolute -top-0.5 -translate-x-1/2 rounded bg-night px-1 text-[10px] text-fog" style={{ left: `${((hover - DAY0) / (DAY1 - DAY0)) * 100}%` }}>
+              <span className="num pointer-events-none absolute -top-0.5 -translate-x-1/2 rounded bg-night px-1 text-[12px] text-fog" style={{ left: `${((hover - DAY0) / (DAY1 - DAY0)) * 100}%` }}>
                 {toHHMM(Math.round(hover / 10) * 10)}
               </span>
             )}
           </div>
-          <div className="num mt-0.5 hidden justify-between text-[10px] text-mist md:flex" aria-hidden>
+          <div className="num mt-0.5 hidden justify-between text-[12px] text-mist md:flex" aria-hidden>
             {["06", "08", "10", "12", "14", "16", "18"].map((h) => <span key={h}>{h}</span>)}
           </div>
         </div>
 
         <div className="ml-auto flex flex-wrap items-center gap-1.5">
-          {actions}
           <button
             disabled={busy}
             onClick={() => run(async () => { const next = !playing; setPlaying(next); await postJSON("/api/demo/autoplay", { on: next, speed: 60 }); })}
-            className="hidden rounded-md border border-soil px-2.5 py-1 text-[12px] text-fog hover:bg-night-2 sm:inline-block"
+            className="hidden rounded-full border border-soil px-3 py-1 text-[13px] text-fog hover:bg-night-2 sm:inline-block"
           >
             {playing ? "Pause" : "Play ×60"}
           </button>
-          <button disabled={busy} onClick={() => goTo(13 * 60 + 45)} className="rounded-md border border-water/60 px-2.5 py-1 text-[12px] text-water hover:bg-water/10">
+          <button disabled={busy} onClick={() => goTo(13 * 60 + 45)} className="rounded-full border border-water-deep/60 px-3 py-1 text-[13px] text-water-ink hover:bg-water/10">
             Jump to 13:45
           </button>
-          <button disabled={busy} onClick={() => run(async () => { setPlaying(false); await postJSON("/api/demo/reset"); })} className="hidden rounded-md border border-soil px-2.5 py-1 text-[12px] text-mist hover:bg-night-2 sm:inline-block">
+          <button disabled={busy} onClick={() => run(async () => { setPlaying(false); await postJSON("/api/demo/reset"); })} className="hidden rounded-full border border-soil px-3 py-1 text-[13px] text-mist hover:bg-night-2 sm:inline-block">
             Reset
           </button>
         </div>

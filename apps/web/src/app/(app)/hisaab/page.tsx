@@ -50,17 +50,17 @@ export default function HisaabPage() {
           ))}
         </div>
         {a && (
-          <article className="paper perforated relative rounded-b-lg px-6 pb-6 pt-7 text-ink shadow-[0_24px_50px_-20px_rgba(0,0,0,.7)]" aria-live="polite">
+          <article className="paper perforated relative rounded-b-lg px-6 pb-6 pt-7 text-ink shadow-[0_24px_50px_-20px_rgba(110,80,30,.22)]" aria-live="polite">
             <div className="flex items-baseline justify-between gap-3 border-b border-ink/15 pb-2">
               <span className="font-serif text-xl italic">Hisaab</span>
-              <span className="text-[11px] text-ink/60">read-only, row-limited SQL over verified receipts</span>
+              <span className="text-[12px] text-ink/60">read-only, row-limited SQL over verified receipts</span>
             </div>
             <p className="deva mt-3 font-serif text-[15px] italic text-ink/70">{q}</p>
             <p className="mt-2 bg-[repeating-linear-gradient(to_bottom,transparent_0_31px,rgba(19,32,26,.12)_31px_32px)] text-[22px] leading-[32px]">{a.answer}</p>
             {numericCol >= 0 && a.rows && a.rows.length > 1 && (
               <ul className="mt-4 flex flex-col gap-1.5">
                 {a.rows.slice(0, 40).map((r, i) => (
-                  <li key={i} className="grid grid-cols-[120px_minmax(0,1fr)_80px] items-center gap-3 text-[12.5px]">
+                  <li key={i} className="grid grid-cols-[120px_minmax(0,1fr)_80px] items-center gap-3 text-[13px]">
                     <span className="num truncate text-ink/75">{String(r[0])}</span>
                     <span className="h-2.5 rounded-sm bg-[#1f6f9f]" style={{ width: `${(Number(r[numericCol]) / max) * 100}%` }} />
                     <span className="num text-right">{String(r[numericCol])}</span>
