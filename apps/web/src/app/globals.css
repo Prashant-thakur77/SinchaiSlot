@@ -220,7 +220,7 @@ body {
 
 /* Heading scale. Yatra One is a painted-sign face with one weight: headings only, 22px and up. */
 .h-hero, .h-chapter, .h-page, .h-lead { font-family: var(--font-yatra), var(--font-mukta), serif; font-weight: 400; letter-spacing: -0.018em; word-spacing: -0.06em; text-wrap: balance; }
-.h-hero { font-size: clamp(2.6rem, min(5.7vw, 9.4vh), 5.25rem); line-height: 1.06; }
+.h-hero { font-size: clamp(2.6rem, min(5.7vw, 8.6vh), 5.25rem); line-height: 1.06; }
 .h-chapter { font-size: clamp(2.1rem, 4.3vw, 3.9rem); line-height: 1.12; }
 .h-page { font-size: clamp(1.9rem, 2.9vw, 2.6rem); line-height: 1.12; }
 .h-lead { font-size: clamp(1.45rem, 2.2vw, 2rem); line-height: 1.2; }
