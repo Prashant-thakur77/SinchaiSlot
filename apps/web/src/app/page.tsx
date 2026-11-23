@@ -1,9 +1,5 @@
 "use client";
 
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "lenis";
 import Link from "next/link";
 import { area, curveMonotoneX, line } from "d3-shape";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -15,7 +11,14 @@ import { SourceTag } from "@/components/ui";
 import { fmt, getJSON } from "@/lib/api";
 import type { LedgerRow, Proof } from "@/lib/types";
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+type Motion = { gsap: typeof import("gsap").gsap; ScrollTrigger: typeof import("gsap/ScrollTrigger").ScrollTrigger; Lenis: typeof import("lenis").default };
+
+/** Animation libraries load after the page is painted and interactive; the content never waits on them. */
+async function loadMotion(): Promise<Motion> {
+  const [g, st, l] = await Promise.all([import("gsap"), import("gsap/ScrollTrigger"), import("lenis")]);
+  g.gsap.registerPlugin(st.ScrollTrigger);
+  return { gsap: g.gsap, ScrollTrigger: st.ScrollTrigger, Lenis: l.default };
+}
 
 const PlotMosaic = dynamic(() => import("@/components/PlotMosaic").then((m) => m.PlotMosaic), { ssr: false });
 
@@ -60,6 +63,16 @@ export default function Home() {
   const [c, setC] = useState<Constants | null>(null);
   const [story, setStory] = useState<Story | null>(null);
   const [plots, setPlots] = useState<PlotFeature[]>([]);
+  const [motion, setMotion] = useState<Motion | null>(null);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let live = true;
+    loadMotion().then((m) => live && setMotion(m)).catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
 
   useEffect(() => {
     getJSON<Proof>("/api/proof").then(setProof).catch(() => {});
@@ -70,7 +83,8 @@ export default function Home() {
 
   // Smooth scroll (off for reduced motion), driven by GSAP's ticker so ScrollTrigger stays in sync.
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!motion) return;
+    const { gsap, ScrollTrigger, Lenis } = motion;
     const lenis = new Lenis({ lerp: 0.09 });
     lenis.on("scroll", ScrollTrigger.update);
     const raf = (t: number) => lenis.raf(t * 1000);
@@ -80,14 +94,15 @@ export default function Home() {
       gsap.ticker.remove(raf);
       lenis.destroy();
     };
-  }, []);
+  }, [motion]);
 
-  useGSAP(
-    () => {
+  useEffect(() => {
+    if (!motion) return;
+    const { gsap } = motion;
+    const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         // Hero: the sun rises as you start scrolling; the wordmark settles.
-        gsap.from(".wm-l", { yPercent: 110, duration: 1.1, ease: "expo.out", stagger: 0.04 });
         gsap.to(".hero-sun", { yPercent: -60, scale: 1.15, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
         gsap.to(".hero-sky", { opacity: 1, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
         // 06:00 statement fills word by word.
@@ -123,9 +138,9 @@ export default function Home() {
           gsap.to(o, { v: to, duration: 1.4, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 85%", once: true }, onUpdate: () => { el.textContent = o.v.toLocaleString("en-IN", { maximumFractionDigits: dec, minimumFractionDigits: dec }); } });
         });
       });
-    },
-    { scope: root, dependencies: [proof, story, plots.length], revertOnUpdate: true },
-  );
+    }, root);
+    return () => ctx.revert();
+  }, [motion, proof, story, plots.length]);
 
   const day = proof?.demo_day;
   const chart = useMemo(() => {
@@ -188,7 +203,7 @@ export default function Home() {
         </div>
         <h1 className="wm relative z-10 select-none overflow-hidden px-3 pb-2 font-display font-extrabold leading-[0.8] tracking-[-0.02em] text-sun" aria-label="SinchaiSlot">
           <span className="flex justify-between text-[clamp(3.2rem,13.5vw,15rem)]" aria-hidden>
-            {"SINCHAISLOT".split("").map((ch, i) => <span key={i} className="wm-l inline-block">{ch}</span>)}
+            {"SINCHAISLOT".split("").map((ch, i) => <span key={i} className="wm-l inline-block" style={{ animationDelay: `${i * 40}ms` }}>{ch}</span>)}
           </span>
         </h1>
       </section>

@@ -11,7 +11,6 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@gsap/react": "^2.1.2",
     "d3-delaunay": "^6.0.6",
     "d3-scale": "^4.0.3",
     "d3-shape": "^3.2.1",
