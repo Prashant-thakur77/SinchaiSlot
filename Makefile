@@ -51,6 +51,9 @@ test-web: ## Playwright end-to-end and accessibility tests (needs `pnpm install`
 evals: ## Agent eval suite (held-out scripted interactions), ASR WER, optimiser benchmark
 	$(UV) python -W ignore -m evals.run
 
+film-capture: ## Record every product shot for the video from the running stack (docker compose up first)
+	cd apps/web && node scripts/capture-film.mjs ../../submission/video/capture.json
+
 lint: ## ruff + mypy + eslint
 	$(UV) ruff check services packages tests evals
 	$(UV) mypy services/planner services/jalprahari services/rasid --ignore-missing-imports
