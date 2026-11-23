@@ -202,7 +202,9 @@ def book_slot(ctx: ToolContext, inp: BookIn) -> dict:
                                               db.Booking.status.in_(["confirmed", "paid", "running"])).first()
         if existing:
             return {"booked": False, "reason": "already_booked", **_booking_view(s, existing)}
-        n = s.query(db.Booking).count() + 1
+        n = s.query(db.Booking).filter(db.Booking.pump_id == "P1", db.Booking.day == st.day).count() + 1
+        while s.get(db.Booking, f"B{st.day[5:7]}{st.day[8:10]}{n:03d}") is not None:
+            n += 1
         b = db.Booking(id=f"B{st.day[5:7]}{st.day[8:10]}{n:03d}", farmer_id=p.farmer_id, plot_id=p.id, pump_id="P1",
                        day=st.day, m3_requested=round(m3, 1), price_rs=round(m3 * _tariff(), 0), status="confirmed",
                        channel=ctx.channel)
@@ -670,6 +672,257 @@ def book_seller(ctx: ToolContext, inp: SellerBookIn) -> dict:
         s.commit()
         return {"booked": True, "seller": x.display_name, "hours": inp.hours, "price_rs": round(x.rate_rs_per_h * inp.hours, 0),
                 "note": "Overflow booking; not counted as solar water in Rasid."}
+
+
+# ===========================================================================
+# Cluster: neighbouring pumps, transfers, data health, passport
+# ===========================================================================
+
+@tool("cluster_overview", "All pumps in the cluster: today's water, open bookings, faults, data health, water quality.",
+      ("operator", "planner", "funder", "system"))
+def cluster_overview(ctx: ToolContext, inp: Empty) -> dict:
+    from . import cluster
+    return cluster.overview()
+
+
+class TransferRef(BaseModel):
+    booking_id: str
+
+
+@tool("transfer_options", "Which neighbouring pumps can reach a booking's plot and what each would deliver today.",
+      ("operator", "farmer", "system"))
+def transfer_options_tool(ctx: ToolContext, inp: TransferRef) -> dict:
+    from . import cluster
+    _own_booking(ctx, inp.booking_id)
+    try:
+        return cluster.transfer_options(inp.booking_id)
+    except ValueError as e:
+        raise ToolError(str(e)) from e
+
+
+class TransferIn(BaseModel):
+    booking_id: str
+    to_pump: str
+
+
+@tool("transfer_booking", "Move a booking to a neighbouring pump that can reach the plot (needs confirmation).",
+      ("operator", "farmer", "system"), confirm=True)
+def transfer_booking(ctx: ToolContext, inp: TransferIn) -> dict:
+    from . import cluster
+    _own_booking(ctx, inp.booking_id)
+    try:
+        return cluster.transfer(inp.booking_id, inp.to_pump)
+    except ValueError as e:
+        raise ToolError(str(e)) from e
+
+
+class PumpRef(BaseModel):
+    pump_id: str | None = None
+
+
+@tool("suggest_transfers", "When a pump is down or full, the best neighbouring pump for each of its open bookings.",
+      ("operator", "planner", "system"))
+def suggest_transfers_tool(ctx: ToolContext, inp: PumpRef) -> dict:
+    from . import cluster
+    return cluster.suggest_transfers(inp.pump_id)
+
+
+@tool("pump_health", "Data-health monitor: is each pump still reporting, late, silent or stalled.",
+      ("operator", "funder", "planner", "system"))
+def pump_health(ctx: ToolContext, inp: PumpRef) -> dict:
+    from . import cluster
+    with db.session() as s:
+        ids = [inp.pump_id] if inp.pump_id else [p.id for p in s.query(db.Pump).order_by(db.Pump.id).all()]
+    return {"pumps": [cluster.health(i) for i in ids]}
+
+
+def _own_booking(ctx: ToolContext, booking_id: str) -> None:
+    if ctx.role != "farmer":
+        return
+    with db.session() as s:
+        b = s.get(db.Booking, booking_id)
+        if b is None or b.farmer_id != ctx.user_ref:
+            raise ToolError("not your booking")
+
+
+@tool("pump_passport", "Pump Passport: utilisation, uptime, faults, receipts, repayment record and credit scorecard.",
+      ("funder", "operator", "planner", "system"))
+def pump_passport(ctx: ToolContext, inp: PumpRef) -> dict:
+    from sinchai_rasid.passport import PumpMeta, passport
+
+    from . import cluster
+    st = get_state()
+    pid = inp.pump_id or "P1"
+    as_of = date.fromisoformat(st.day)
+    with db.session() as s:
+        p = s.get(db.Pump, pid)
+        if p is None:
+            raise ToolError("unknown pump")
+        receipts = ledger_service.receipts(s)
+        verified = ledger_service.verify(s).get("ok", False)
+        mt = s.query(db.Maintenance).filter(db.Maintenance.pump_id == pid).all()
+        faults = [{"code": m.fault, "at": m.created_at.date().isoformat(), "downtime_h": m.downtime_h}
+                  for m in mt if m.fault]
+        credits = s.query(db.Credit).filter(db.Credit.pump_id == pid, db.Credit.paid_on.isnot(None)).all()
+        meta = PumpMeta(p.id, p.name, p.kwp, p.operator)
+    first = min((r.start[:10] for r in receipts if r.pump_id == pid), default=None)
+    span = max((as_of - date.fromisoformat(first)).days, 1) if first else 1
+    op_hours = min(span, 365) * (C.get("operator_end_hour") - C.get("operator_start_hour"))
+    down = sum(f["downtime_h"] for f in faults)
+    uptime = max(0.0, 1 - down / op_hours) if op_hours else None
+    on_time = sum(1 for c in credits if c.paid_on <= c.due) / len(credits) if credits else None
+    health = cluster.health(pid)["status"]
+    out = passport(meta, receipts, as_of, uptime=uptime, faults=faults, repayment_on_time=on_time,
+                   ledger_verified=verified, data_health=health)
+    out["fault_log"] = sorted(faults, key=lambda f: f["at"], reverse=True)
+    out["downtime_h"] = round(down, 1)
+    out["after_harvest_credits"] = len(credits)
+    out["water_quality"] = cluster.card(pid, cluster.BOREWELL_EC_DSM.get(pid, 0.6)).to_dict()
+    out["labels"] = {"receipts": "SIMULATED operation on REAL weather", "faults": "SIMULATED history",
+                     "credits": "SIMULATED history"}
+    return out
+
+
+@tool("water_quality", "Water-quality card for a pump's borewell (EC/TDS probe) and which crops it suits.",
+      ("farmer", "operator", "funder", "system"))
+def water_quality(ctx: ToolContext, inp: PumpRef) -> dict:
+    from . import cluster
+    pid = inp.pump_id or "P1"
+    return cluster.card(pid, cluster.BOREWELL_EC_DSM.get(pid, 0.6)).to_dict()
+
+
+class RechargeIn(BaseModel):
+    pump_id: str | None = None
+    offset_share: float = Field(1.0, gt=0, le=2)
+
+
+@tool("recharge_plan", "Recharge pairing: structures that put back what a pump (or the cluster) takes out each year.",
+      ("funder", "operator", "planner", "system"))
+def recharge_plan(ctx: ToolContext, inp: RechargeIn) -> dict:
+    from sinchai_jal.recharge import pair
+    st = get_state()
+    as_of = date.fromisoformat(st.day)
+    since = date(as_of.year - 1, as_of.month, as_of.day).isoformat()
+    with db.session() as s:
+        q = s.query(db.LedgerRow).filter(db.LedgerRow.kind == "water", db.LedgerRow.start >= since)
+        if inp.pump_id:
+            q = q.filter(db.LedgerRow.pump_id == inp.pump_id)
+        m3 = sum(r.m3 for r in q.all())
+    out = pair(m3, inp.offset_share)
+    out["scope"] = inp.pump_id or "cluster"
+    out["period"] = f"{since} to {st.day}"
+    return out
+
+
+# ===========================================================================
+# Harvest-linked repayment
+# ===========================================================================
+
+def _history(s, farmer_id: str):
+    from sinchai_rasid.credit import Repayment
+    return [Repayment(date.fromisoformat(c.due), c.amount_rs + c.fee_rs,
+                      date.fromisoformat(c.paid_on) if c.paid_on else None)
+            for c in s.query(db.Credit).filter(db.Credit.farmer_id == farmer_id).all()]
+
+
+class HarvestIn(BaseModel):
+    farmer_id: str | None = None
+    booking_id: str | None = None
+
+
+@tool("harvest_offer", "Can this booking be paid partly after harvest, how much now and how much later.",
+      ("farmer", "operator", "system"))
+def harvest_offer(ctx: ToolContext, inp: HarvestIn) -> dict:
+    from sinchai_rasid.credit import offer
+    st = get_state()
+    with db.session() as s:
+        q = s.query(db.Booking).filter(db.Booking.paid.is_(False), db.Booking.status == "confirmed")
+        if inp.booking_id:
+            q = q.filter(db.Booking.id == inp.booking_id)
+        if inp.farmer_id:
+            q = q.filter(db.Booking.farmer_id == inp.farmer_id)
+        b = q.first()
+        if b is None:
+            raise ToolError("no unpaid booking")
+        p = s.get(db.Plot, b.plot_id)
+        o = offer(b.price_rs, p.crop if p.crop in ("wheat", "maize", "paddy", "potato", "veg_summer") else "wheat",
+                  date.fromisoformat(st.day), _history(s, b.farmer_id))
+        return {"booking_id": b.id, "farmer_id": b.farmer_id, **o.to_dict(),
+                "history": [{"due": r.due.isoformat(), "amount_rs": r.amount_rs,
+                             "paid_on": r.paid_on.isoformat() if r.paid_on else None, "on_time": r.on_time()}
+                            for r in _history(s, b.farmer_id)]}
+
+
+@tool("pay_after_harvest", "Take the pay-now part in cash or UPI and record the rest as due after harvest (needs confirmation).",
+      ("farmer", "operator", "system"), confirm=True)
+def pay_after_harvest(ctx: ToolContext, inp: HarvestIn) -> dict:
+    o = harvest_offer(ctx, inp)
+    if not o["eligible"]:
+        raise ToolError(o["reason_en"])
+    st = get_state()
+    with db.session() as s:
+        b = s.get(db.Booking, o["booking_id"])
+        s.add(db.Credit(farmer_id=b.farmer_id, booking_id=b.id, pump_id=b.pump_id, amount_rs=o["after_harvest_rs"],
+                        fee_rs=o["fee_rs"], due=o["due"], created_on=st.day))
+        s.commit()
+    paid = record_payment(ctx, RecordPaymentIn(booking_id=o["booking_id"], method="cash"))
+    return {**paid, "pay_now_rs": o["pay_now_rs"], "after_harvest_rs": o["after_harvest_rs"], "fee_rs": o["fee_rs"],
+            "due": o["due"], "reason_en": o["reason_en"], "reason_hi": o["reason_hi"]}
+
+
+# ===========================================================================
+# Soil Health Card and Bharat-VISTAAR
+# ===========================================================================
+
+class SoilIn(BaseModel):
+    farmer_id: str | None = None
+    plot_id: str | None = None
+    texture: str | None = None
+    ph: float | None = None
+    ec_dsm: float | None = None
+    oc_pct: float | None = None
+    n_kg_ha: float | None = None
+    p_kg_ha: float | None = None
+    k_kg_ha: float | None = None
+    s_ppm: float | None = None
+    zn_ppm: float | None = None
+    card_no: str | None = None
+
+
+@tool("apply_soil_card", "Set a plot's soil from its Soil Health Card values; changes how often its crop is watered.",
+      ("farmer", "operator", "system"))
+def apply_soil_card(ctx: ToolContext, inp: SoilIn) -> dict:
+    from sinchai_planner.soil import SoilCard, apply
+    with db.session() as s:
+        p = _farmer_plot(s, inp.farmer_id, inp.plot_id)
+        card = SoilCard(**inp.model_dump(exclude={"farmer_id", "plot_id"}))
+        crop = p.crop if p.crop in ("wheat", "maize", "paddy", "potato", "veg_summer") else "wheat"
+        res = apply(card, crop)
+        p.taw_mm_per_m = res["taw_mm_per_m"]
+        p.soil_card = res["card"]
+        s.commit()
+        return {"plot_id": p.id, **res}
+
+
+class AdviceIn(BaseModel):
+    farmer_id: str | None = None
+    question: str
+
+
+@tool("vistaar_handoff", "Hand an agronomy question (pests, fertiliser, seed, prices) to Bharat-VISTAAR with the farm context.",
+      ("farmer", "operator", "system"))
+def vistaar_handoff(ctx: ToolContext, inp: AdviceIn) -> dict:
+    from sinchai_channels.vistaar import TOPICS, Handoff, adapter, classify
+    with db.session() as s:
+        f = s.get(db.Farmer, inp.farmer_id) if inp.farmer_id else None
+        p = s.query(db.Plot).filter(db.Plot.farmer_id == inp.farmer_id).first() if inp.farmer_id else None
+        topic = classify(inp.question)
+        h = Handoff(question=inp.question[:500], topic=topic, language=f.language if f else ctx.language,
+                    farmer_ref=inp.farmer_id or "anon", crop=p.crop if p else None, stage=p.stage if p else None,
+                    soil=p.soil_card if p else None)
+    rec = adapter().handoff(h)
+    en, hi = TOPICS[topic]
+    return {**rec, "topic_en": en, "topic_hi": hi}
 
 
 def describe() -> list[dict]:

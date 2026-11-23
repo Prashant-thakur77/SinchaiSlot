@@ -121,7 +121,7 @@ class VillageState:
     # ---------------- planning ----------------
     def _requests(self, s: db.Session) -> list[Request]:
         out = []
-        for b in s.query(db.Booking).filter(db.Booking.day == self.day,
+        for b in s.query(db.Booking).filter(db.Booking.day == self.day, db.Booking.pump_id == self.pump_id,
                                             db.Booking.status.in_(["confirmed", "paid", "running"])).all():
             f = s.get(db.Farmer, b.farmer_id)
             left = max(b.m3_requested - b.m3_delivered, 0.0)
@@ -201,7 +201,7 @@ class VillageState:
             for sp in plan.slots:
                 if sp.action.startswith("req:"):
                     booking_slots.setdefault(sp.action[4:], []).append(sp.slot)
-            for b in s.query(db.Booking).filter(db.Booking.day == self.day).all():
+            for b in s.query(db.Booking).filter(db.Booking.day == self.day, db.Booking.pump_id == self.pump_id).all():
                 ks = booking_slots.get(b.id)
                 if ks:
                     b.slot_start = self.slot_label(min(ks))
@@ -285,8 +285,6 @@ class VillageState:
         ep = EdgePlan(self.pump_id, self.plan_version, slots,
                       self.budget.remaining(datetime.fromisoformat(self.day).date())).to_json()
         self.edge.receive_plan(ep)
-        from . import bridge
-        bridge.publish_plan("P2", {**ep, "pump_id": "P2"})
 
     # ---------------- simulation ----------------
     def advance(self, minutes: float, step_s: float = 20.0) -> None:
@@ -400,6 +398,9 @@ def get_state() -> VillageState:
 
 def reset_state() -> VillageState:
     global _STATE
+    from . import cluster
+
+    cluster.reset()
     _STATE = build_state()
     return _STATE
 
@@ -421,7 +422,7 @@ def build_state(start_hhmm: str = "06:00") -> VillageState:
     st.edge = EdgeController(st.pump_id, InProcessAltivar(st.model), settings().edge_secret.encode(), st.uplink)
     # Budget used so far this season, from the ledger.
     with db.session() as s:
-        used = sum(r.m3 for r in s.query(db.LedgerRow).filter(db.LedgerRow.kind == "water",
+        used = sum(r.m3 for r in s.query(db.LedgerRow).filter(db.LedgerRow.kind == "water", db.LedgerRow.pump_id == st.pump_id,
                                                              db.LedgerRow.start < day).all()
                    if r.start[:4] == day[:4] and r.start[5:7] in ("01", "02", "03", "04", "05", "06")
                    and int(r.start[5:7]) >= 3)

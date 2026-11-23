@@ -26,6 +26,14 @@ sources:
   altivar_solar: https://www.se.com/za/en/product-range/247470166-altivar-solar
   heftcom: https://arxiv.org/html/2507.01579v2
   fao56: https://www.fao.org/4/x0490e/x0490e00.htm
+  fao29: https://www.fao.org/4/t0234e/T0234E01.htm
+  fao56_soils: https://www.fao.org/4/x0490e/x0490e0c.htm
+  cgwb_recharge_plan: https://cgwb.gov.in/sites/default/files/2022-10/karauli_district_sapotra_block.pdf
+  cgwb_master_plan: https://cgwb.gov.in/node/1845
+  rbi_kcc_subvention: https://website.rbi.org.in/documents/d/rbi/circularonmissdatedjanuary132026
+  kcc_pri: https://hdfcbank.com/agri/gov-schemes/central-interest-subvention-scheme
+  bharat_vistaar: https://frontiertech.niti.gov.in/story/how-bharat-vistaar-is-connecting-140m-farmers-to-smarter-agriculture/
+  vistaar_launch: https://www.tribuneindia.com/news/india/shivraj-chouhan-launches-ai-powered-bharat-vistaar-platform-for-farmers/
   nasa_power: https://power.larc.nasa.gov/
   open_meteo: https://open-meteo.com/
 
@@ -357,3 +365,113 @@ constants:
     unit: Rs/yr
     kind: assumption
     note: Annual operation and maintenance of a 5 kWp shared pump (cleaning, small parts). Confirm with operators.
+
+  # ---- Extras: cluster, health, credit, water quality, recharge, advisory ----
+  cluster_pump_offsets_deg:
+    value: {P2: [0.0085, 0.0010], P3: [-0.0040, 0.0080]}
+    unit: deg (lon, lat) from P1
+    kind: config
+    note: Neighbouring pumps in the demo cluster (simulated). Replace with surveyed locations.
+  transfer_max_channel_m:
+    value: 700
+    unit: m
+    kind: assumption
+    note: Longest field-channel or lay-flat pipe run a farmer will accept to take water from a neighbouring pump.
+  telemetry_late_after_min:
+    value: 10
+    unit: min
+    kind: assumption
+    note: Edge publishes every minute while awake; 10 missed messages marks it late.
+  telemetry_silent_after_min:
+    value: 60
+    unit: min
+    kind: assumption
+    note: No message for an hour in daylight means the pump has gone silent; the operator is alerted.
+  kcc_interest_rate:
+    value: 0.07
+    unit: per year
+    kind: published
+    source: rbi_kcc_subvention
+    note: Short-term crop loan rate to farmers under the interest subvention scheme (2025-26).
+  kcc_prompt_repayment_incentive:
+    value: 0.03
+    unit: per year
+    kind: published
+    source: kcc_pri
+    note: Extra subvention for prompt repayment, effective rate 4%.
+  harvest_credit_share_cap:
+    value: 0.5
+    unit: fraction of the booking
+    kind: assumption
+    note: Share of a booking that can be paid after harvest. The rest is paid at booking so the Saur Mitra has cash.
+  harvest_credit_limit_rs:
+    value: 1500
+    unit: Rs per farmer
+    kind: assumption
+    note: Outstanding after-harvest credit per farmer; raised only by a clean repayment record.
+  harvest_credit_fee_rate:
+    value: 0.07
+    unit: per year, simple
+    kind: assumption
+    note: Fee priced at the published KCC rate so deferring is never dearer than a crop loan.
+  water_ec_none_below_dsm:
+    value: 0.7
+    unit: dS/m
+    kind: published
+    source: fao29
+    note: Salinity, degree of restriction on use - none below 0.7 dS/m (TDS 450 mg/l).
+  water_ec_severe_above_dsm:
+    value: 3.0
+    unit: dS/m
+    kind: published
+    source: fao29
+    note: Salinity - severe restriction above 3.0 dS/m (TDS 2000 mg/l); slight to moderate between.
+  tds_mg_per_l_per_dsm:
+    value: 640
+    unit: mg/l per dS/m
+    kind: published
+    source: fao29
+    note: Conversion used in the FAO guideline tables for EC below 5 dS/m.
+  recharge_shaft_m3_per_year:
+    value: 35000
+    unit: m3/yr
+    kind: published
+    source: cgwb_recharge_plan
+    note: CGWB block plan planning norm (0.035 MCM per shaft), Rajasthan; depends on surplus runoff. Not a Bihar figure.
+  recharge_shaft_cost_rs:
+    value: 500000
+    unit: Rs
+    kind: published
+    source: cgwb_recharge_plan
+    note: CGWB block plan unit cost per recharge shaft (alluvium about Rs 5 lakh).
+  farm_pond_m3:
+    value: 1200
+    unit: m3 storage
+    kind: assumption
+    note: A 30 x 20 x 2 m farm pond; recharge counted as seepage of one fill plus refills per monsoon.
+  farm_pond_fills_per_monsoon:
+    value: 3
+    unit: fills
+    kind: assumption
+  farm_pond_seepage_share:
+    value: 0.5
+    unit: fraction of stored water reaching groundwater
+    kind: assumption
+  farm_pond_cost_rs:
+    value: 120000
+    unit: Rs
+    kind: assumption
+    note: Earthwork for 1,200 m3 at about Rs 100/m3. Confirm with MGNREGA estimates.
+  vistaar_helpline:
+    value: "155261"
+    unit: phone
+    kind: published
+    source: vistaar_launch
+    note: Bharat-VISTAAR toll-free advisory line, launched 17 Feb 2026 (Hindi and English first).
+
+  crop_ecw_threshold_dsm:
+    value: {wheat: 4.0, paddy: 2.0, maize: 1.1, potato: 1.1, veg_summer: 1.0}
+    unit: dS/m irrigation water EC at 100% yield potential
+    kind: published
+    source: fao29
+    note: FAO-29 crop salt tolerance table (100% yield potential). veg_summer uses the lowest common vegetable value.

@@ -16,19 +16,37 @@ def _head(s) -> tuple[str, int]:
     return (last.hash, last.seq) if last else (GENESIS, 0)
 
 
-def append(s, r: Receipt) -> db.LedgerRow:
-    prev, seq = _head(s)
-    r.prev_hash = prev
-    r.hash = r.compute_hash()
-    row = db.LedgerRow(
+def _row(r: Receipt) -> db.LedgerRow:
+    return db.LedgerRow(
         receipt_id=r.receipt_id, kind=r.kind, booking_id=r.booking_id, pump_id=r.pump_id, plot_id=r.plot_id,
         farmer_ref=r.farmer_ref, tenant=r.tenant, start=r.start, end=r.end, kwh=r.kwh, m3=r.m3,
         amount_rs=r.amount_rs, diesel_l_avoided=r.diesel_l_avoided, co2_kg_avoided=r.co2_kg_avoided,
         payload=asdict(r), hash=r.hash, prev_hash=r.prev_hash,
     )
+
+
+def append(s, r: Receipt) -> db.LedgerRow:
+    prev, _ = _head(s)
+    r.prev_hash = prev
+    r.hash = r.compute_hash()
+    row = _row(r)
     s.add(row)
     s.commit()
     return row
+
+
+def append_many(s, rs: list[Receipt]) -> int:
+    """Chain and store many receipts in order with one commit (seeding history)."""
+    prev, _ = _head(s)
+    rows = []
+    for r in rs:
+        r.prev_hash = prev
+        r.hash = r.compute_hash()
+        prev = r.hash
+        rows.append(_row(r))
+    s.add_all(rows)
+    s.commit()
+    return len(rows)
 
 
 def record_water_receipt(s, b: db.Booking, m3: float, kwh: float, now: datetime) -> dict:

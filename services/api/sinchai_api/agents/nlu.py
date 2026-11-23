@@ -33,9 +33,15 @@ INTENTS: dict[str, list[str]] = {
     "diesel": ["डीजल", "diesel", "दूसरा पंप", "other pump"],
     "greet": ["नमस्ते", "नमस्कार", "प्रणाम", "राम राम", "hello", "hi", "namaste", "pranam"],
     "help": ["मदद", "सहायता", "help", "madad"],
+    "harvest": ["फसल के बाद", "फ़सल के बाद", "फसल बाद", "कटनी के बाद", "कटनी बाद", "बाद में देंगे", "बाद में दूँगा",
+                "बाद मे देब", "बाद में देब", "बाद में दीहल", "उधार", "after harvest", "pay later", "later pay",
+                "fasal ke baad", "baad mein denge", "udhar", "udhaar"],
+    "advice": ["कीड़ा", "कीड़े", "कीड़ों", "कीट", "रोग", "बीमारी", "खाद", "यूरिया", "डीएपी", "बीज", "किस्म", "दवा",
+               "दवाई", "रतुआ", "मंडी", "पिल्लू", "pest", "insect", "disease", "fertiliser", "fertilizer", "urea",
+               "seed", "variety", "mandi", "keeda", "khad", "beej", "dawai"],
 }
 # Higher wins when several intents match.
-PRIORITY = ["cancel", "issue", "why", "schemes", "balance", "pay", "status", "diesel", "price", "when", "book",
+PRIORITY = ["cancel", "harvest", "advice", "issue", "why", "schemes", "balance", "pay", "status", "diesel", "price", "when", "book",
             "no", "yes", "help", "greet"]
 
 LANG_MARKERS = {

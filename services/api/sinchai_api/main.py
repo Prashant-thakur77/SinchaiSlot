@@ -128,10 +128,11 @@ def get_state() -> dict:
 
 
 @app.get("/api/village")
-def village() -> dict:
+def village(pump: str = "P1") -> dict:
     with db.session() as s:
         farmers = {f.id: f for f in s.query(db.Farmer).all()}
-        plots = s.query(db.Plot).all()
+        q = s.query(db.Plot)
+        plots = (q if pump == "all" else q.filter(db.Plot.pump_id == pump)).all()
         pumps = s.query(db.Pump).all()
         sellers = s.query(db.Seller).all()
         bookings = {b.plot_id: b for b in s.query(db.Booking).filter(db.Booking.day == state.get_state().day).all()}
@@ -140,7 +141,7 @@ def village() -> dict:
             f = farmers[p.farmer_id]
             b = bookings.get(p.id)
             feats.append({"type": "Feature", "geometry": p.geojson, "properties": {
-                "plot_id": p.id, "farmer_id": f.id, "farmer": f.display_name, "tenant": f.tenant, "owner": f.owner,
+                "plot_id": p.id, "pump_id": p.pump_id, "farmer_id": f.id, "farmer": f.display_name, "tenant": f.tenant, "owner": f.owner,
                 "crop": p.crop, "stage": p.stage, "area_ha": p.area_ha, "need_m3": p.need_m3,
                 "booking": b.status if b else None, "slot": f"{b.slot_start}-{b.slot_end}" if b and b.slot_start else None,
                 "language": f.language}})
@@ -165,7 +166,7 @@ def bookings(day: str | None = None) -> list[dict]:
         out = []
         for b in s.query(db.Booking).filter(db.Booking.day == d).order_by(db.Booking.slot_start).all():
             f, p = fs.get(b.farmer_id), ps.get(b.plot_id)
-            out.append({"id": b.id, "farmer_id": b.farmer_id, "farmer": f.display_name if f else b.farmer_id,
+            out.append({"id": b.id, "pump_id": b.pump_id, "farmer_id": b.farmer_id, "farmer": f.display_name if f else b.farmer_id,
                         "tenant": bool(f and f.tenant), "language": f.language if f else "hi",
                         "crop": p.crop if p else None, "slot_start": b.slot_start, "slot_end": b.slot_end,
                         "m3": b.m3_requested, "m3_delivered": round(b.m3_delivered, 1), "price_rs": b.price_rs,
@@ -540,6 +541,88 @@ def ledger_pdf() -> Response:
         p = write_pdf(ledger_service.receipts(s), Path(d) / "report.pdf")
         return Response(p.read_bytes(), media_type="application/pdf",
                         headers={"Content-Disposition": "attachment; filename=rasid-funder-report.pdf"})
+
+
+# ---------------------------------------------------------------------------
+# Cluster, Pump Passport, soil card
+# ---------------------------------------------------------------------------
+
+def _tool(name: str, args: dict | None = None) -> dict:
+    try:
+        return tools.call(name, args or {}, tools.ToolContext(role="system"))
+    except (tools.ToolError, ValueError) as e:
+        raise HTTPException(400, str(e)) from e
+
+
+@app.get("/api/cluster")
+def cluster_view() -> dict:
+    return _tool("cluster_overview")
+
+
+@app.get("/api/cluster/suggest")
+def cluster_suggest(pump: str | None = None) -> dict:
+    return _tool("suggest_transfers", {"pump_id": pump})
+
+
+@app.get("/api/cluster/transfer_options/{booking_id}")
+def cluster_transfer_options(booking_id: str) -> dict:
+    return _tool("transfer_options", {"booking_id": booking_id})
+
+
+@app.get("/api/cluster/recharge")
+def cluster_recharge(pump: str | None = None, share: float = 1.0) -> dict:
+    return _tool("recharge_plan", {"pump_id": pump, "offset_share": share})
+
+
+@app.get("/api/pumps/{pump_id}/passport")
+def pump_passport(pump_id: str) -> dict:
+    return _tool("pump_passport", {"pump_id": pump_id})
+
+
+@app.get("/api/pumps/{pump_id}/passport.pdf")
+def pump_passport_pdf(pump_id: str) -> Response:
+    import tempfile
+    from pathlib import Path
+
+    from sinchai_rasid.passport import write_pdf as passport_pdf
+    pp = _tool("pump_passport", {"pump_id": pump_id})
+    with tempfile.TemporaryDirectory() as d:
+        p = passport_pdf(pp, Path(d) / "passport.pdf")
+        return Response(Path(p).read_bytes(), media_type="application/pdf",
+                        headers={"Content-Disposition": f"attachment; filename=pump-passport-{pump_id}.pdf"})
+
+
+class SoilReadIn(BaseModel):
+    image_b64: str | None = None
+    media_type: str = "image/png"
+    sample: bool = False
+
+
+@app.get("/api/soil-card/sample.png")
+def soil_sample() -> Response:
+    from .agents.soil_card import SAMPLE
+    return Response(SAMPLE.read_bytes(), media_type="image/png")
+
+
+@app.post("/api/soil-card/read")
+def soil_read(inp: SoilReadIn) -> dict:
+    import base64
+
+    from .agents import soil_card
+    if inp.sample:
+        img = soil_card.SAMPLE.read_bytes()
+    elif inp.image_b64:
+        try:
+            img = base64.b64decode(inp.image_b64.split(",")[-1], validate=False)
+        except ValueError as e:
+            raise HTTPException(400, "bad image") from e
+        if len(img) > 6_000_000:
+            raise HTTPException(413, "image too large")
+    else:
+        raise HTTPException(400, "send image_b64 or sample=true")
+    if inp.media_type not in ("image/png", "image/jpeg", "image/webp"):
+        raise HTTPException(415, "png, jpeg or webp only")
+    return soil_card.read(img, inp.media_type)
 
 
 @app.get("/api/ledger/claim")

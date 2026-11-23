@@ -16,6 +16,30 @@ CROP = {
 }
 
 T: dict[str, dict[str, str]] = {
+    "harvest_offer": {
+        "hi": "हाँ, हो सकता है। अभी {now} रुपये दें, बाकी {later} रुपये फसल के बाद {due} तक। यह किसान क्रेडिट कार्ड की दर पर है। ठीक है? हाँ के लिए 1, नहीं के लिए 2।",
+        "mai": "हँ, भ सकैत अछि। एखन {now} टाका दिअ, बाँकी {later} टाका फसलक बाद {due} धरि। ई किसान क्रेडिट कार्डक दर पर अछि। ठीक? हँ लेल 1, नै लेल 2।",
+        "bho": "हँ, हो सकेला। अबहीं {now} रुपया दीं, बाकी {later} रुपया फसल के बाद {due} ले। ई किसान क्रेडिट कार्ड के दर पर बा। ठीक बा? हँ खातिर 1, ना खातिर 2।",
+        "en": "Yes. Pay Rs {now} now and Rs {later} after harvest, by {due}. Priced at the Kisan Credit Card rate. OK? Press 1 for yes, 2 for no.",
+    },
+    "harvest_no": {
+        "hi": "माफ़ कीजिए, अभी फसल के बाद भुगतान नहीं हो सकता: {reason}। पूरा {price} रुपये अभी देना होगा।",
+        "mai": "माफ करू, एखन फसलक बाद भुगतान नै भ सकैत: {reason}। पूरा {price} टाका एखन देबय पड़त।",
+        "bho": "माफ करीं, अबहीं फसल के बाद भुगतान ना हो सकी: {reason}। पूरा {price} रुपया अबहीं देवे के पड़ी।",
+        "en": "Sorry, after-harvest payment is not possible now: {reason}. The full Rs {price} is due now.",
+    },
+    "harvest_done": {
+        "hi": "हो गया। {now} रुपये लिए, {later} रुपये {due} तक। कोड {code}।",
+        "mai": "भ गेल। {now} टाका लेल, {later} टाका {due} धरि। कोड {code}।",
+        "bho": "हो गइल। {now} रुपया लिहल गइल, {later} रुपया {due} ले। कोड {code}।",
+        "en": "Done. Rs {now} taken, Rs {later} due by {due}. Code {code}.",
+    },
+    "advice": {
+        "hi": "यह {topic} का सवाल है। सही सलाह के लिए मैंने आपका सवाल भारत-विस्तार को भेज दिया है, संदर्भ {ref}। वहाँ से फ़ोन आएगा, या आप खुद {helpline} पर मुफ़्त कॉल कर सकते हैं। पानी का काम मैं देखूँगा।",
+        "mai": "ई {topic} के सवाल अछि। सही सलाह लेल हम अहाँक सवाल भारत-विस्तार के पठा देलहुँ, संदर्भ {ref}। ओतय सँ फोन आएत, वा अहाँ {helpline} पर मुफ्त फोन क सकैत छी। पानिक काज हम देखब।",
+        "bho": "ई {topic} के सवाल बा। सही सलाह खातिर हम रउरा सवाल भारत-विस्तार के भेज देनी, संदर्भ {ref}। उहाँ से फोन आई, भा रउआ {helpline} पर मुफत फोन कर सकेनी। पानी के काम हम देखब।",
+        "en": "That is a {topic} question. I have sent it to Bharat-VISTAAR for proper advice, reference {ref}. They will call back, or you can call {helpline} free. I will look after the water.",
+    },
     "greet": {
         "hi": "नमस्ते {name} जी, मैं सिंचाईस्लॉट साथी बोल रहा हूँ।",
         "mai": "प्रणाम {name} जी, हम सिंचाईस्लॉट साथी बजैत छी।",

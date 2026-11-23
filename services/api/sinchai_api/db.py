@@ -46,6 +46,7 @@ class Plot(Base):
     __tablename__ = "plots"
     id: Mapped[str] = mapped_column(String(16), primary_key=True)
     farmer_id: Mapped[str] = mapped_column(ForeignKey("farmers.id"), index=True)
+    pump_id: Mapped[str] = mapped_column(String(16), default="P1", index=True)
     area_ha: Mapped[float] = mapped_column(Float)
     crop: Mapped[str] = mapped_column(String(16))
     stage: Mapped[str] = mapped_column(String(16), default="development")
@@ -53,6 +54,8 @@ class Plot(Base):
     lat: Mapped[float] = mapped_column(Float)
     geojson: Mapped[dict[str, Any]] = mapped_column(JSON)
     need_m3: Mapped[float] = mapped_column(Float, default=0.0)  # FAO-56 remaining need now
+    taw_mm_per_m: Mapped[float | None] = mapped_column(Float, nullable=True)  # from a Soil Health Card
+    soil_card: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
 
 
 class Pump(Base):
@@ -184,7 +187,22 @@ class Maintenance(Base):
     action: Mapped[str] = mapped_column(String(64))
     note: Mapped[str] = mapped_column(Text)
     fault: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    downtime_h: Mapped[float] = mapped_column(Float, default=0.0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class Credit(Base):
+    """After-harvest share of a booking (harvest-linked repayment)."""
+    __tablename__ = "credits"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    farmer_id: Mapped[str] = mapped_column(ForeignKey("farmers.id"), index=True)
+    booking_id: Mapped[str] = mapped_column(String(24))
+    pump_id: Mapped[str] = mapped_column(String(16), default="P1")
+    amount_rs: Mapped[float] = mapped_column(Float)
+    fee_rs: Mapped[float] = mapped_column(Float, default=0.0)
+    due: Mapped[str] = mapped_column(String(10))
+    paid_on: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    created_on: Mapped[str] = mapped_column(String(10))
 
 
 _engine = None
