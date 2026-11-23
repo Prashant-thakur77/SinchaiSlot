@@ -152,7 +152,7 @@ export default function PhonePage() {
           </form>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {(QUICK[lang] ?? QUICK.hi).map((q) => (
-              <button key={q} disabled={!call || call.closed || busy} onClick={() => answer(q)} className="deva rounded-full border border-soil px-2.5 py-0.5 text-[12px] text-fog hover:bg-night-2 disabled:opacity-40">
+              <button key={q} disabled={!call || call.closed || busy} onClick={() => answer(q)} className="deva rounded-full border border-soil px-2.5 py-0.5 text-[12px] text-fog hover:bg-night-2 disabled:text-mist disabled:opacity-80">
                 {q}
               </button>
             ))}
@@ -178,7 +178,7 @@ export default function PhonePage() {
           </div>
           <form className="flex gap-2 bg-[#1f2c33] p-2" onSubmit={(e) => { e.preventDefault(); sendWa(waText); }}>
             <input value={waText} onChange={(e) => setWaText(e.target.value)} placeholder="Message" aria-label="WhatsApp message" className="deva min-w-0 flex-1 rounded-full bg-[#2a3942] px-3 py-1.5 text-[13px] outline-none" />
-            <button type="submit" disabled={busy} className="rounded-full bg-[#00a884] px-3 text-[13px] text-ink">Send</button>
+            <button type="submit" disabled={busy} className="rounded-full bg-water px-3 text-[13px] text-ink">Send</button>
           </form>
         </div>
 

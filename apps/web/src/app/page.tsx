@@ -25,7 +25,34 @@ type Story = {
   offer: { mai: string; en: string; greet: string } | null;
   callbacks: { name: string; language: string; text: string; at: string }[];
   receipt: LedgerRow | null;
+  replay: {
+    label: string;
+    callbacks: { name: string; language: string; text: string; at: string }[];
+    slots_before: { start: string; action: string; farmer: string | null }[];
+    slots_after: { start: string; action: string; farmer: string | null }[];
+  } | null;
 };
+
+const SLOT_CLS: Record<string, string> = { req: "bg-water", mill: "bg-sun", chaff: "bg-[#c98b4a]", battery: "bg-mist/70", idle: "bg-transparent" };
+
+const FARMER_SHADES = ["bg-water", "bg-[#8fd0f5]", "bg-[#2c7bb0]", "bg-[#b9e3fa]"];
+
+function SlotStrip({ slots, order, className = "" }: { slots: { start: string; action: string; farmer: string | null }[]; order: string[]; className?: string }) {
+  return (
+    <div className={`grid h-5 grid-cols-24 gap-px ${className}`} style={{ gridTemplateColumns: `repeat(${slots.length}, minmax(0, 1fr))` }}>
+      {slots.map((s, i) => {
+        const prev = slots[i - 1];
+        const head = s.action === "req" && (!prev || prev.farmer !== s.farmer || prev.action !== "req");
+        return (
+          <div key={s.start} title={`${s.start} ${s.action === "req" ? s.farmer : s.action}`}
+            className={`relative rounded-[2px] ${s.action === "req" ? FARMER_SHADES[Math.max(0, order.indexOf(s.farmer ?? "")) % FARMER_SHADES.length] : SLOT_CLS[s.action] ?? "bg-soil"}`}>
+            {head && <span className="absolute -top-4 left-0 whitespace-nowrap text-[10px] text-fog">{s.farmer?.split(" ")[0]}</span>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Home() {
   const root = useRef<HTMLDivElement>(null);
@@ -81,7 +108,10 @@ export default function Home() {
           .fromTo(".cloud", { xPercent: -120, opacity: 0 }, { xPercent: 40, opacity: 1, duration: 0.3 }, 0.55)
           .to(".cloud", { xPercent: 140, opacity: 0, duration: 0.25 }, 0.85)
           .fromTo(".cloud-note", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.12 }, 0.62)
-          .fromTo(".ring-card", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.12 }, 0.7);
+          .fromTo(".ring-card", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.12 }, 0.7)
+          .fromTo(".strip-before", { opacity: 1 }, { opacity: 0, duration: 0.08 }, 0.62)
+          .fromTo(".strip-after", { opacity: 0, clipPath: "inset(-24px 0 0 64%)" }, { opacity: 1, clipPath: "inset(-24px 0 0 0%)", duration: 0.12, ease: "power2.out" }, 0.62)
+          .fromTo(".ring-dot", { scale: 1 }, { scale: 1.6, repeat: 5, yoyo: true, duration: 0.02 }, 0.72);
         // Receipt prints at dusk.
         gsap.fromTo(".receipt-slot", { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", ease: "power2.out", scrollTrigger: { trigger: ".dusk", start: "top 60%", end: "top 10%", scrub: true } });
         // Proof numbers count up once.
@@ -212,7 +242,7 @@ export default function Home() {
       </section>
 
       {/* 13:40 THE CLOUD (signature) */}
-      <section className="day relative flex h-[100svh] min-h-[600px] flex-col justify-center overflow-hidden bg-night py-10" aria-labelledby="t-cloud">
+      <section className="day relative flex h-[100svh] min-h-[600px] flex-col justify-center overflow-hidden bg-night pb-6 pt-20 md:py-10" aria-labelledby="t-cloud">
         {plots.length > 0 && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.07]" aria-hidden>
             <div className="w-[120vmin]"><PlotMosaic features={plots} /></div>
@@ -234,19 +264,33 @@ export default function Home() {
           </div>
           {chart && (
             <div className="relative mt-6">
-              <svg viewBox={`0 0 ${chart.W} ${chart.H}`} preserveAspectRatio="none" className="h-[34vh] w-full overflow-visible" role="img" aria-label="Solar power on the demo day: forecast band, forecast median and actual">
+              <svg viewBox={`0 0 ${chart.W} ${chart.H}`} preserveAspectRatio="none" className="aspect-[3/1] w-full overflow-visible md:aspect-auto md:h-[30vh]" role="img" aria-label="Solar power on the demo day: forecast band, forecast median and actual">
                 <path className="curve-band" d={chart.band} fill="var(--sun)" opacity="0.22" />
                 <path className="curve-p50" d={chart.p50} pathLength={1} strokeDasharray="1" fill="none" stroke="var(--sun-deep)" strokeWidth="3" strokeOpacity="0.8" vectorEffect="non-scaling-stroke" />
                 <path className="curve-actual" d={chart.actual} pathLength={1} strokeDasharray="1" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
               </svg>
-              <div className="cloud-note pointer-events-none absolute flex items-center gap-2" style={{ left: `${(chart.cloudX / chart.W) * 100}%`, top: `${(chart.cloudY / chart.H) * 100}%`, transform: "translate(-7px, -7px)" }}>
+              <div className="cloud-note pointer-events-none absolute flex items-center gap-2" style={{ left: `${(chart.cloudX / chart.W) * 100}%`, top: `${(chart.cloudY / chart.H) * 100}%`, transform: chart.cloudX / chart.W > 0.6 ? "translate(calc(-100% + 7px), -7px)" : "translate(-7px, -7px)", flexDirection: chart.cloudX / chart.W > 0.6 ? "row-reverse" : "row" }}>
                 <span className="h-3.5 w-3.5 rounded-full bg-water ring-4 ring-water/25" />
-                <span className="whitespace-nowrap rounded bg-night/80 px-2 py-0.5 text-[13px] text-water">actual sun below the P10 forecast</span>
+                <span className="hidden whitespace-nowrap rounded bg-night/80 px-2 py-0.5 text-[13px] text-water md:inline">actual sun below the P10 forecast</span>
               </div>
+              {story?.replay && (
+                <div role="img" className="relative mt-7" aria-label="Pump plan for the day, before and after the 13:40 re-plan">
+                  {(() => {
+                    const order = [...new Set([...story.replay.slots_before, ...story.replay.slots_after].filter((s) => s.action === "req").map((s) => s.farmer ?? ""))];
+                    return (
+                      <>
+                        <SlotStrip slots={story.replay.slots_before} order={order} className="strip-before" />
+                        <SlotStrip slots={story.replay.slots_after} order={order} className="strip-after absolute inset-0" />
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
               <div className="mt-2 flex flex-wrap gap-4 text-[12px] text-mist">
                 <span><span className="mr-1.5 inline-block h-2 w-5 bg-sun/30 align-middle" />P10 to P90 forecast</span>
                 <span><span className="mr-1.5 inline-block w-5 border-t-2 border-sun-deep align-middle" />P50</span>
                 <span><span className="mr-1.5 inline-block w-5 border-t-[3px] border-white align-middle" />actual sun</span>
+                {story?.replay && <span><span className="mr-1.5 inline-block h-2 w-5 bg-water align-middle" />water slots, re-planned at 13:40</span>}
               </div>
             </div>
           )}
@@ -257,18 +301,28 @@ export default function Home() {
               fits today, Saathi says so and puts them first tomorrow.
             </p>
             <div className="ring-card rounded-2xl border border-water/40 bg-night-2 p-4">
-              {story?.callbacks?.length ? (
-                <>
-                  <div className="num text-[12px] text-water">📞 {story.callbacks[story.callbacks.length - 1].at} · {story.callbacks[story.callbacks.length - 1].name}</div>
-                  <p className="deva mt-2 text-[15px]" lang="mai">{story.callbacks[story.callbacks.length - 1].text}</p>
-                </>
-              ) : (
-                <>
-                  <div className="text-[12px] text-water">📞 Plan-change calls</div>
-                  <p className="mt-2 text-[14px] text-fog">Run the day in the Village Twin to hear who gets called, and what they are told.</p>
-                  <Link href="/twin" className="mt-3 inline-block text-[13px] text-sun underline">Open the live day</Link>
-                </>
-              )}
+              {(() => {
+                const live = story?.callbacks?.length ? story.callbacks : null;
+                const list = live ?? story?.replay?.callbacks ?? [];
+                const last = list[list.length - 1];
+                return last ? (
+                  <>
+                    <div className="num flex items-center gap-2 text-[12px] text-water">
+                      <span className="ring-dot inline-block h-2.5 w-2.5 rounded-full bg-water" aria-hidden />
+                      Saathi calls · {last.at} · {last.name}
+                      {!live && <SourceTag kind="simulated" className="ml-auto" />}
+                    </div>
+                    <p className="deva mt-2 text-[15px]" lang="mai">{last.text}</p>
+                    {list.length > 1 && <p className="mt-2 text-[12px] text-mist">{list.length} farmers called about the change, each in their own language.</p>}
+                  </>
+                ) : (
+                  <>
+                    <div className="text-[12px] text-water">Plan-change calls</div>
+                    <p className="mt-2 text-[14px] text-fog">Run the day in the Village Twin to hear who gets called, and what they are told.</p>
+                    <Link href="/twin" className="mt-3 inline-block text-[13px] text-sun underline">Open the live day</Link>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </div>

@@ -48,23 +48,35 @@ export default function LabPage() {
             {p.setup.years.join(", ")}), real NASA POWER sun and real archived forecasts. Bands are P10 to P90 across runs.{" "}
             <SourceTag kind="real" /> weather · <SourceTag kind="simulated" /> village, pump and bookings.
           </p>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <Panel>
-              <Stat big tone="sun" value={fmt.n(pol.D.utilisation_kwh_per_kwp.p50)} unit="kWh/kWp/yr" label="Solar used, SinchaiSlot"
-                sub={`vs ${fmt.n(pol.B.utilisation_kwh_per_kwp.p50)} for the Chakhaji baseline`} />
-            </Panel>
-            <Panel>
-              <Stat big tone="sun" value={fmt.signedPct(g?.utilisation_D_vs_B.p50)} label="Utilisation gain vs baseline B" sub={bandTxt(g?.utilisation_D_vs_B, true)} />
-            </Panel>
-            <Panel>
-              <Stat big tone="water" value={`₹${pol.D.farmer_rs_per_m3_solar.p50.toFixed(2)}`} unit="/m³" label="Farmer price, solar water"
-                sub={`B ₹${pol.B.farmer_rs_per_m3_solar.p50.toFixed(2)} · diesel ₹${p.headline.diesel_rs_per_m3.toFixed(2)}`} />
-            </Panel>
-            <Panel>
-              <Stat big tone="leaf" value={fmt.pct(pol.D.tenant_share_served_by_solar.p50)} label="Tenant water need met by solar"
-                sub={`B ${fmt.pct(pol.B.tenant_share_served_by_solar.p50)} · Gini ${pol.D.gini_solar_share_by_household.p50.toFixed(2)} vs ${pol.B.gini_solar_share_by_household.p50.toFixed(2)}`} />
-            </Panel>
-          </div>
+          <Panel>
+            <div className="grid gap-6 p-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-end">
+              <div>
+                <div className="text-[12px] text-mist">Sun put to work by SinchaiSlot, per kWp of panels per year</div>
+                <div className="num mt-2 text-6xl leading-none text-sun md:text-8xl">{fmt.n(pol.D.utilisation_kwh_per_kwp.p50)}<span className="ml-2 whitespace-nowrap text-lg text-mist">kWh/kWp·yr</span></div>
+                <div className="mt-3 text-[13px] text-fog">
+                  vs <span className="num text-white">{fmt.n(pol.B.utilisation_kwh_per_kwp.p50)}</span> for first-come hourly sales (Chakhaji baseline):{" "}
+                  <span className="num text-sun">{fmt.signedPct(g?.utilisation_D_vs_B.p50)}</span> <span className="text-mist">({bandTxt(g?.utilisation_D_vs_B, true)})</span>
+                </div>
+              </div>
+              <dl className="grid grid-cols-1 divide-y divide-soil border-y border-soil sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+                <div className="px-0 py-3 sm:px-4">
+                  <dt className="text-[12px] text-mist">Farmer price, solar water</dt>
+                  <dd className="num mt-1 text-3xl text-water">₹{pol.D.farmer_rs_per_m3_solar.p50.toFixed(2)}<span className="ml-1 text-sm text-mist">/m³</span></dd>
+                  <dd className="num mt-1 text-[12px] text-mist">B ₹{pol.B.farmer_rs_per_m3_solar.p50.toFixed(2)} · diesel ₹{p.headline.diesel_rs_per_m3.toFixed(2)}</dd>
+                </div>
+                <div className="px-0 py-3 sm:px-4">
+                  <dt className="text-[12px] text-mist">Tenant need met by solar</dt>
+                  <dd className="num mt-1 text-3xl text-white">{fmt.pct(pol.D.tenant_share_served_by_solar.p50)}</dd>
+                  <dd className="num mt-1 text-[12px] text-mist">B {fmt.pct(pol.B.tenant_share_served_by_solar.p50)}</dd>
+                </div>
+                <div className="px-0 py-3 sm:px-4">
+                  <dt className="text-[12px] text-mist">Fairness (Gini, lower is fairer)</dt>
+                  <dd className="num mt-1 text-3xl text-white">{pol.D.gini_solar_share_by_household.p50.toFixed(2)}</dd>
+                  <dd className="num mt-1 text-[12px] text-mist">B {pol.B.gini_solar_share_by_household.p50.toFixed(2)}</dd>
+                </div>
+              </dl>
+            </div>
+          </Panel>
 
           <div className="grid min-w-0 gap-4 xl:grid-cols-2">
             <Panel title="Solar kWh used per kWp per year" right={<span className="text-[11px] text-mist">bars P50, whiskers P10-P90</span>}>

@@ -97,8 +97,22 @@ def run_once(verbose: bool = True) -> dict:
         "fault_cleared": fault_after is None,
         "budget_never_exceeded": st.budget.remaining(__import__("datetime").date.fromisoformat(st.day)) >= 0,
     }
-    return {"signature": sig, "checks": checks, "ramesh_m3": round(ramesh_m3, 1), "receipts_today": len(today),
+    def strip(snap: dict) -> list[dict]:
+        return [{"start": x["start"], "action": x["action"], "farmer": x["farmer"]} for x in snap["slots"]]
+
+    replay = {"day": st.day, "label": "REPLAY of the scripted demo day (real held-out sun)",
+              "changes": [{k: c[k] for k in ("kind", "subject", "old_slots", "new_slots", "reason_en", "reason_hi")}
+                          for c in diff["changes"]],
+              "callbacks": after["callbacks"], "slots_before": strip(before), "slots_after": strip(after)}
+    return {"signature": sig, "checks": checks, "replay": replay, "ramesh_m3": round(ramesh_m3, 1), "receipts_today": len(today),
             "changes": len(diff["changes"]), "callbacks": len(after["callbacks"])}
+
+
+def _write_replay(replay: dict) -> None:
+    """The 13:40 re-plan and callbacks, kept for the story page (served when the live day has not run)."""
+    from .settings import ROOT
+
+    (ROOT / "reports" / "story_replay.json").write_text(json.dumps(replay, ensure_ascii=False, indent=1, default=str))
 
 
 def main() -> None:
@@ -113,6 +127,7 @@ def main() -> None:
     if not a.soak:
         out = run_once(verbose=True)
         _p("Checks", json.dumps(out["checks"], indent=1))
+        _write_replay(out["replay"])
         return
     sigs, fails = [], 0
     t0 = time.time()
@@ -121,6 +136,8 @@ def main() -> None:
         ok = all(out["checks"].values())
         fails += not ok
         sigs.append(out["signature"])
+        if i == 0:
+            _write_replay(out["replay"])
         print(f"run {i + 1:2d}: {'PASS' if ok else 'FAIL'} sig={out['signature']} changes={out['changes']} "
               f"callbacks={out['callbacks']} receipts={out['receipts_today']} ramesh_m3={out['ramesh_m3']}"
               + ("" if ok else f" {out['checks']}"), flush=True)

@@ -53,8 +53,10 @@ def passport(meta: PumpMeta, receipts: list[Receipt], as_of: date, *, uptime: fl
     for r in rs:
         by_kind[r.kind] += r.amount_rs
     monthly = defaultdict(float)
+    monthly_kind: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
     for r in rs:
         monthly[r.start[:7]] += r.amount_rs
+        monthly_kind[r.start[:7]][r.kind] += r.amount_rs
     months = [v for _, v in sorted(monthly.items())]
     cv = statistics.pstdev(months) / statistics.mean(months) if len(months) >= 3 and statistics.mean(months) > 0 else None
     fault_counts = Counter(f["code"] for f in faults)
@@ -74,6 +76,7 @@ def passport(meta: PumpMeta, receipts: list[Receipt], as_of: date, *, uptime: fl
         "farmers_served": len(farmers), "tenant_water_share": round(tenant_m3 / m3, 3) if m3 else None,
         "revenue_rs": round(revenue), "revenue_by_kind_rs": {k: round(v) for k, v in by_kind.items()},
         "monthly_revenue_rs": {k: round(v) for k, v in sorted(monthly.items())},
+        "monthly_by_kind_rs": {m: {k: round(v) for k, v in kinds.items()} for m, kinds in sorted(monthly_kind.items())},
         "uptime": round(uptime, 3) if uptime is not None else None,
         "faults": [{"code": c, "count": n} for c, n in fault_counts.most_common()],
         "repayment_on_time": repayment_on_time, "ledger_verified": ledger_verified, "data_health": data_health,

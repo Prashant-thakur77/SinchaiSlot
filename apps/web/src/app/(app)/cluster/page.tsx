@@ -107,7 +107,7 @@ export default function ClusterPage() {
     <Shell title="Pump cluster">
       <ErrorNote error={error || err} />
       <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-        <Panel title="Three pumps, one sky" right={
+        <Panel className="xl:sticky xl:top-4 xl:self-start" title="Three pumps, one sky" right={
           <div className="flex gap-1" role="group" aria-label="Map layer">
             <Btn tone={layer === "true" ? "sun" : "ghost"} onClick={() => setLayer("true")}>Satellite</Btn>
             <Btn tone={layer === "crops" ? "sun" : "ghost"} onClick={() => setLayer("crops")}>Crop seasons</Btn>
@@ -122,8 +122,8 @@ export default function ClusterPage() {
           <Panel>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <Stat label="Pumps reporting" value={`${data?.transmitting ?? "–"}/${data?.pumps.length ?? "–"}`} tone={data && data.transmitting < data.pumps.length ? "fault" : "leaf"} />
-              <Stat label="Planned water today" value={fmt.n(totals.water)} unit="m³" tone="water" source="simulated" />
-              <Stat label="Asked for today" value={fmt.n(totals.req)} unit="m³" />
+              <Stat label="Planned today" value={fmt.n(totals.water)} unit="m³" tone="water" source="simulated" />
+              <Stat label="Asked for" value={fmt.n(totals.req)} unit="m³" />
               <Stat label="Clock" value={data?.clock ?? "–"} sub={data?.day} />
             </div>
             <p className="mt-3 text-[12px] text-mist">Why watch for silence: on one state portal only {fmt.pct(data?.context.value)} of pumps that ever reported were still transmitting ({data?.context.note}).</p>

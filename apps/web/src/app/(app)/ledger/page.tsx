@@ -40,14 +40,28 @@ export default function LedgerPage() {
     <Shell title="Rasid ledger">
       <ErrorNote error={error} />
       <div className="grid min-w-0 gap-4">
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
-          <Panel><Stat value={fmt.n(s?.m3)} unit="m³" label="Solar water" tone="water" /></Panel>
-          <Panel><Stat value={fmt.n(s?.diesel_l_avoided, 1)} unit="L" label="Diesel avoided" tone="leaf" /></Panel>
-          <Panel><Stat value={fmt.n(s?.co2_kg_avoided)} unit="kg" label="CO₂ avoided" tone="leaf" /></Panel>
-          <Panel><Stat value={fmt.n(s?.secondary_kwh)} unit="kWh" label="Mill, cutter, batteries" tone="sun" /></Panel>
-          <Panel><Stat value={`${s?.farmers_served ?? "–"}`} label="Farmers served" sub={`${s?.tenant_farmers_served ?? "–"} of them tenants`} /></Panel>
-          <Panel><Stat value={fmt.n(s?.receipts)} label="Receipts" sub={s ? `${s.first?.slice(0, 10)} to ${s.last?.slice(0, 10)}` : ""} /></Panel>
-        </div>
+        <Panel>
+          <div className="grid gap-6 p-1 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:items-end">
+            <div>
+              <div className="text-[12px] text-mist">Solar water on verified receipts</div>
+              <div className="num mt-2 text-6xl leading-none text-water md:text-7xl">{fmt.n(s?.m3)}<span className="ml-2 text-lg text-mist">m³</span></div>
+              <div className="num mt-2 text-[12px] text-mist">{fmt.n(s?.receipts)} receipts{s ? ` · ${s.first?.slice(0, 10)} to ${s.last?.slice(0, 10)}` : ""}</div>
+            </div>
+            <dl className="grid grid-cols-2 divide-soil border-y border-soil sm:grid-cols-4 sm:divide-x">
+              {[
+                ["Diesel avoided", fmt.n(s?.diesel_l_avoided, 1), "L"],
+                ["CO₂ avoided", fmt.n(s?.co2_kg_avoided), "kg"],
+                ["Mill, cutter, batteries", fmt.n(s?.secondary_kwh), "kWh"],
+                ["Farmers served", `${s?.farmers_served ?? "–"}`, `${s?.tenant_farmers_served ?? "–"} tenants`],
+              ].map(([k, v, u]) => (
+                <div key={k} className="px-0 py-3 sm:px-4">
+                  <dt className="text-[12px] text-mist">{k}</dt>
+                  <dd className="num mt-1 text-2xl text-white">{v}<span className="ml-1 whitespace-nowrap text-sm text-mist">{u}</span></dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </Panel>
         <p className="text-[12px] text-mist">
           History from the SinchaiSlot policy run on the synthetic village over real 2024 weather <SourceTag kind="simulated" />. Diesel
           counterfactual 1 L/h for a 5 HP diesel pump and 2.6444 kg CO₂ per litre <SourceTag kind="published" />.
@@ -108,7 +122,7 @@ export default function LedgerPage() {
               {claim && (
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <Stat value={fmt.n(claim.totals.m3)} unit="m³" label="Water" tone="water" />
-                  <Stat value={fmt.n(claim.totals.diesel_l_avoided, 1)} unit="L" label="Diesel avoided" tone="leaf" />
+                  <Stat value={fmt.n(claim.totals.diesel_l_avoided, 1)} unit="L" label="Diesel avoided" tone="sun" />
                   <Stat value={fmt.rs(claim.subsidy_equivalent_rs)} label="Diesel-subsidy equivalent" sub="at ₹75/L, needs a rule change" tone="sun" />
                   <Stat value={fmt.n(claim.totals.receipts)} label="Receipts with hashes" />
                   <p className="col-span-2 text-[12px] text-mist">{claim.status}</p>

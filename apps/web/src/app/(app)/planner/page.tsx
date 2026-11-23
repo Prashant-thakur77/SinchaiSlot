@@ -53,7 +53,7 @@ export default function PlannerPage() {
           title={<span className="flex items-center gap-2">Today&apos;s plan, plan v{snap?.plan_version ?? "–"} <SourceTag kind="model" /></span>}
           right={<span className="text-[11px] text-mist">Two-stage stochastic MILP (HiGHS) over P10 / P50 / P90 sun</span>}
         >
-          {snap && <Gantt slots={snap.slots} nowIndex={now} highlight={moved} />}
+          {snap && <div role="region" className="overflow-x-auto" tabIndex={0} aria-label="Plan timeline, scrolls sideways on small screens"><div className="min-w-[720px]"><Gantt slots={snap.slots} nowIndex={now} highlight={moved} /></div></div>}
           <div className="mt-4">
             {snap && (
               <BandChart
@@ -128,7 +128,7 @@ export default function PlannerPage() {
                 <div className="grid grid-cols-3 gap-3">
                   <Stat value={`${fmt.n(whatIf.water_m3_p50_before)}→${fmt.n(whatIf.water_m3_p50_after)}`} unit="m³" label="Water (P50)" tone="water" />
                   <Stat value={`${fmt.n(whatIf.mill_kwh_before, 1)}→${fmt.n(whatIf.mill_kwh_after, 1)}`} unit="kWh" label="Mill" tone="sun" />
-                  <Stat value={fmt.n(whatIf.battery_kwh_after, 1)} unit="kWh" label="Batteries after" tone="se" />
+                  <Stat value={fmt.n(whatIf.battery_kwh_after, 1)} unit="kWh" label="Batteries after" />
                 </div>
                 <ul className="flex flex-col gap-1 text-[13px]">
                   {whatIf.changes.length === 0 && <li className="text-mist">No slot would move.</li>}

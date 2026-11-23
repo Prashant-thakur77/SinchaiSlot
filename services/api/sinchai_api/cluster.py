@@ -167,7 +167,8 @@ def health(pump_id: str) -> dict:
     since = SILENT_SINCE.get(pump_id)
     seen = datetime.fromisoformat(f"{st.day}T{since}") if since and st.clock.strftime("%H:%M") > since else now
     h = assess(pump_id, seen, now, daylight=daylight)
-    return {**h.to_dict(), "source": "SIMULATED edge" + (" (scripted outage)" if since else "")}
+    gone = since and h.status != "live"
+    return {**h.to_dict(), "source": "SIMULATED edge" + (f" · outage scripted from {since}" if gone else "")}
 
 
 # ---------------------------------------------------------------- views

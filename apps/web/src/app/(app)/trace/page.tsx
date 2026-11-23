@@ -49,8 +49,8 @@ export default function TracePage() {
                 <button onClick={() => setSel(r.id)} className={`w-full rounded-md px-2.5 py-2 text-left ${run?.id === r.id ? "bg-night-3" : "hover:bg-night"}`}>
                   <div className="flex items-center gap-2 text-[11px] text-mist">
                     <span className="num">{r.at.slice(11, 19)}</span>
-                    <span className="text-sun">{r.agent}</span>
-                    <span>{r.channel}</span>
+                    <span className="text-sun">{r.agent === "api" ? "direct tool call" : r.agent}</span>
+                    {r.channel !== "api" && <span>{r.channel}</span>}
                     {r.status !== "ok" && <span className="text-fault">{r.status}</span>}
                     <span className="num ml-auto">{r.latency_ms} ms</span>
                   </div>
@@ -85,7 +85,13 @@ export default function TracePage() {
               </ol>
               <div>
                 <div className="text-[11px] text-mist">Reply</div>
-                <p className="deva mt-1 text-[14px]">{run.output}</p>
+                {(() => {
+                  try {
+                    const j = run.output.trim().startsWith("{") ? JSON.parse(run.output) : null;
+                    if (j) return <pre tabIndex={0} className="deva mt-1 max-h-56 overflow-auto rounded bg-night p-2 text-[12px] text-fog">{JSON.stringify(j, null, 2)}</pre>;
+                  } catch {}
+                  return <p className="deva mt-1 text-[14px]">{run.output}</p>;
+                })()}
               </div>
             </div>
           </Panel>

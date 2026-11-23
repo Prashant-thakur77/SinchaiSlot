@@ -18,6 +18,20 @@ const T = {
   en: { today: "Today", cash: "Cash", alerts: "Alerts", fix: "Repair", water: "water", collect: "Cash received", paid: "Paid", noSlot: "no slot today", confirm: "Confirm", cancel: "Cancel", code: "Code", due: "Due", got: "Collected", share: "Your share", offline: "Offline: showing the last saved data", nofault: "Drive is running normally", start: "Start the guided fix", next: "Done, next", reset: "Reset the drive", budget: "Groundwater budget", fault: "Fault", m3: "m³", rs: "₹", tenant: "tenant", lang: "हिंदी", issues: "Complaints", harvest: "Half now, rest after harvest", later: "after harvest", soil: "Soil", scan: "Read the sample card", upload: "Photograph a card", farmerPick: "Farmer", useCard: "Apply to the plot", applied: "Applied", water_every: "Water when the root zone has dried by", manual: "Photo could not be read: type the values" },
 };
 
+const CROP_HI: Record<string, string> = { wheat: "गेहूँ", maize: "मक्का", paddy: "धान", potato: "आलू", veg_summer: "सब्ज़ी", fallow: "परती" };
+const CHANNEL_HI: Record<string, string> = { ivr: "मिस्ड कॉल", whatsapp: "व्हाट्सऐप", mitra: "सौर मित्र", ussd: "यूएसएसडी", api: "ऐप" };
+const ICON: Record<string, string> = {
+  today: "M12 4v2M12 18v2M4 12h2M18 12h2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M6.3 17.7l1.4-1.4M16.3 7.7l1.4-1.4M12 9a3 3 0 100 6 3 3 0 000-6z",
+  cash: "M4 7h16v10H4zM12 10a2 2 0 100 4 2 2 0 000-4zM7 10v4M17 10v4",
+  alerts: "M12 4l9 16H3zM12 10v4M12 17v.5",
+  fix: "M14 6a4 4 0 01-5 5L4 16l2 2 5-5a4 4 0 005-5l-2 2-2-2z",
+  soil: "M3 15c3-2 6-2 9 0s6 2 9 0M3 19c3-2 6-2 9 0s6 2 9 0M12 4v7M9 7l3-3 3 3",
+  drop: "M12 3c3 4 6 7 6 10a6 6 0 01-12 0c0-3 3-6 6-10z",
+};
+function Icon({ d, className = "h-5 w-5" }: { d: string; className?: string }) {
+  return <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={d} /></svg>;
+}
+
 export default function MitraPage() {
   const [lang, setLang] = useState<"hi" | "en">("hi");
   const t = T[lang];
@@ -129,18 +143,18 @@ export default function MitraPage() {
       <main className="mx-auto flex max-w-xl flex-col gap-3 p-4">
         {tab === "today" &&
           (bookings ?? []).map((b) => (
-            <article key={b.id} className="rounded-2xl border border-ink/10 bg-white p-4 shadow-sm">
+            <article key={b.id} className="rounded-2xl border border-ink/15 bg-[#fbf8ef] bg-[repeating-linear-gradient(0deg,transparent_0_27px,rgba(20,40,30,.06)_27px_28px)] p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="deva text-[18px] font-semibold">{b.farmer}</div>
                   <div className="text-[13px] text-[#3d4a43]">
-                    {b.crop} {b.tenant ? `· ${t.tenant}` : ""} · {b.channel}
+                    {lang === "hi" ? CROP_HI[b.crop ?? ""] ?? b.crop : b.crop} {b.tenant ? `· ${t.tenant}` : ""} · {lang === "hi" ? CHANNEL_HI[b.channel] ?? b.channel : b.channel}
                   </div>
                 </div>
                 <div className="num text-right text-[22px] font-semibold text-[#145b85]">{b.slot_start ? `${b.slot_start}–${b.slot_end}` : <span className="deva text-[14px] opacity-60">{t.noSlot}</span>}</div>
               </div>
               <div className="num mt-2 flex items-center gap-4 text-[15px]">
-                <span>💧 {b.m3_delivered.toFixed(0)}/{b.m3.toFixed(0)} {t.m3}</span>
+                <span className="flex items-center gap-1 text-[#145b85]"><Icon d={ICON.drop} className="h-4 w-4" /> <span className="text-ink">{b.m3_delivered.toFixed(0)}/{b.m3.toFixed(0)} {t.m3}</span></span>
                 <span>₹{b.price_rs.toFixed(0)}</span>
               </div>
               <div className="mt-3">
@@ -166,7 +180,7 @@ export default function MitraPage() {
               [t.due, cashBook.due_rs],
               [t.share, cashBook.saur_mitra_share_rs],
             ].map(([k, v]) => (
-              <div key={k as string} className="rounded-2xl bg-white p-4 shadow-sm">
+              <div key={k as string} className="rounded-2xl border border-ink/15 bg-[#fbf8ef] p-4">
                 <div className="deva text-[14px] opacity-70">{k}</div>
                 <div className="num text-[30px] font-semibold">₹{Number(v).toLocaleString("en-IN")}</div>
               </div>
@@ -177,11 +191,11 @@ export default function MitraPage() {
         {tab === "alerts" && (
           <section className="flex flex-col gap-3">
             {alerts.map((a) => (
-              <div key={a.k} className={`deva rounded-2xl p-4 text-[16px] ${a.red ? "bg-fault text-white" : "bg-white"}`}>{a.text}</div>
+              <div key={a.k} className={`deva rounded-2xl p-4 text-[16px] ${a.red ? "bg-fault text-white" : "border border-ink/15 bg-[#fbf8ef]"}`}>{a.text}</div>
             ))}
             <h2 className="deva mt-2 text-[15px] font-semibold">{t.issues}</h2>
             {(issues ?? []).map((i) => (
-              <div key={i.id} className="deva rounded-xl bg-white p-3 text-[14px]">
+              <div key={i.id} className="deva rounded-xl border border-ink/15 bg-[#fbf8ef] p-3 text-[14px]">
                 <span className="num opacity-60">#{i.id} {i.at.slice(11, 16)}</span> {i.kind}: {i.note}
               </div>
             ))}
@@ -189,7 +203,7 @@ export default function MitraPage() {
         )}
 
         {tab === "soil" && (
-          <section className="flex flex-col gap-3 rounded-2xl bg-white p-5 shadow-sm">
+          <section className="flex flex-col gap-3 rounded-2xl border border-ink/15 bg-[#fbf8ef] p-5">
             <label className="deva flex items-center justify-between gap-3 text-[15px]">
               {t.farmerPick}
               <select value={soilFarmer} onChange={(e) => setSoilFarmer(e.target.value)} className="min-h-11 flex-1 rounded-xl border border-ink/20 bg-paper px-3">
@@ -231,7 +245,7 @@ export default function MitraPage() {
         )}
 
         {tab === "fix" && (
-          <section className="rounded-2xl bg-white p-5 shadow-sm">
+          <section className="rounded-2xl border border-ink/15 bg-[#fbf8ef] p-5">
             {!drive?.fault && !diag && <p className="deva text-[17px]">{t.nofault}</p>}
             {drive?.fault && !diag && (
               <>
@@ -285,14 +299,14 @@ export default function MitraPage() {
 
       <nav aria-label="Saur Mitra" className="fixed inset-x-0 bottom-0 mx-auto grid max-w-md grid-cols-5 border-t border-ink/10 bg-paper md:absolute">
         {([
-          ["today", "☀", t.today],
-          ["cash", "₹", t.cash],
-          ["alerts", "!", t.alerts],
-          ["fix", "🔧", t.fix],
-          ["soil", "◍", t.soil],
+          ["today", ICON.today, t.today],
+          ["cash", ICON.cash, t.cash],
+          ["alerts", ICON.alerts, t.alerts],
+          ["fix", ICON.fix, t.fix],
+          ["soil", ICON.soil, t.soil],
         ] as const).map(([k, icon, label]) => (
           <button key={k} onClick={() => setTab(k)} aria-current={tab === k ? "page" : undefined} className={`deva flex min-h-16 flex-col items-center justify-center gap-0.5 text-[13px] ${tab === k ? "font-semibold text-ink" : "text-[#3d4a43]"}`}>
-            <span className="text-[20px]" aria-hidden>{icon}</span>
+            <Icon d={icon} className="h-6 w-6" />
             {label}
             {k === "alerts" && alerts.some((a) => a.red) && <span className="sr-only">(needs attention)</span>}
           </button>

@@ -416,7 +416,7 @@ def call_tool(name: str, inp: ToolIn, role: str = Depends(role_from)) -> dict:
     from .agents import runtime
     run = runtime.Run("api", "api", ctx.user_ref, "direct", f"{name} {json.dumps(inp.args)}", "en")
     r = run.call(name, inp.args, ctx, confirmed=True if t.confirm else None)
-    run.finish(json.dumps(r, default=str)[:500], "error" if "error" in r else "ok")
+    run.finish(json.dumps(r, default=str, ensure_ascii=False)[:500], "error" if "error" in r else "ok")
     if "error" in r:
         raise HTTPException(400, r["error"])
     return r
@@ -679,8 +679,10 @@ def story() -> dict:
     with db.session() as s:
         last = s.query(db.LedgerRow).filter(db.LedgerRow.kind == "water").order_by(db.LedgerRow.seq.desc()).first()
         receipt = ledger_service.row_to_dict(last) if last else None
+    rp = ROOT / "reports" / "story_replay.json"
+    replay = json.loads(rp.read_text()) if rp.exists() else None
     return {"day": st.day, "offer": _STORY[st.day], "callbacks": st.callbacks[-3:], "diffs": st.diffs[-1:],
-            "receipt": receipt}
+            "receipt": receipt, "replay": replay if replay and replay.get("day") == st.day else None}
 
 
 @app.get("/api/evals")

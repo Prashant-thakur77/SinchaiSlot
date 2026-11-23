@@ -183,7 +183,7 @@ export default function TwinPage() {
             <Panel title="Verified today">
               <div className="grid gap-3">
                 <Stat value={fmt.n(today.m3, 0)} unit="m³" label={`Solar water, ${today.n} receipts`} tone="water" />
-                <Stat value={fmt.n(today.diesel, 1)} unit="L" label="Diesel avoided" tone="leaf" />
+                <Stat value={fmt.n(today.diesel, 1)} unit="L" label="Diesel avoided" tone="sun" />
               </div>
             </Panel>
           </div>

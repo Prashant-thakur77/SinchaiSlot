@@ -8,7 +8,8 @@ COPY pyproject.toml uv.lock README.md ./
 COPY packages ./packages
 COPY services ./services
 COPY docs/schneider/register_map.yaml docs/schneider/fault_codes.yaml ./docs/schneider/
-COPY reports/proof.json reports/proof.json
+COPY reports/proof.json reports/evals.json reports/story_replay.json reports/
+
 RUN uv sync --frozen --no-dev
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000

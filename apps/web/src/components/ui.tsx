@@ -48,7 +48,7 @@ export function Stat({
       </div>
       <div className={`num break-words leading-none ${big ? "text-4xl md:text-6xl" : "text-2xl sm:text-3xl"} ${tones[tone]}`}>
         {value}
-        {unit && <span className="ml-1 text-base text-mist">{unit}</span>}
+        {unit && <span className="ml-1 whitespace-nowrap text-base text-mist">{unit}</span>}
       </div>
       {sub && <div className="text-[12px] text-mist">{sub}</div>}
     </div>

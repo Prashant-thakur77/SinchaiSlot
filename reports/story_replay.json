@@ -1,0 +1,371 @@
+{
+ "day": "2024-03-02",
+ "label": "REPLAY of the scripted demo day (real held-out sun)",
+ "changes": [
+  {
+   "kind": "moved",
+   "subject": "B0302001",
+   "old_slots": [
+    "14:30",
+    "15:00",
+    "15:30",
+    "16:00",
+    "16:30"
+   ],
+   "new_slots": [
+    "16:00"
+   ],
+   "reason_en": "less sun now expected 13:30-17:30: B0302001 14:30-17:00 -> 16:00-17:00",
+   "reason_hi": "13:30-17:30 बजे बादल / कम धूप का अनुमान: 14:30-17:00 से 16:00-17:00"
+  },
+  {
+   "kind": "added",
+   "subject": "B0302002",
+   "old_slots": [],
+   "new_slots": [
+    "16:30"
+   ],
+   "reason_en": "less sun now expected 13:30-17:30: water added 16:30-17:30",
+   "reason_hi": "13:30-17:30 बजे बादल / कम धूप का अनुमान: 16:30-17:30 बजे पानी का समय जोड़ा गया"
+  },
+  {
+   "kind": "moved",
+   "subject": "B0302003",
+   "old_slots": [
+    "13:30",
+    "14:00"
+   ],
+   "new_slots": [
+    "13:30",
+    "14:00",
+    "14:30",
+    "15:00",
+    "15:30"
+   ],
+   "reason_en": "less sun now expected 13:30-17:30: B0302003 13:30-14:30 -> 13:30-16:00",
+   "reason_hi": "13:30-17:30 बजे बादल / कम धूप का अनुमान: 13:30-14:30 से 13:30-16:00"
+  }
+ ],
+ "callbacks": [
+  {
+   "at": "13:40",
+   "farmer_id": "H04",
+   "name": "Kavita Kumari",
+   "language": "mai",
+   "channel": "ivr_callback",
+   "text": "प्रणाम Kavita जी। मेघक कारण रौद कम अछि। अहाँक पानि आब 16:00-16:30 बजे, आइ करीब 4 घन मीटर भेटत, बाँकी 34 काल्हि भोरे पहिल नम्बर पर।",
+   "change": {
+    "kind": "moved",
+    "subject": "B0302001",
+    "household": "H04",
+    "old_slots": [
+     "14:30",
+     "15:00",
+     "15:30",
+     "16:00",
+     "16:30"
+    ],
+    "new_slots": [
+     "16:00"
+    ],
+    "reason_en": "less sun now expected 13:30-17:30: B0302001 14:30-17:00 -> 16:00-17:00",
+    "reason_hi": "13:30-17:30 बजे बादल / कम धूप का अनुमान: 14:30-17:00 से 16:00-17:00",
+    "old_m3": 39.0,
+    "new_m3": 4.5
+   }
+  },
+  {
+   "at": "13:40",
+   "farmer_id": "H45",
+   "name": "Nirmala Devi",
+   "language": "mai",
+   "channel": "ivr_callback",
+   "text": "प्रणाम Nirmala जी। अहाँक पानिक समय 16:30-17:00 बजे तय भेल अछि।",
+   "change": {
+    "kind": "added",
+    "subject": "B0302002",
+    "household": "H45",
+    "old_slots": [],
+    "new_slots": [
+     "16:30"
+    ],
+    "reason_en": "less sun now expected 13:30-17:30: water added 16:30-17:30",
+    "reason_hi": "13:30-17:30 बजे बादल / कम धूप का अनुमान: 16:30-17:30 बजे पानी का समय जोड़ा गया",
+    "old_m3": 0,
+    "new_m3": 2.8
+   }
+  },
+  {
+   "at": "13:40",
+   "farmer_id": "H01",
+   "name": "Ramesh Sahni",
+   "language": "mai",
+   "channel": "ivr_callback",
+   "text": "प्रणाम Ramesh जी। मेघक कारण अहाँक पानिक समय 13:30-14:30 सँ बदलि क 13:30-16:00 बजे कएल गेल अछि। पानि ओतबे भेटत।",
+   "change": {
+    "kind": "moved",
+    "subject": "B0302003",
+    "household": "H01",
+    "old_slots": [
+     "13:30",
+     "14:00"
+    ],
+    "new_slots": [
+     "13:30",
+     "14:00",
+     "14:30",
+     "15:00",
+     "15:30"
+    ],
+    "reason_en": "less sun now expected 13:30-17:30: B0302003 13:30-14:30 -> 13:30-16:00",
+    "reason_hi": "13:30-17:30 बजे बादल / कम धूप का अनुमान: 13:30-14:30 से 13:30-16:00",
+    "old_m3": 25.1,
+    "new_m3": 44.5
+   }
+  }
+ ],
+ "slots_before": [
+  {
+   "start": "06:00",
+   "action": "idle",
+   "farmer": null
+  },
+  {
+   "start": "06:30",
+   "action": "idle",
+   "farmer": null
+  },
+  {
+   "start": "07:00",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "07:30",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "08:00",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "08:30",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "09:00",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "09:30",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "10:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "10:30",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "11:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "11:30",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "12:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "12:30",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "13:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "13:30",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "14:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "14:30",
+   "action": "req",
+   "farmer": "Kavita Kumari"
+  },
+  {
+   "start": "15:00",
+   "action": "req",
+   "farmer": "Kavita Kumari"
+  },
+  {
+   "start": "15:30",
+   "action": "req",
+   "farmer": "Kavita Kumari"
+  },
+  {
+   "start": "16:00",
+   "action": "req",
+   "farmer": "Kavita Kumari"
+  },
+  {
+   "start": "16:30",
+   "action": "req",
+   "farmer": "Kavita Kumari"
+  },
+  {
+   "start": "17:00",
+   "action": "idle",
+   "farmer": null
+  },
+  {
+   "start": "17:30",
+   "action": "idle",
+   "farmer": null
+  }
+ ],
+ "slots_after": [
+  {
+   "start": "06:00",
+   "action": "idle",
+   "farmer": null
+  },
+  {
+   "start": "06:30",
+   "action": "idle",
+   "farmer": null
+  },
+  {
+   "start": "07:00",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "07:30",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "08:00",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "08:30",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "09:00",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "09:30",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "10:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "10:30",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "11:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "11:30",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "12:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "12:30",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "13:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "13:30",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "14:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "14:30",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "15:00",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "15:30",
+   "action": "req",
+   "farmer": "Ramesh Sahni"
+  },
+  {
+   "start": "16:00",
+   "action": "req",
+   "farmer": "Kavita Kumari"
+  },
+  {
+   "start": "16:30",
+   "action": "req",
+   "farmer": "Nirmala Devi"
+  },
+  {
+   "start": "17:00",
+   "action": "idle",
+   "farmer": null
+  },
+  {
+   "start": "17:30",
+   "action": "idle",
+   "farmer": null
+  }
+ ]
+}

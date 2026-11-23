@@ -10,7 +10,7 @@ type Passport = {
   as_of: string; period_days: number; receipts: number; days_with_receipts: number;
   utilisation_kwh_per_kwp_yr: number; energy_kwh: number; water_m3: number; farmers_served: number;
   tenant_water_share: number | null; revenue_rs: number; revenue_by_kind_rs: Record<string, number>;
-  monthly_revenue_rs: Record<string, number>; uptime: number | null; faults: { code: string; count: number }[];
+  monthly_revenue_rs: Record<string, number>; monthly_by_kind_rs: Record<string, Record<string, number>>; uptime: number | null; faults: { code: string; count: number }[];
   fault_log: { code: string; at: string; downtime_h: number }[]; downtime_h: number;
   repayment_on_time: number | null; after_harvest_credits: number; ledger_verified: boolean; data_health: string;
   score: { value: number; grade: string; weights: Record<string, number>; parts: Record<string, number>; note: string };
@@ -19,25 +19,26 @@ type Passport = {
 
 const KIND: Record<string, { label: string; cls: string }> = {
   water: { label: "Water", cls: "bg-water" }, mill: { label: "Flour mill", cls: "bg-sun" },
-  chaff: { label: "Chaff cutter", cls: "bg-[#c98b4a]" }, battery: { label: "Battery packs", cls: "bg-leaf" },
+  chaff: { label: "Chaff cutter", cls: "bg-[#c98b4a]" }, battery: { label: "Battery packs", cls: "bg-mist" },
 };
 const PART_LABEL: Record<string, string> = {
   utilisation: "Sun put to work (vs 1,000 kWh/kWp/yr)", uptime: "Uptime", repayment: "After-harvest repaid on time",
   revenue_stability: "Revenue steadiness (1 − month-to-month CV)", data: "Ledger verified + still reporting",
 };
 
-function Gauge({ value, grade }: { value: number; grade: string }) {
-  const r = 70;
-  const c = Math.PI * r;
-  const off = c * (1 - value / 100);
+function ScoreBar({ value, grade }: { value: number; grade: string }) {
   return (
-    <svg viewBox="0 0 180 110" className="w-full max-w-[260px]" role="img" aria-label={`Scorecard ${value} of 100, grade ${grade}`}>
-      <path d="M20 95 A70 70 0 0 1 160 95" fill="none" stroke="#2a3430" strokeWidth={14} strokeLinecap="round" />
-      <path d="M20 95 A70 70 0 0 1 160 95" fill="none" stroke="#F2B33D" strokeWidth={14} strokeLinecap="round"
-        strokeDasharray={c} strokeDashoffset={off} className="motion-safe:transition-[stroke-dashoffset] motion-safe:duration-1000" />
-      <text x="90" y="82" textAnchor="middle" className="fill-white num text-[34px]">{value}</text>
-      <text x="90" y="104" textAnchor="middle" className="fill-[#9aa7a0] text-[12px]">grade {grade}</text>
-    </svg>
+    <div className="w-full" role="img" aria-label={`Scorecard ${value} of 100, grade ${grade}`}>
+      <div className="flex items-baseline justify-between">
+        <span className="num text-6xl leading-none text-white">{value}<span className="ml-1 text-base text-mist">/ 100</span></span>
+        <span className="num rounded-md border border-sun/50 px-2 py-0.5 text-lg text-sun">{grade}</span>
+      </div>
+      <div className="relative mt-4 h-3 rounded-full bg-night">
+        <div className="h-3 rounded-full bg-sun motion-safe:transition-[width] motion-safe:duration-1000" style={{ width: `${value}%` }} />
+        {[50, 65, 80].map((x) => <span key={x} className="absolute top-[-3px] h-[18px] w-px bg-mist/60" style={{ left: `${x}%` }} aria-hidden />)}
+      </div>
+      <div className="num mt-1 flex justify-between text-[10px] text-mist"><span>0</span><span style={{ marginLeft: "40%" }}>C</span><span>B</span><span>A</span><span>100</span></div>
+    </div>
   );
 }
 
@@ -61,9 +62,9 @@ export default function PassportView({ id }: { id: string }) {
       {!p ? <div className="h-64 animate-pulse rounded-xl bg-night-2" /> : (
         <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]">
           <Panel title={p.pump.name} right={<SourceTag kind="simulated" />}>
-            <div className="flex flex-col items-center gap-2">
-              <Gauge value={p.score.value} grade={p.score.grade} />
-              <p className="text-center text-[12px] text-mist">{p.score.note}</p>
+            <div className="flex flex-col gap-3">
+              <ScoreBar value={p.score.value} grade={p.score.grade} />
+              <p className="text-[12px] text-mist">{p.score.note}</p>
             </div>
             <ul className="mt-4 flex flex-col gap-2">
               {Object.entries(p.score.parts).map(([k, v]) => (
@@ -88,7 +89,7 @@ export default function PassportView({ id }: { id: string }) {
                 <Stat label="Sun put to work" value={fmt.n(p.utilisation_kwh_per_kwp_yr)} unit="kWh/kWp/yr" tone="sun" />
                 <Stat label="Water delivered" value={fmt.n(p.water_m3)} unit="m³" tone="water" sub={`${p.farmers_served} farmers`} />
                 <Stat label="To tenants" value={fmt.pct(p.tenant_water_share)} sub="share of water" />
-                <Stat label="Revenue" value={fmt.rs(p.revenue_rs)} tone="leaf" sub={`${fmt.n(p.receipts)} receipts`} />
+                <Stat label="Revenue" value={fmt.rs(p.revenue_rs)} sub={`${fmt.n(p.receipts)} receipts`} />
                 <Stat label="Uptime" value={fmt.pct(p.uptime, 1)} sub={`${fmt.n(p.downtime_h, 1)} h down`} />
                 <Stat label="Faults" value={p.faults.reduce((a, f) => a + f.count, 0)} sub={p.faults.map((f) => `${f.code}×${f.count}`).join(" ") || "none"} />
                 <Stat label="Repaid on time" value={fmt.pct(p.repayment_on_time)} sub={`${p.after_harvest_credits} after-harvest credits`} />
@@ -98,8 +99,13 @@ export default function PassportView({ id }: { id: string }) {
             <Panel title="Revenue by month" right={<span className="text-[11px] text-mist">from receipts</span>}>
               <div className="flex h-40 items-end gap-1" role="img" aria-label="Monthly revenue bars">
                 {months.map(([m, v]) => (
-                  <div key={m} className="flex min-w-0 flex-1 flex-col items-center gap-1">
-                    <div className="w-full rounded-t bg-sun/80" style={{ height: `${(v / maxM) * 120}px` }} title={`${m}: ₹${v}`} />
+                  <div key={m} className="flex min-w-0 flex-1 flex-col items-center gap-1" title={`${m}: ₹${v}`}>
+                    <div className="flex w-full flex-col-reverse overflow-hidden rounded-t" style={{ height: `${(v / maxM) * 120}px` }}>
+                      {Object.keys(KIND).map((k) => {
+                        const x = p.monthly_by_kind_rs?.[m]?.[k] ?? 0;
+                        return x > 0 ? <div key={k} className={KIND[k].cls} style={{ height: `${(x / v) * 100}%` }} /> : null;
+                      })}
+                    </div>
                     <span className="num text-[10px] text-mist">{m.slice(5)}</span>
                   </div>
                 ))}
