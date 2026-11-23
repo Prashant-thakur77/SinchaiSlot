@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { type ReactNode, useCallback, useEffect, useState } from "react";
-import { postJSON, useApi } from "@/lib/api";
-import type { Snapshot } from "@/lib/types";
+import { type ReactNode, useEffect, useState } from "react";
+import { DayBar } from "@/components/DayBar";
 
 export const NAV = [
   { href: "/twin", label: "Village Twin", key: "1", icon: "M3 12h4l3-8 4 16 3-8h4" },
@@ -85,7 +84,7 @@ export function Shell({ title, children, actions }: { title: string; children: R
         </button>
       </nav>
       <div className="flex min-w-0 flex-1 flex-col">
-        <DemoBar title={title} actions={actions} />
+        <DayBar title={title} actions={actions} />
         <nav aria-label="Main (mobile)" className="flex gap-1 overflow-x-auto border-b border-soil px-3 py-2 md:hidden">
           {NAV.map((n) => (
             <Link key={n.href} href={n.href} className={`shrink-0 rounded-full px-3 py-1 text-[12px] ${path === n.href ? "bg-sun text-ink" : "bg-night-2 text-fog"}`}>
@@ -142,70 +141,5 @@ export function Mark({ size = 22 }: { size?: number }) {
       <circle cx="16" cy="12" r="7" fill="var(--sun)" />
       <path d="M3 24c4-3 8-3 13 0s9 3 13 0" fill="none" stroke="var(--water)" strokeWidth="3" strokeLinecap="round" />
     </svg>
-  );
-}
-
-/** Top bar: the demo clock and controls (the day is a real held-out day, replayed). */
-function DemoBar({ title, actions }: { title: string; actions?: ReactNode }) {
-  const { data, reload } = useApi<Snapshot>("/api/state", 2000);
-  const [busy, setBusy] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const run = useCallback(
-    async (fn: () => Promise<unknown>) => {
-      setBusy(true);
-      try {
-        await fn();
-      } finally {
-        setBusy(false);
-        reload();
-      }
-    },
-    [reload],
-  );
-  return (
-    <header className="sticky top-0 z-10 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-soil bg-night/90 px-3 py-2 backdrop-blur md:px-5 md:py-2.5">
-      <h1 className="font-display text-base font-semibold tracking-tight md:text-lg">{title}</h1>
-      <div className="flex items-center gap-2 text-[12px] text-mist">
-        <span className="num rounded bg-night-2 px-2 py-0.5 text-fog" aria-live="polite">
-          {data ? `${data.day} · ${data.clock}` : "…"}
-        </span>
-        <span className="hidden lg:inline">Samastipur · held-out day, real sun</span>
-        {data?.cloud_applied && <span className="rounded bg-water/15 px-2 py-0.5 text-water">nowcast active</span>}
-      </div>
-      <div className="ml-auto flex flex-wrap items-center gap-1.5">
-        {actions}
-        <button
-          disabled={busy}
-          onClick={() =>
-            run(async () => {
-              const next = !playing;
-              setPlaying(next);
-              await postJSON("/api/demo/autoplay", { on: next, speed: 60 });
-            })
-          }
-          className="rounded-md border border-soil px-2.5 py-1 text-[12px] text-fog hover:bg-night-2"
-        >
-          {playing ? "Pause" : "Play day ×60"}
-        </button>
-        <button disabled={busy} onClick={() => run(() => postJSON("/api/demo/advance", { minutes: 30 }))} className="hidden rounded-md border sm:inline-block border-soil px-2.5 py-1 text-[12px] text-fog hover:bg-night-2">
-          +30 min
-        </button>
-        <button disabled={busy} onClick={() => run(() => postJSON("/api/demo/run_to", { hhmm: "13:45" }))} className="rounded-md border border-water/60 px-2.5 py-1 text-[12px] text-water hover:bg-water/10">
-          Jump to 13:45
-        </button>
-        <button
-          disabled={busy}
-          onClick={() =>
-            run(async () => {
-              setPlaying(false);
-              await postJSON("/api/demo/reset");
-            })
-          }
-          className="hidden rounded-md border border-soil px-2.5 py-1 text-[12px] text-mist hover:bg-night-2 sm:inline-block"
-        >
-          Reset 06:00
-        </button>
-      </div>
-    </header>
   );
 }

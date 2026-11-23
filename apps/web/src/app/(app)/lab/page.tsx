@@ -79,13 +79,13 @@ export default function LabPage() {
           </Panel>
 
           <div className="grid min-w-0 gap-4 xl:grid-cols-2">
-            <Panel title="Solar kWh used per kWp per year" right={<span className="text-[11px] text-mist">bars P50, whiskers P10-P90</span>}>
+            <Panel title={<Finding kicker="Solar kWh used per kWp per year">SinchaiSlot puts {fmt.n(pol.D.utilisation_kwh_per_kwp.p50)} to work; first-come hourly sales, {fmt.n(pol.B.utilisation_kwh_per_kwp.p50)}.</Finding>} right={<span className="text-[11px] text-mist">bars P50, whiskers P10-P90</span>}>
               <Bars rows={keys.map((k) => ({ k, b: pol[k].utilisation_kwh_per_kwp }))} digits={0} />
             </Panel>
-            <Panel title="Share of tenant water need met by solar">
+            <Panel title={<Finding kicker="Share of tenant water need met by solar">Tenants get {fmt.pct(pol.D.tenant_share_served_by_solar.p50)} of their need from the sun, against {fmt.pct(pol.B.tenant_share_served_by_solar.p50)}.</Finding>}>
               <Bars rows={keys.map((k) => ({ k, b: pol[k].tenant_share_served_by_solar }))} pct />
             </Panel>
-            <Panel title="Diesel avoided per pump-year" right={<SourceTag kind="published" />}>
+            <Panel title={<Finding kicker="Diesel avoided per pump-year">{fmt.n(pol.D.diesel_l_avoided.p50)} litres of diesel avoided a year; the groundwater cap holds some water back.</Finding>} right={<SourceTag kind="published" />}>
               <Bars rows={keys.map((k) => ({ k, b: pol[k].diesel_l_avoided }))} digits={0} unit=" L" />
             </Panel>
             <Panel title="Pump owner / FPO income and Saur Mitra income">
@@ -124,7 +124,7 @@ export default function LabPage() {
           </div>
 
           <div className="grid min-w-0 gap-4 xl:grid-cols-2">
-            <Panel title="Honest results: what the planner does and does not add" right={<span className="rounded bg-sun/10 px-2 py-0.5 text-[11px] text-sun">negative result</span>}>
+            <Panel title={<Finding kicker="Honest results: what the planner does and does not add">Not everything wins, and the report says where.</Finding>} right={<span className="rounded bg-sun/10 px-2 py-0.5 text-[11px] text-sun">negative result</span>}>
               <div className="grid grid-cols-2 gap-4">
                 <Stat value={fmt.signedPct(p.negative_results.gain_vs_Cloads_monsoon, 1)} label="Gain vs greedy loads, monsoon weeks" />
                 <Stat value={fmt.signedPct(p.negative_results.gain_vs_Cloads_dry, 1)} label="Gain vs greedy loads, dry season" />
@@ -258,5 +258,14 @@ function Weekly({ p }: { p: Proof }) {
         <span>kWh per week</span>
       </figcaption>
     </figure>
+  );
+}
+
+function Finding({ kicker, children }: { kicker: string; children: React.ReactNode }) {
+  return (
+    <span className="block py-1">
+      <span className="block text-[11.5px] font-normal text-mist">{kicker}</span>
+      <span className="mt-1 block font-serif text-[19px] font-normal leading-snug text-white">{children}</span>
+    </span>
   );
 }

@@ -39,7 +39,7 @@ test("cloud at 13:40 re-plans with reasons and callbacks", async ({ page, reques
   await request.post("/api/demo/reset");
   await page.goto("/planner");
   await page.getByRole("button", { name: "Jump to 13:45" }).click();
-  await expect(page.getByText(/v\d+ · 13:4/)).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText(/13:4\d · plan v\d+/)).toBeVisible({ timeout: 30_000 });
   await expect(page.getByText(/less sun now expected/).first()).toBeVisible();
   const cbs = await (await request.get("/api/channels/callbacks")).json();
   expect(cbs.length).toBeGreaterThan(0);

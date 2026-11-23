@@ -68,16 +68,33 @@ export default function TracePage() {
                 <div className="text-[11px] text-mist">Input</div>
                 <p className="deva mt-1 text-[14px]">{run.input}</p>
               </div>
+              {/* Departure-board summary of the run */}
+              <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border border-soil bg-soil text-[11px]">
+                {[
+                  ["AGENT", run.agent === "api" ? "direct" : run.agent.replace("_", " ")],
+                  ["TOOLS", String(run.tool_calls.length)],
+                  ["TOTAL", `${run.latency_ms} ms`],
+                ].map(([k, v]) => (
+                  <div key={k} className="bg-night px-3 py-2">
+                    <div className="num tracking-wider text-mist">{k}</div>
+                    <div className="num mt-0.5 text-[15px] text-sun">{v}</div>
+                  </div>
+                ))}
+              </div>
               <ol className="relative ml-2 flex flex-col gap-3 border-l border-soil pl-4">
                 {run.tool_calls.map((c, i) => (
                   <li key={i} className="relative">
                     <span className={`absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full ${c.error ? "bg-fault" : c.confirm ? (c.confirmed ? "bg-leaf" : "bg-sun") : "bg-water"}`} />
                     <div className="flex flex-wrap items-center gap-2 text-[12px]">
                       <code className="num text-sun">{c.name}</code>
-                      {c.confirm && <span className="rounded bg-sun/15 px-1.5 text-sun">held for confirmation</span>}
-                      {c.confirmed && <span className="rounded bg-leaf/15 px-1.5 text-leaf">confirmed</span>}
                       {c.error && <span className="text-fault">{c.error}</span>}
-                      <span className="num ml-auto text-mist">{c.ms} ms</span>
+                      <span className={`num ml-auto rounded px-1.5 text-[10px] tracking-wider ${c.error ? "bg-fault/15 text-fault" : c.confirm ? (c.confirmed ? "bg-water/15 text-water" : "bg-sun/15 text-sun") : "bg-night-3 text-fog"}`}>
+                        {c.error ? "FAILED" : c.confirm ? (c.confirmed ? "RELEASED BY YES" : "HELD") : "DONE"}
+                      </span>
+                      <span className="num w-16 text-right text-mist">{c.ms} ms</span>
+                    </div>
+                    <div className="mt-1 h-1 rounded-full bg-night-3" aria-hidden>
+                      <div className={`h-1 rounded-full ${c.error ? "bg-fault" : "bg-sun/70"}`} style={{ width: `${Math.max(2, (c.ms / Math.max(1, ...run.tool_calls.map((x) => x.ms))) * 100)}%` }} />
                     </div>
                     <pre tabIndex={0} className="num mt-1 max-h-56 overflow-auto rounded bg-night p-2 text-[11px] text-fog">{JSON.stringify({ args: c.args, result: c.result }, null, 1)}</pre>
                   </li>

@@ -1,7 +1,7 @@
 import type { LedgerRow } from "@/lib/types";
 
 /** Rasid: a verified receipt printed on ledger paper. */
-export function Receipt({ r, fresh = false }: { r: LedgerRow; fresh?: boolean }) {
+export function Receipt({ r, fresh = false, stamp = "verified" }: { r: LedgerRow; fresh?: boolean; stamp?: "verified" | "pending" | "checking" }) {
   const water = r.kind === "water";
   return (
     <article
@@ -45,9 +45,11 @@ export function Receipt({ r, fresh = false }: { r: LedgerRow; fresh?: boolean })
         <span className="num truncate text-[10px] opacity-60" title={r.hash}>
           #{r.hash.slice(0, 16)}… ← {r.prev_hash.slice(0, 6)}
         </span>
-        <span className="ml-2 shrink-0 rotate-[-4deg] rounded border-2 border-[#1d8a37] px-1.5 text-[10px] font-semibold tracking-wider text-[#1d8a37]">
-          VERIFIED
-        </span>
+        {stamp === "verified" ? (
+          <span className="stamp-in ml-2 shrink-0 rotate-[-4deg] rounded border-2 border-[#1d8a37] px-1.5 text-[10px] font-semibold tracking-wider text-[#1d8a37]">VERIFIED</span>
+        ) : (
+          <span className={`ml-2 shrink-0 rounded border border-dashed border-ink/30 px-1.5 text-[10px] tracking-wider text-ink/50 ${stamp === "checking" ? "animate-pulse" : ""}`}>{stamp === "checking" ? "CHECKING" : "HASH"}</span>
+        )}
       </div>
       <div className="mt-1 text-[10px] opacity-60">{r.method === "drive-estimate" ? "Water metered from Altivar drive telemetry" : r.method}</div>
     </article>

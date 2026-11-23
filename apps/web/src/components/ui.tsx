@@ -118,3 +118,37 @@ export function ErrorNote({ error }: { error: string | null }) {
     </div>
   );
 }
+
+/** Tabular numeral that rolls only the digits that change (instrument readout). Reduced motion: no roll. */
+export function Roll({ value, className = "" }: { value: string; className?: string }) {
+  return (
+    <span className={`num inline-flex ${className}`}>
+      <span className="sr-only">{value}</span>
+      {value.split("").map((ch, i) => {
+        const d = ch >= "0" && ch <= "9" ? Number(ch) : null;
+        if (d === null) return <span key={i} aria-hidden>{ch}</span>;
+        return (
+          <span key={i} aria-hidden className="relative inline-block h-[1em] overflow-hidden leading-none" style={{ width: "1ch" }}>
+            <span className="absolute left-0 top-0 flex flex-col motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-[cubic-bezier(.2,.7,.1,1)]" style={{ transform: `translateY(-${d}em)` }}>
+              {"0123456789".split("").map((n) => <span key={n} className="block h-[1em] leading-none">{n}</span>)}
+            </span>
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+/** One readout in an instrument strip: label, rolling value, unit; no card around it. */
+export function Readout({ label, value, unit, tone = "text-white", sub, source }: { label: ReactNode; value: string; unit?: string; tone?: string; sub?: ReactNode; source?: Source }) {
+  return (
+    <div className="min-w-0 px-4 py-3 first:pl-0">
+      <div className="flex items-center gap-2 text-[11.5px] text-mist">{label}{source && <SourceTag kind={source} />}</div>
+      <div className={`mt-1.5 flex items-baseline gap-1 text-[28px] leading-none md:text-[34px] ${tone}`}>
+        <Roll value={value} />
+        {unit && <span className="whitespace-nowrap text-sm text-mist">{unit}</span>}
+      </div>
+      {sub && <div className="mt-1.5 text-[11.5px] text-mist">{sub}</div>}
+    </div>
+  );
+}

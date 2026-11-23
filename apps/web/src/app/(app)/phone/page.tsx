@@ -5,6 +5,7 @@ import { Shell } from "@/components/Shell";
 import { Btn, Panel, SourceTag } from "@/components/ui";
 import { postJSON, type ServerEvent, useApi, useEvents } from "@/lib/api";
 import { ToolList } from "@/components/ToolList";
+import { TypeOut } from "@/components/TypeOut";
 import type { AgentReply } from "@/lib/types";
 
 type Turn = { who: "farmer" | "saathi" | "system"; text: string; dtmf?: string | null };
@@ -119,13 +120,13 @@ export default function PhonePage() {
                 {call?.turns.map((t, i) => (
                   <p key={i} className={t.who === "farmer" ? "text-right font-medium" : t.who === "system" ? "text-center text-[11px] opacity-60" : ""}>
                     {t.who === "farmer" && t.dtmf ? `[${t.dtmf}] ` : ""}
-                    {t.text}
+                    {t.who === "saathi" && i === call.turns.length - 1 ? <TypeOut key={t.text} text={t.text} /> : t.text}
                   </p>
                 ))}
               </div>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <button onClick={missedCall} disabled={busy} className="rounded-full bg-leaf py-2 text-[13px] font-medium text-ink disabled:opacity-50">
+              <button onClick={missedCall} disabled={busy} className="rounded-full bg-water py-2 text-[13px] font-medium text-ink disabled:opacity-50">
                 Missed call
               </button>
               <button onClick={() => setCall(null)} className="rounded-full bg-[#3b4540] py-2 text-[13px] font-medium text-white">

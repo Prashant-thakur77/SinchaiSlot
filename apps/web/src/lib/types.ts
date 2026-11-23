@@ -44,7 +44,7 @@ export type Proof = {
 export type Slot = {
   slot: number;
   start: string;
-  action: "req" | "mill" | "chaff" | "idle";
+  action: "req" | "mill" | "chaff" | "battery" | "idle";
   booking_id: string | null;
   farmer: string | null;
   tenant: boolean | null;

@@ -122,7 +122,7 @@ export function Gantt({
           </Track>
           <Track n={n} nowIndex={nowIndex} h={h} label="Chaff cutter">
             {segments(slots, (s) => s.action === "chaff").map((seg, i) => (
-              <Block n={n} tr={tr} key={`chaff-${i}`} id={`chaff-${i}`} seg={seg} cls="bg-leaf" title={`Chaff cutter from ${slots[seg.start].start}`} />
+              <Block n={n} tr={tr} key={`chaff-${i}`} id={`chaff-${i}`} seg={seg} cls="bg-[#c98b4a]" title={`Chaff cutter from ${slots[seg.start].start}`} />
             ))}
           </Track>
           <Track n={n} nowIndex={nowIndex} h={h} label="Battery packs">
@@ -130,7 +130,7 @@ export function Gantt({
               s.battery_kwh > 0.01 ? (
                 <div
                   key={`b${k}`}
-                  className="absolute bottom-[3px] rounded-[2px] bg-se/85"
+                  className="absolute bottom-[3px] rounded-[2px] bg-mist/70"
                   title={`${s.battery_kwh.toFixed(2)} kWh at ${s.start}`}
                   style={{ left: `${(k / n) * 100}%`, width: `calc(${100 / n}% - 2px)`, height: `${Math.max(18, (s.battery_kwh / bmax) * 80)}%` }}
                 />

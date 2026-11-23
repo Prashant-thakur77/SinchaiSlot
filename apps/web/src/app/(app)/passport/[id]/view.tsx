@@ -30,14 +30,14 @@ function ScoreBar({ value, grade }: { value: number; grade: string }) {
   return (
     <div className="w-full" role="img" aria-label={`Scorecard ${value} of 100, grade ${grade}`}>
       <div className="flex items-baseline justify-between">
-        <span className="num text-6xl leading-none text-white">{value}<span className="ml-1 text-base text-mist">/ 100</span></span>
-        <span className="num rounded-md border border-sun/50 px-2 py-0.5 text-lg text-sun">{grade}</span>
+        <span className="num text-7xl leading-none text-ink">{value}<span className="ml-1 text-base text-ink/55">/ 100</span></span>
+        <span className="stamp-in num rotate-[-6deg] rounded-md border-[3px] border-[#a8361f] px-3 py-1 text-3xl font-bold text-[#a8361f]" aria-hidden>{grade}</span>
       </div>
-      <div className="relative mt-4 h-3 rounded-full bg-night">
-        <div className="h-3 rounded-full bg-sun motion-safe:transition-[width] motion-safe:duration-1000" style={{ width: `${value}%` }} />
-        {[50, 65, 80].map((x) => <span key={x} className="absolute top-[-3px] h-[18px] w-px bg-mist/60" style={{ left: `${x}%` }} aria-hidden />)}
+      <div className="relative mt-4 h-3 rounded-full bg-ink/10">
+        <div className="h-3 rounded-full bg-[#c98b1a] motion-safe:transition-[width] motion-safe:duration-1000" style={{ width: `${value}%` }} />
+        {[50, 65, 80].map((x) => <span key={x} className="absolute top-[-3px] h-[18px] w-px bg-ink/40" style={{ left: `${x}%` }} aria-hidden />)}
       </div>
-      <div className="num mt-1 flex justify-between text-[10px] text-mist"><span>0</span><span style={{ marginLeft: "40%" }}>C</span><span>B</span><span>A</span><span>100</span></div>
+      <div className="num mt-1 flex justify-between text-[10px] text-ink/55"><span>0</span><span style={{ marginLeft: "40%" }}>C</span><span>B</span><span>A</span><span>100</span></div>
     </div>
   );
 }
@@ -60,28 +60,37 @@ export default function PassportView({ id }: { id: string }) {
         <a href={`/api/pumps/${id}/passport.pdf`} className="ml-auto rounded-lg border border-soil px-3 py-1.5 text-fog hover:border-sun hover:text-white">Download one-page PDF</a>
       </div>
       {!p ? <div className="h-64 animate-pulse rounded-xl bg-night-2" /> : (
-        <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]">
-          <Panel title={p.pump.name} right={<SourceTag kind="simulated" />}>
+        <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,4fr)_minmax(0,7fr)]">
+          <article className="paper perforated relative min-w-0 rounded-b-lg px-6 pb-6 pt-7 text-ink shadow-[0_24px_50px_-20px_rgba(0,0,0,.7)] xl:sticky xl:top-28 xl:self-start" aria-label={`Pump Passport ${p.pump.pump_id}`}>
+            <div className="flex items-baseline justify-between gap-3 border-b border-ink/15 pb-3">
+              <div>
+                <div className="font-serif text-2xl italic">Pump Passport</div>
+                <div className="num text-[12px] text-ink/60">{p.pump.pump_id} · {p.pump.name}</div>
+              </div>
+              <span className="num rounded border border-ink/25 px-1.5 text-[10px] tracking-wider text-ink/60">SIMULATED</span>
+            </div>
+            <div className="mt-5">
             <div className="flex flex-col gap-3">
               <ScoreBar value={p.score.value} grade={p.score.grade} />
-              <p className="text-[12px] text-mist">{p.score.note}</p>
+              <p className="text-[12px] text-ink/65">{p.score.note}</p>
             </div>
             <ul className="mt-4 flex flex-col gap-2">
               {Object.entries(p.score.parts).map(([k, v]) => (
                 <li key={k}>
-                  <div className="flex justify-between text-[12px]"><span className="text-fog">{PART_LABEL[k] ?? k}</span><span className="num text-mist">{p.score.weights[k]} pts · {fmt.pct(v)}</span></div>
-                  <div className="mt-1 h-1.5 rounded-full bg-night"><div className="h-1.5 rounded-full bg-sun" style={{ width: `${Math.min(v, 1) * 100}%` }} /></div>
+                  <div className="flex justify-between text-[12px]"><span>{PART_LABEL[k] ?? k}</span><span className="num text-ink/60">{p.score.weights[k]} pts · {fmt.pct(v)}</span></div>
+                  <div className="mt-1 h-1.5 rounded-full bg-ink/10"><div className="h-1.5 rounded-full bg-[#c98b1a]" style={{ width: `${Math.min(v, 1) * 100}%` }} /></div>
                 </li>
               ))}
             </ul>
-            <dl className="mt-4 grid grid-cols-2 gap-y-1 text-[12px]">
-              <dt className="text-mist">Operator</dt><dd className="text-right text-fog">{p.pump.operator}</dd>
-              <dt className="text-mist">Array</dt><dd className="num text-right text-fog">{p.pump.kwp} kWp</dd>
-              <dt className="text-mist">Ledger</dt><dd className={`text-right ${p.ledger_verified ? "text-leaf" : "text-fault"}`}>{p.ledger_verified ? "hash chain verified" : "NOT verified"}</dd>
-              <dt className="text-mist">Data health</dt><dd className="text-right text-fog">{p.data_health}</dd>
-              <dt className="text-mist">Borewell</dt><dd className="num text-right text-fog">{p.water_quality.ec_dsm} dS/m · {p.water_quality.label_en}</dd>
+            <dl className="mt-5 grid grid-cols-2 gap-y-1 border-t border-dashed border-ink/25 pt-3 text-[12px]">
+              <dt className="text-ink/60">Operator</dt><dd className="text-right">{p.pump.operator}</dd>
+              <dt className="text-ink/60">Array</dt><dd className="num text-right">{p.pump.kwp} kWp</dd>
+              <dt className="text-ink/60">Ledger</dt><dd className={`text-right ${p.ledger_verified ? "text-[#1d8a37]" : "text-fault"}`}>{p.ledger_verified ? "hash chain verified" : "NOT verified"}</dd>
+              <dt className="text-ink/60">Data health</dt><dd className="text-right">{p.data_health}</dd>
+              <dt className="text-ink/60">Borewell</dt><dd className="num text-right">{p.water_quality.ec_dsm} dS/m · {p.water_quality.label_en}</dd>
             </dl>
-          </Panel>
+            </div>
+          </article>
 
           <div className="flex min-w-0 flex-col gap-4">
             <Panel title={`Last ${p.period_days} days to ${p.as_of}`}>

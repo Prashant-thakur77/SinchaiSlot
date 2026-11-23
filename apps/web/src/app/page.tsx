@@ -64,6 +64,9 @@ export default function Home() {
   const [story, setStory] = useState<Story | null>(null);
   const [plots, setPlots] = useState<PlotFeature[]>([]);
   const [motion, setMotion] = useState<Motion | null>(null);
+  const skyRef = useRef<HTMLDivElement>(null);
+  const sunRef = useRef<SVGCircleElement>(null);
+  const hudRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -101,10 +104,20 @@ export default function Home() {
     const { gsap } = motion;
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
+      // The whole page is one day: scroll position is the clock; the sky and the sun follow it.
+      const dayKw = proof?.demo_day?.pv_actual_kw ?? [];
+      const cum: number[] = [0];
+      dayKw.forEach((k, i) => cum.push(cum[i] + k));
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap.to(".hero-sun", { yPercent: -70, scale: 1.12, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+        motion.ScrollTrigger.create({
+          start: 0, end: "max",
+          onUpdate: (self) => paintSky(self.progress, skyRef.current, sunRef.current, hudRef.current, cum),
+        });
+        paintSky(0, skyRef.current, sunRef.current, hudRef.current, cum);
+      });
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         // Hero: the sun rises as you start scrolling; the wordmark settles.
-        gsap.to(".hero-sun", { yPercent: -60, scale: 1.15, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
-        gsap.to(".hero-sky", { opacity: 1, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
         // 06:00 statement fills word by word.
         gsap.fromTo(".fill-word", { color: "#6b7b72" }, { color: "#eef3ee", stagger: 0.08, ease: "none", scrollTrigger: { trigger: ".problem", start: "top 70%", end: "bottom 60%", scrub: true } });
         // The beam: a wedge of morning sun sweeps across and becomes the gold chapter.
@@ -171,7 +184,16 @@ export default function Home() {
   const dieselShare = c?.bihar_diesel_structures_share;
 
   return (
-    <div ref={root} className="grain overflow-x-clip bg-night text-[#eef3ee]">
+    <div ref={root} className="grain relative overflow-x-clip bg-night text-[#eef3ee]">
+      <div ref={skyRef} className="pointer-events-none fixed inset-0 z-0" aria-hidden />
+      <div ref={hudRef} className="num pointer-events-none fixed bottom-5 left-5 z-20 hidden items-center gap-3 rounded-full border border-white/10 bg-night/80 py-1.5 pl-3 pr-4 text-[12px] text-mist backdrop-blur md:motion-safe:flex" aria-hidden>
+        <svg width="64" height="26" viewBox="0 0 64 26" className="overflow-visible">
+          <path d="M4 24 Q32 -8 60 24" fill="none" stroke="var(--soil)" strokeWidth="1.5" strokeDasharray="2 3" />
+          <line x1="0" x2="64" y1="24" y2="24" stroke="var(--soil)" strokeWidth="1" />
+          <circle ref={sunRef} cx="4" cy="24" r="4.5" fill="var(--sun)" />
+        </svg>
+        <span data-hud="clock" className="text-[15px] text-sun">06:00</span><span data-hud="kwh">0.0 kWh of real sun so far</span>
+      </div>
       <a href="#story" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-sun focus:px-3 focus:py-1 focus:text-ink">Skip to the story</a>
       <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-white/5 bg-night/75 px-5 py-3 backdrop-blur-md md:px-10">
         <Link href="/" className="flex items-center gap-2 text-white"><Mark /> <span className="font-display text-lg font-semibold">SinchaiSlot</span></Link>
@@ -183,10 +205,8 @@ export default function Home() {
       </header>
 
       {/* HERO */}
-      <section className="hero relative flex min-h-[100svh] flex-col justify-end overflow-hidden" aria-label="Introduction">
-        <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_70%_110%,#3a2a0c_0%,#13201a_45%,#0e1512_75%)]" />
-        <div className="hero-sky absolute inset-0 bg-[radial-gradient(90%_70%_at_70%_100%,rgba(245,184,61,.35)_0%,rgba(14,21,18,0)_60%)] opacity-40" />
-        <div className="hero-sun absolute right-[8%] top-[16%] h-[18vmin] w-[18vmin] rounded-full md:right-[12%] md:top-[58%] md:h-[22vmin] md:w-[22vmin] bg-sun shadow-[0_0_120px_40px_rgba(245,184,61,.35)]" aria-hidden />
+      <section className="hero relative z-10 flex min-h-[100svh] flex-col justify-end overflow-hidden" aria-label="Introduction">
+        <div className="hero-sun absolute right-[8%] top-[16%] h-[18vmin] w-[18vmin] rounded-full bg-sun shadow-[0_0_120px_40px_rgba(245,184,61,.35)] md:right-[12%] md:top-[58%] md:h-[22vmin] md:w-[22vmin]" aria-hidden />
         <div className="relative z-10 mx-auto w-full max-w-[1400px] px-5 pb-6 md:px-10">
           <p className="max-w-3xl font-display text-[clamp(1.7rem,3.6vw,3.4rem)] font-semibold leading-[1.05] tracking-tight text-[#eef3ee]">
             Every shared solar pump in Bihar is a 5&nbsp;kW power plant that sleeps most of the day.
@@ -209,7 +229,7 @@ export default function Home() {
       </section>
 
       {/* 06:00 PROBLEM */}
-      <section id="story" className="problem relative mx-auto max-w-[1400px] px-5 py-[18vh] md:px-10" aria-labelledby="t-problem">
+      <section id="story" className="problem relative z-10 mx-auto max-w-[1400px] px-5 py-[18vh] md:px-10" aria-labelledby="t-problem">
         <Clock t="06:00" label="Dawn, Samastipur" />
         <h2 id="t-problem" className="mt-8 max-w-5xl font-display text-[clamp(2.2rem,5.6vw,5.5rem)] font-semibold leading-[1.02] tracking-tight">
           {`Solar pumps put about ${ceew ? Math.round(ceew.value * 100) : "…"}% of their sunshine to work. Next door, a tenant farmer pays a diesel seller ₹${dieselRate?.value ?? "…"} an hour for the same water.`
@@ -230,7 +250,7 @@ export default function Home() {
       </section>
 
       {/* 10:00 THE BEAM */}
-      <section className="beam-wrap relative min-h-[110vh]" aria-labelledby="t-book">
+      <section className="beam-wrap relative z-10 min-h-[110vh]" aria-labelledby="t-book">
         <div className="beam absolute inset-0 bg-sun" style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }} aria-hidden />
         <div className="relative mx-auto grid max-w-[1400px] items-center gap-10 px-5 py-[16vh] text-ink md:grid-cols-[1.1fr_0.9fr] md:px-10">
           <div>
@@ -257,7 +277,7 @@ export default function Home() {
       </section>
 
       {/* 13:40 THE CLOUD (signature) */}
-      <section className="day relative flex h-[100svh] min-h-[600px] flex-col justify-center overflow-hidden bg-night pb-6 pt-20 md:py-10" aria-labelledby="t-cloud">
+      <section className="day relative z-10 flex h-[100svh] min-h-[600px] flex-col justify-center overflow-hidden pb-6 pt-20 md:py-10" aria-labelledby="t-cloud">
         {plots.length > 0 && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.07]" aria-hidden>
             <div className="w-[120vmin]"><PlotMosaic features={plots} /></div>
@@ -344,7 +364,7 @@ export default function Home() {
       </section>
 
       {/* 18:00 DUSK RECEIPT */}
-      <section className="dusk relative bg-[linear-gradient(180deg,#0e1512_0%,#1a1510_100%)] py-[16vh]" aria-labelledby="t-receipt">
+      <section className="dusk relative z-10 py-[16vh]" aria-labelledby="t-receipt">
         <div className="mx-auto grid max-w-[1400px] items-center gap-12 px-5 md:grid-cols-2 md:px-10">
           <div>
             <Clock t="18:00" label="The pump stops; the books close" />
@@ -361,7 +381,7 @@ export default function Home() {
       </section>
 
       {/* PROOF */}
-      <section id="proof" className="mx-auto max-w-[1400px] px-5 py-[14vh] md:px-10" aria-labelledby="t-proof">
+      <section id="proof" className="relative z-10 mx-auto max-w-[1400px] px-5 py-[14vh] md:px-10" aria-labelledby="t-proof">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <h2 id="t-proof" className="font-display text-[clamp(2rem,4.6vw,4.2rem)] font-semibold tracking-tight">The proof</h2>
           <p className="max-w-xl text-[13px] text-mist">
@@ -370,14 +390,14 @@ export default function Home() {
           </p>
         </div>
         {h && pol && (
-          <div className="mt-10 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-            <Big to={h.utilisation_D_kwh_per_kwp} unit="kWh per kWp per year of sun put to work" sub={`Chakhaji-style first-come baseline: ${fmt.n(h.utilisation_B_kwh_per_kwp)}`} />
-            <Big to={h.utilisation_gain_vs_B * 100} dec={0} prefix="+" unit="% more solar used than the baseline" sub={`P10 ${fmt.signedPct(proof!.gains.utilisation_D_vs_B.p10)} to P90 ${fmt.signedPct(proof!.gains.utilisation_D_vs_B.p90)}`} />
-            <Big to={h.farmer_rs_per_m3_D} dec={2} prefix="₹" unit="per m³ of solar water for the farmer" sub={`Baseline ₹${h.farmer_rs_per_m3_B.toFixed(2)} · diesel ₹${h.diesel_rs_per_m3.toFixed(2)}`} />
-            <Big to={h.tenant_share_D * 100} dec={0} unit="% of tenant water need met by solar" sub={`Baseline ${fmt.pct(h.tenant_share_B)} · Gini of access ${h.gini_D.toFixed(2)} vs ${h.gini_B.toFixed(2)}`} />
-            <Big to={h.diesel_l_avoided_D} unit="litres of diesel avoided per pump-year" sub={`${fmt.n(h.co2_kg_avoided_D)} kg CO₂ · factor 2.6444 kg/L, published`} />
-            <Big to={h.forecast_skill_vs_persistence * 100} dec={0} unit="% better solar forecast than yesterday's sun" sub={`Held-out ${proof!.forecast.test_years.join("-")} · ${fmt.pct(h.forecast_skill_vs_climatology)} better than climatology`} />
-          </div>
+          <ol className="mt-12 border-t border-dashed border-fog/25">
+            <Row what="Sun put to work" to={h.utilisation_D_kwh_per_kwp} unit="kWh per kWp a year" base={`first-come hourly sales: ${fmt.n(h.utilisation_B_kwh_per_kwp)}`} />
+            <Row what="More solar used" to={h.utilisation_gain_vs_B * 100} prefix="+" unit="%" base={`P10 ${fmt.signedPct(proof!.gains.utilisation_D_vs_B.p10)} to P90 ${fmt.signedPct(proof!.gains.utilisation_D_vs_B.p90)} across runs`} />
+            <Row what="Farmer pays" to={h.farmer_rs_per_m3_D} dec={2} prefix="₹" unit="per m³" base={`baseline ₹${h.farmer_rs_per_m3_B.toFixed(2)} · diesel ₹${h.diesel_rs_per_m3.toFixed(2)}`} tone="text-water" />
+            <Row what="Tenants' need met by solar" to={h.tenant_share_D * 100} unit="%" base={`baseline ${fmt.pct(h.tenant_share_B)} · Gini ${h.gini_D.toFixed(2)} vs ${h.gini_B.toFixed(2)}`} />
+            <Row what="Diesel avoided" to={h.diesel_l_avoided_D} unit="litres a year" base={`${fmt.n(h.co2_kg_avoided_D)} kg CO₂ at 2.6444 kg/L`} />
+            <Row what="Forecast skill" to={h.forecast_skill_vs_persistence * 100} unit="% over yesterday's sun" base={`held-out ${proof!.forecast.test_years.join("–")} · ${fmt.pct(h.forecast_skill_vs_climatology)} over climatology`} />
+          </ol>
         )}
         {proof?.negative_results?.explanation && (
           <div className="mt-14 max-w-3xl border-l-2 border-sun/60 pl-5">
@@ -389,7 +409,7 @@ export default function Home() {
       </section>
 
       {/* SCHNEIDER */}
-      <section id="schneider" className="border-t border-soil bg-night-2" aria-labelledby="t-se">
+      <section id="schneider" className="relative z-10 border-t border-soil bg-night-2" aria-labelledby="t-se">
         <div className="mx-auto max-w-[1400px] px-5 py-[12vh] md:px-10">
           <h2 id="t-se" className="font-display text-[clamp(1.8rem,4vw,3.4rem)] font-semibold tracking-tight">
             Remove the <span className="text-se">Altivar Solar</span> drive and nothing works.
@@ -412,7 +432,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="mx-auto max-w-[1400px] px-5 py-16 md:px-10">
+      <footer className="relative z-10 mx-auto max-w-[1400px] px-5 py-16 md:px-10">
         <div className="flex flex-wrap items-center justify-between gap-6">
           <Link href="/twin" className="rounded-full bg-sun px-7 py-3.5 text-[16px] font-semibold text-ink hover:bg-sun-deep">Run today live</Link>
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-mist">
@@ -439,15 +459,59 @@ function Clock({ t, label, dark = false }: { t: string; label: string; dark?: bo
   );
 }
 
-function Big({ to, dec = 0, prefix = "", unit, sub }: { to: number; dec?: number; prefix?: string; unit: string; sub: string }) {
+function Row({ what, to, dec = 0, prefix = "", unit, base, tone = "text-sun" }: { what: string; to: number; dec?: number; prefix?: string; unit: string; base: string; tone?: string }) {
   return (
-    <div>
-      <div className="num text-[clamp(3rem,6vw,5.5rem)] leading-none text-sun">
-        {prefix}
-        <span className="count" data-to={to} data-dec={dec}>{to.toLocaleString("en-IN", { maximumFractionDigits: dec, minimumFractionDigits: dec })}</span>
+    <li className="grid items-baseline gap-x-8 gap-y-1 border-b border-dashed border-fog/25 py-5 md:grid-cols-[220px_minmax(0,1fr)_minmax(0,320px)] md:py-7">
+      <div className="text-[14px] text-fog">{what}</div>
+      <div className={`num flex items-baseline gap-3 leading-none ${tone}`}>
+        <span className="text-[clamp(3.2rem,8vw,7.5rem)] tracking-tight">{prefix}<span className="count" data-to={to} data-dec={dec}>{to.toLocaleString("en-IN", { maximumFractionDigits: dec, minimumFractionDigits: dec })}</span></span>
+        <span className="text-[15px] text-mist">{unit}</span>
       </div>
-      <div className="mt-3 text-[15px] text-fog">{unit}</div>
-      <div className="num mt-1 text-[12px] text-mist">{sub}</div>
-    </div>
+      <div className="num text-[12.5px] leading-relaxed text-mist md:text-right">{base}</div>
+    </li>
   );
+}
+
+const SKY: [number, number[], number[]][] = [
+  // [progress, horizon RGBA, zenith RGBA]: dawn rose, morning gold, noon haze, 13:40 cloud, dusk amber, night
+  [0.0, [214, 110, 92, 0.32], [14, 21, 18, 1]],
+  [0.18, [245, 184, 61, 0.26], [22, 30, 24, 1]],
+  [0.36, [250, 214, 140, 0.18], [24, 34, 28, 1]],
+  [0.52, [120, 140, 150, 0.24], [16, 24, 22, 1]],
+  [0.72, [227, 130, 40, 0.3], [20, 18, 14, 1]],
+  [1.0, [40, 60, 90, 0.18], [10, 14, 13, 1]],
+];
+
+/** Paint the sky, the sun on its arc and the corner clock for a scroll progress p (0..1). */
+function paintSky(p: number, sky: HTMLDivElement | null, sun: SVGCircleElement | null, hud: HTMLDivElement | null, cum: number[]) {
+  const i = Math.max(0, SKY.findIndex(([q]) => q >= p) - 1);
+  const [q0, h0, z0] = SKY[i];
+  const [q1, h1, z1] = SKY[Math.min(SKY.length - 1, i + 1)];
+  const k = q1 > q0 ? (p - q0) / (q1 - q0) : 0;
+  const mix = (a: number[], b: number[]) => a.map((v, j) => (j < 3 ? Math.round(v + (b[j] - v) * k) : +(v + (b[j] - v) * k).toFixed(3)));
+  const h = mix(h0, h1);
+  const z = mix(z0, z1);
+  const sx = 0.9 - 0.8 * p;
+  if (sky) sky.style.background = `radial-gradient(120% 70% at ${sx * 100}% 100%, rgba(${h.join(",")}) 0%, transparent 70%), rgb(${z.slice(0, 3).join(",")})`;
+  if (sun) {
+    // the same quadratic arc as the HUD path: M4 24 Q32 -8 60 24
+    const u = p;
+    sun.setAttribute("cx", String((1 - u) * (1 - u) * 4 + 2 * (1 - u) * u * 32 + u * u * 60));
+    sun.setAttribute("cy", String((1 - u) * (1 - u) * 24 + 2 * (1 - u) * u * -8 + u * u * 24));
+    sun.style.opacity = p > 0.48 && p < 0.6 ? "0.45" : "1";
+  }
+  if (hud) {
+    const mins = 360 + p * 720;
+    const hh = Math.floor(mins / 60);
+    const clock = hud.querySelector('[data-hud="clock"]');
+    const kwh = hud.querySelector('[data-hud="kwh"]');
+    if (clock) clock.textContent = `${String(hh).padStart(2, "0")}:${String(Math.floor(mins % 60)).padStart(2, "0")}`;
+    if (kwh && cum.length > 1) {
+      // demo_day hours start 06:30-labelled at index 0; cumulative kWh of real sun to this minute
+      const x = Math.max(0, Math.min(cum.length - 1, (mins - 360) / 60));
+      const a = Math.floor(x);
+      const v = cum[a] + (cum[Math.min(cum.length - 1, a + 1)] - cum[a]) * (x - a);
+      kwh.textContent = `${v.toFixed(1)} kWh of real sun so far · 2 Mar 2024`;
+    }
+  }
 }

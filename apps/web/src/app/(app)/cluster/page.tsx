@@ -25,6 +25,28 @@ const HEALTH: Record<Health["status"], { cls: string; en: string; hi: string }> 
 const QUAL: Record<Quality["restriction"], string> = { none: "text-leaf", slight_moderate: "text-sun", severe: "text-fault" };
 const PUMP_COLOR: Record<string, string> = { P1: "#F2B33D", P2: "#5FB3E6", P3: "#9BC46A" };
 
+/** Heartbeat of a pump's telemetry: a pulse every half hour it reported today, flat once it went quiet. Drawn
+ *  from the health monitor's last-seen time; not a raw signal. */
+function Heartbeat({ h, clock }: { h: Health; clock: string }) {
+  const toMin = (s: string) => Number(s.slice(0, 2)) * 60 + Number(s.slice(3, 5));
+  const now = toMin(clock);
+  const last = h.last_seen ? toMin(h.last_seen.slice(11, 16)) : 360;
+  const W = 240;
+  const x = (m: number) => ((m - 360) / 720) * W;
+  let d = "M0 12";
+  for (let m = 360; m <= Math.max(360, now); m += 30) {
+    const alive = m <= last;
+    d += alive ? ` L${x(m) - 4} 12 L${x(m) - 2} 3 L${x(m)} 20 L${x(m) + 2} 12` : ` L${x(m)} 12`;
+  }
+  const bad = h.status === "silent" || h.status === "stalled" || h.status === "never";
+  return (
+    <svg viewBox={`0 0 ${W} 24`} className="mt-1 h-6 w-full max-w-[240px]" aria-hidden>
+      <path d={d} fill="none" stroke={bad ? "var(--fault)" : "var(--leaf)"} strokeWidth={1.3} strokeLinejoin="round" />
+      <circle cx={x(Math.max(360, now))} cy={12} r={2.5} fill={bad ? "var(--fault)" : "var(--leaf)"} />
+    </svg>
+  );
+}
+
 function SiteMap({ pumps, village, bounds, layer }: { pumps: Pump[]; village: Village | null; bounds: Bounds | null; layer: "true" | "crops" }) {
   const W = 1000;
   const H = 1000;
@@ -39,7 +61,7 @@ function SiteMap({ pumps, village, bounds, layer }: { pumps: Pump[]; village: Vi
         {village?.plots.features.map((f) => {
           const ring = f.geometry.coordinates[0];
           const d = ring.map(([lo, la], i) => `${i ? "L" : "M"}${x(lo).toFixed(1)},${y(la).toFixed(1)}`).join("") + "Z";
-          return <path key={f.properties.plot_id} d={d} fill={PUMP_COLOR[f.properties.pump_id] ?? "#fff"} fillOpacity={f.properties.booking ? 0.75 : 0.28} stroke="#0b1110" strokeWidth={1.2} />;
+          return <path key={f.properties.plot_id} d={d} fill={PUMP_COLOR[f.properties.pump_id] ?? "#fff"} fillOpacity={f.properties.booking ? 0.6 : 0.08} stroke={PUMP_COLOR[f.properties.pump_id] ?? "#fff"} strokeOpacity={0.95} strokeWidth={1.6} strokeLinejoin="round" />;
         })}
         {pumps.map((p) => (
           <g key={p.pump_id} transform={`translate(${x(p.lon)},${y(p.lat)})`}>
@@ -141,6 +163,7 @@ export default function ClusterPage() {
                     <span className="text-[13px] text-mist" lang="hi">{HEALTH[p.health.status].hi}</span>
                   </div>
                   <div className="text-[12px] text-mist">{p.health.reason_en}</div>
+                  {data && <Heartbeat h={p.health} clock={data.clock} />}
                   <div className="text-[11px] text-mist/80">{p.health.source}</div>
                 </div>
                 <div className="flex flex-col gap-1">
