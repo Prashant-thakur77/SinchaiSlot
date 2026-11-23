@@ -195,7 +195,8 @@ Without Docker: `uv sync -p 3.12`, `make api`, and in `apps/web`: `pnpm install 
 Demo: open http://localhost:3000, press **Run 2 March live** or **Jump to 13:45**. Screens: Village
 Twin, Planner, Saathi phone (missed call → Maithili callback → press 1), Altivar drive (inject a fault,
 follow the Copilot), Rasid ledger (verify the chain, build a claim pack), Prayogshala (all numbers),
-Agent trace, Hisaab, Saur Mitra app (`/mitra`).
+Agent trace, Hisaab, Pump cluster (three pumps on a Sentinel-2 image, data health, move an overflow booking to a
+neighbour), Pump Passport (`/passport/P1`, one-page PDF), Saur Mitra app (`/mitra`: soil card, pay after harvest).
 
 ## What is in the box
 | Module | What it does | Where |
@@ -209,6 +210,12 @@ Agent trace, Hisaab, Saur Mitra app (`/mitra`).
 | Channels and speech | IVR callback, WhatsApp, USSD, ASR/TTS, all with local simulators | `services/channels`, `services/speech` |
 | Paani Khata | Diesel and electric sellers as overflow agents | `services/api` |
 | Prayogshala | Village twin, policies A-D, ablations, Monte Carlo, sensitivity | `services/sim` |
+| Cluster | Three pumps on one forecast, booking transfer within channel reach, data-health monitor | `services/api/sinchai_api/cluster.py`, `services/edge` |
+| Pump Passport | Utilisation, uptime, faults, receipts, repayment record, scorecard, PDF | `services/rasid` |
+| Harvest-linked repayment | Part now, rest after harvest at the KCC rate; limit grows with on-time repayment | `services/rasid` |
+| Soil and water | Soil Health Card reader (texture sets TAW), borewell water-quality card, recharge pairing | `services/planner`, `services/jalprahari` |
+| Bharat-VISTAAR handoff | Agronomy questions go to the national advisory line with the farm context | `services/channels` |
+| Sentinel-2 crop map | NDVI phenology classes and a true-colour basemap from 30 clear scenes | `services/data` |
 | Web | Story page, dashboards, phone simulator, Saur Mitra PWA | `apps/web` |
 
 More: `docs/architecture.md`, `docs/agents.md`, `docs/optimiser.md`, `docs/data.md`, `docs/edge-protocol.md`,
@@ -216,6 +223,8 @@ More: `docs/architecture.md`, `docs/agents.md`, `docs/optimiser.md`, `docs/data.
 
 ## Data labels
 Weather and forecasts: **REAL** (NASA POWER 2016-2025; Open-Meteo archived ECMWF IFS, GFS, ICON 2022-2025).
+Satellite: **REAL** Sentinel-2 L2A imagery (Jun 2024-May 2025); crop-season classes **DERIVED**, not validated
+against field labels.
 Village, bookings, pump and drive telemetry, ledger history: **SIMULATED**. Prices, factors, capex,
 subsidy rules: **PUBLISHED** with source URLs in `packages/schemas/sinchai_schemas/constants.yaml`.
 Modelling values not found in a publication are marked **ASSUMPTION** there ({len(assumptions)} of them) and the
@@ -228,6 +237,9 @@ ones that move the headline are swept in the sensitivity analysis.
 - Samastipur pilot block CGWB category (assumed Safe) and the 450 mm annual extraction cap.
 - Maithili and Bhojpuri phrasing (native-speaker review pending, docs/decisions/0005).
 - Real Indic ASR accuracy (no hosted speech service configured).
+- Bharat-VISTAAR integration API (no public API found; the HTTP adapter is a placeholder shape).
+- Recharge shaft yield and cost (CGWB planning norm from a Rajasthan block plan, not Bihar).
+- Site coordinates: the configured point is Samastipur town; re-run the crop map on the pilot cluster.
 """
 
 
@@ -248,6 +260,9 @@ Facts only. Final answers are written by the team. Every number below is copied 
   groundwater budget; missed-call booking in Maithili/Hindi/Bhojpuri; verified receipts.
 - Modules: Saathi, Surya Planner, Saur Mitra Copilot, Jal Prahari, Rasid, Paani Khata, Anudan Meter, Hisaab,
   Prayogshala.
+- Extras: multi-pump cluster with booking transfer, Pump Passport (scorecard, PDF), data-health monitor,
+  harvest-linked repayment, Soil Health Card reader, borewell water-quality card, recharge pairing,
+  Bharat-VISTAAR handoff, Sentinel-2 crop-season map.
 
 ## Architecture
 - Diagram: `docs/architecture.png` / `docs/architecture.svg`; description `docs/architecture.md`.
@@ -255,10 +270,10 @@ Facts only. Final answers are written by the team. Every number below is copied 
 
 ## Technologies / third-party services
 - Python 3.12, FastAPI, Pydantic, SQLAlchemy, Postgres 16 + TimescaleDB + PostGIS, Redis, Mosquitto MQTT.
-- HiGHS (MILP), LightGBM, pvlib, scikit-learn (Isolation Forest, TF-IDF), pymodbus, paho-mqtt, ReportLab.
+- HiGHS (MILP), LightGBM, pvlib, rasterio (Sentinel-2 COG reads), scikit-learn (Isolation Forest, TF-IDF), pymodbus, paho-mqtt, ReportLab.
 - Next.js 16, React 19, Tailwind 4, GSAP, Lenis, Motion, d3; Playwright + axe.
 - ESP32 (PlatformIO, Arduino): ModbusMaster, PubSubClient, ArduinoJson, mbedTLS HMAC.
-- Data APIs: NASA POWER, Open-Meteo historical forecast API. Optional adapters: hosted LLM, hosted Indic speech,
+- Data APIs: NASA POWER, Open-Meteo historical forecast API, Earth Search STAC (Sentinel-2 L2A on AWS). Optional adapters: hosted LLM, hosted Indic speech,
   WhatsApp Cloud API, IVR provider, UPI deep links (test mode).
 
 ## Data (real / sample / simulated)

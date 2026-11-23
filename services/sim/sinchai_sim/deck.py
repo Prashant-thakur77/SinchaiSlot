@@ -101,13 +101,13 @@ def build_deck(v: dict, out_dir: Path) -> Path:
 <tr><td>Water per m³</td><td>Farmer</td><td class="d">{v['rsm3_D']}/m³</td></tr>
 <tr><td>Mill, chaff cutter, battery packs</td><td>Mill and battery users</td><td class="d">{v['rev_mill_D']} mill · {v['rev_batt_D']} packs</td></tr>
 <tr><td>Platform fee (revenue share)</td><td>Owner / FPO / operator</td><td class="d">{v['platform_D']}</td></tr>
-<tr><td>Verification receipts</td><td>CSR, lenders, programmes</td><td class="d">per receipt (to price)</td></tr>
+<tr><td>Verification receipts and Pump Passport</td><td>CSR, lenders, programmes</td><td class="d">per receipt (to price)</td></tr>
 <tr><td>Retrofit kit</td><td>Owner via financing</td><td class="d">vendor quote pending</td></tr></table>
 <p style="margin-top:28px;font-size:26px">Total revenue {v['rev_D']} vs {v['rev_B']} baseline · Saur Mitra {v['mitra_D']}/month · payback {v['payback_D']} years on a ₹{C.get('unit_capex_rs'):,} unit.</p>""", page=12, note="ASSUMPTION prices swept in the sensitivity analysis")
 
     s("""<div class="kick">Rollout</div><h2>Start on pumps that already exist.</h2>
 <ol style="margin-top:48px;padding-left:40px"><li>Pilot: retrofit existing shared pumps in Samastipur with drive telemetry and the edge controller.</li>
-<li>Operators: offer the platform to per-m³ operators and Schneider's Access to Energy partners.</li>
+<li>Operators: run pumps as clusters (bookings move to a neighbour when one is full or faulted) for per-m³ operators and Schneider's Access to Energy partners.</li>
 <li>District and state: propose the Anudan Meter pilot (receipts as diesel-subsidy claims) to the agriculture department.</li>
 <li>National: PM-KUSUM pumps via the optional universal controller; farmer IDs.</li></ol>""", page=13)
 

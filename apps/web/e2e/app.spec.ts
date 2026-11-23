@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const SCREENS = ["/", "/twin", "/planner", "/phone", "/drive", "/ledger", "/lab", "/trace", "/hisaab", "/mitra"];
+const SCREENS = ["/", "/twin", "/planner", "/phone", "/drive", "/ledger", "/lab", "/trace", "/hisaab", "/mitra", "/cluster", "/passport/P2"];
 
 test.beforeAll(async ({ request }) => {
   await request.post("/api/demo/reset");
@@ -50,6 +50,21 @@ test("Saur Mitra app is Hindi first and switches to English @mobile", async ({ p
   await expect(page.getByText("सौर मित्र")).toBeVisible();
   await page.getByRole("button", { name: "English" }).click();
   await expect(page.getByText("Saur Mitra", { exact: true })).toBeVisible();
+});
+
+test("cluster shows three pumps and a Pump Passport with a scorecard", async ({ page }) => {
+  await page.goto("/cluster");
+  await expect(page.getByText("Chakhaji Saur Pump 3 (simulated)")).toBeVisible();
+  await page.getByRole("link", { name: "Pump Passport →" }).first().click();
+  await expect(page.getByRole("img", { name: /Scorecard \d+ of 100/ })).toBeVisible();
+});
+
+test("Saur Mitra reads the sample soil card and applies it @mobile", async ({ page }) => {
+  await page.goto("/mitra");
+  await page.getByRole("button", { name: "मिट्टी" }).click();
+  await page.getByRole("button", { name: "नमूना कार्ड पढ़ें" }).click();
+  await page.getByRole("button", { name: "खेत पर लागू करें" }).click();
+  await expect(page.getByRole("status")).toContainText("72 mm");
 });
 
 test("ledger chain verifies from the UI", async ({ page }) => {

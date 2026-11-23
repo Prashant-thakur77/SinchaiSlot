@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { OPERATOR_TOKEN, postJSON, useApi } from "@/lib/api";
 
 type Booking = { id: string; pump_id: string; farmer_id: string; farmer: string; tenant: boolean; crop: string | null; slot_start: string | null; slot_end: string | null; m3: number; m3_delivered: number; price_rs: number; status: string; paid: boolean; channel: string };
@@ -23,7 +23,7 @@ export default function MitraPage() {
   const t = T[lang];
   const [tab, setTab] = useState<"today" | "cash" | "alerts" | "fix" | "soil">("today");
   const { data: allBookings, error, reload } = useApi<Booking[]>("/api/bookings", 4000);
-  const bookings = allBookings?.filter((b) => (b.pump_id ?? "P1") === "P1");
+  const bookings = useMemo(() => allBookings?.filter((b) => (b.pump_id ?? "P1") === "P1"), [allBookings]);
   const { data: budget } = useApi<Budget>("/api/budget", 8000);
   const { data: drive } = useApi<Drive>("/api/drive", 3000);
   const { data: issues } = useApi<Issue[]>("/api/issues", 8000);
