@@ -80,7 +80,7 @@ export default function LedgerPage() {
           </dl>
 
           <section aria-label="Integrity">
-            <h2 className="text-[13px] font-medium text-fog">Is anything edited?</h2>
+            <h2 className="text-[18px] font-semibold text-ink">Is anything edited?</h2>
             <p className="mt-1 text-[13px] text-mist">Each receipt carries the SHA-256 of the one before it. Change one litre on one receipt and every hash after it breaks.</p>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <Btn tone="sun" onClick={runVerify} disabled={scan !== null}>{scan !== null ? "Checking…" : "Verify the whole chain"}</Btn>
@@ -111,7 +111,7 @@ export default function LedgerPage() {
           </section>
 
           <section aria-label="Claim pack for a funder">
-            <h2 className="text-[13px] font-medium text-fog">Anudan Meter: turn receipts into a claim</h2>
+            <h2 className="text-[18px] font-semibold text-ink">Anudan Meter: turn receipts into a claim</h2>
             <form className="mt-2 flex flex-wrap items-end gap-3 text-[13px]" onSubmit={async (e) => { e.preventDefault(); setClaim(await getJSON<Claim>(`/api/ledger/claim?from_date=${from}&to_date=${to}`)); }}>
               <label className="flex flex-col gap-1 text-mist">From<input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="rounded border border-soil bg-night px-2 py-1 text-fog" /></label>
               <label className="flex flex-col gap-1 text-mist">To<input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="rounded border border-soil bg-night px-2 py-1 text-fog" /></label>
@@ -121,7 +121,7 @@ export default function LedgerPage() {
             </form>
             {claim && (
               <div className="paper mt-4 rounded-md p-4 text-ink">
-                <div className="flex items-baseline justify-between"><span className="font-serif text-lg italic">Claim</span><span className="num text-[12px] opacity-70">{claim.funder} · {claim.period.join(" → ")}</span></div>
+                <div className="flex items-baseline justify-between"><span className="font-display text-[22px]">Claim</span><span className="num text-[12px] opacity-70">{claim.funder} · {claim.period.join(" → ")}</span></div>
                 <dl className="num mt-2 grid grid-cols-2 gap-y-1 text-[13px]">
                   <dt className="opacity-70">Water</dt><dd className="text-right">{fmt.n(claim.totals.m3)} m³</dd>
                   <dt className="opacity-70">Diesel avoided</dt><dd className="text-right">{fmt.n(claim.totals.diesel_l_avoided, 1)} L</dd>
@@ -136,7 +136,7 @@ export default function LedgerPage() {
 
         {/* Right: the roll */}
         <section aria-label="Latest water receipts" className="relative min-w-0">
-          <h2 className="mb-4 text-[13px] font-medium text-fog">The roll, newest first</h2>
+          <h2 className="mb-4 text-[18px] font-semibold text-ink">The roll, newest first</h2>
           <ol className="relative mx-auto flex max-w-[440px] flex-col gap-4 pl-14">
             <span className="absolute bottom-6 left-[19px] top-6 w-px bg-[repeating-linear-gradient(to_bottom,var(--sun)_0_6px,transparent_6px_10px)] opacity-60" aria-hidden />
             {scan !== null && (
@@ -154,7 +154,7 @@ export default function LedgerPage() {
       </div>
 
       <section aria-label="All receipts" className="mt-10">
-        <h2 className="mb-2 text-[13px] font-medium text-fog">All receipts ({data?.total ?? "–"}) <span className="text-mist">· diesel counterfactual 1 L/h, 2.6444 kg CO₂/L</span> <SourceTag kind="published" /></h2>
+        <h2 className="mb-2 text-[18px] font-semibold text-ink">All receipts ({data?.total ?? "–"}) <span className="text-mist">· diesel counterfactual 1 L/h, 2.6444 kg CO₂/L</span> <SourceTag kind="published" /></h2>
         <div className="max-h-[420px] overflow-auto border-y border-soil" tabIndex={0} role="region" aria-label="All receipts table">
           <table className="num w-full min-w-[760px] text-[12px]">
             <thead className="sticky top-0 bg-night text-left text-mist">

@@ -108,7 +108,7 @@ export default function TwinPage() {
           <div className="relative flex flex-wrap items-start justify-between gap-3 px-5 pt-4">
             <div>
               <div className="flex items-center gap-2 text-[12px] text-mist">Command area · pump P1 <SourceTag kind="simulated" /></div>
-              <div className="mt-1 font-display text-[22px] font-medium leading-tight md:text-[26px]">
+              <div className="mt-1 h-lead">
                 {running && cur?.farmer ? <>Water is going to <span className="text-water-ink">{cur.farmer}</span></> : cur?.action === "mill" ? <>The sun is turning the <span className="text-sun-ink">flour mill</span></> : cur?.action === "battery" ? <>Leftover sun is <span className="text-sun-ink">charging battery packs</span></> : <>{village ? village.plots.features.length : "–"} plots, one pump</>}
               </div>
             </div>
@@ -145,7 +145,7 @@ export default function TwinPage() {
         {/* Energy: where the sun is going right now */}
         <section aria-label="Energy now" className="flex min-w-0 flex-col rounded-[20px] border border-soil bg-night-2 p-4">
           <div className="flex items-baseline justify-between gap-2">
-            <h2 className="text-[13px] font-medium text-fog">Where the sun is going</h2>
+            <h2 className="text-[18px] font-semibold text-ink">Where the sun is going</h2>
             <span className="num text-[12px] text-mist">drive telemetry, 20 s steps</span>
           </div>
           <div className="mt-1 flex items-baseline gap-2">
@@ -178,7 +178,7 @@ export default function TwinPage() {
 
         {/* Log */}
         <details className="min-w-0 xl:col-span-2">
-          <summary className="cursor-pointer py-1 font-display text-[18px]">What happened today <span className="text-[14px] text-mist">({feed.length})</span></summary>
+          <summary className="cursor-pointer py-1 text-[18px] font-semibold">What happened today <span className="text-[14px] text-mist">({feed.length})</span></summary>
           <ol className="num flex mt-2 max-h-64 flex-col overflow-y-auto border-l border-soil text-[14px]" aria-live="polite" tabIndex={0}>
             {feed.length === 0 && <li className="pl-4 text-mist">The day has not started. Click the day bar above, or press Jump to 13:45.</li>}
             {feed.map((f, i) => (

@@ -64,12 +64,12 @@ export function Shell({ title, children, actions }: { title: string; children: R
       <nav aria-label="Main" className="sticky top-0 z-20 hidden h-dvh w-[208px] shrink-0 flex-col border-r border-soil bg-night md:flex">
         <Link href="/" className="flex items-center gap-2 px-4 py-4">
           <Mark />
-          <span className="font-display text-[20px] font-medium">SinchaiSlot</span>
+          <span className="font-display text-[24px]">SinchaiSlot</span>
         </Link>
         <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-3 pt-2">
           {GROUPS.map((g) => (
             <div key={g}>
-              <div className="px-3 pb-1 font-display text-[14px] text-mist">{g}</div>
+              <div className="px-3 pb-1 text-[13px] font-medium text-mist">{g}</div>
               <ul className="flex flex-col gap-0.5">
                 {NAV.filter((n) => n.group === g).map((n) => {
                   const on = path === n.href;
@@ -107,7 +107,7 @@ export function Shell({ title, children, actions }: { title: string; children: R
           <div className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-3">
             <Motif name={here?.motif ?? "sun"} size={68} />
             <div className="min-w-0 flex-1 basis-60">
-              <h1 className="font-display text-[26px] font-medium leading-tight md:text-[32px]">{title}</h1>
+              <h1 className="h-page">{title}</h1>
               {here && <p className="mt-0.5 max-w-[62ch] text-[15px] text-mist">{here.what}</p>}
             </div>
             {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}

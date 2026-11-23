@@ -64,7 +64,7 @@ export default function PassportView({ id }: { id: string }) {
           <article className="paper perforated relative min-w-0 rounded-b-lg px-6 pb-6 pt-7 text-ink shadow-[0_24px_50px_-20px_rgba(110,80,30,.22)] xl:sticky xl:top-28 xl:self-start" aria-label={`Pump Passport ${p.pump.pump_id}`}>
             <div className="flex items-baseline justify-between gap-3 border-b border-ink/15 pb-3">
               <div>
-                <div className="font-serif text-2xl italic">Pump Passport</div>
+                <div className="h-lead">Pump Passport</div>
                 <div className="num text-[12px] text-ink/60">{p.pump.pump_id} · {p.pump.name}</div>
               </div>
               <span className="num rounded border border-ink/25 px-1.5 text-[12px] tracking-wider text-ink/60">SIMULATED</span>

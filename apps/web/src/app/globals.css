@@ -63,8 +63,8 @@
   --color-chaff: var(--chaff);
   --color-rose: var(--rose);
   --color-fault: var(--fault);
-  --font-display: var(--font-eczar);
-  --font-serif: var(--font-eczar);
+  --font-display: var(--font-yatra);
+  --font-serif: var(--font-mukta);
   --font-sans: var(--font-mukta);
   --font-mono: ui-monospace, monospace;
   --font-deva: var(--font-mukta);
@@ -213,7 +213,15 @@ body {
 
 .art-sunpos { transform: translate(1065px, 232px); }
 /* Wide, short screens: the opening text sits where the left trees would be. */
-@media (min-aspect-ratio: 17/10) { .art-lefttrees { display: none; } }
+@media (min-aspect-ratio: 3/2) { .art-lefttrees { display: none; } }
 @media (max-aspect-ratio: 1/1), (max-width: 767px) { .art-parrot { display: none; } }
 @media (max-aspect-ratio: 1/1) { .art-sunpos { transform: translate(860px, 232px); } }
 @media (max-width: 767px) { .art-sunpos { transform: translate(760px, 215px) scale(0.82); } }
+
+/* Heading scale. Yatra One is a painted-sign face with one weight: headings only, 22px and up. */
+.h-hero, .h-chapter, .h-page, .h-lead { font-family: var(--font-yatra), var(--font-mukta), serif; font-weight: 400; letter-spacing: -0.018em; word-spacing: -0.06em; text-wrap: balance; }
+.h-hero { font-size: clamp(2.6rem, min(5.7vw, 9.4vh), 5.25rem); line-height: 1.06; }
+.h-chapter { font-size: clamp(2.1rem, 4.3vw, 3.9rem); line-height: 1.12; }
+.h-page { font-size: clamp(1.9rem, 2.9vw, 2.6rem); line-height: 1.12; }
+.h-lead { font-size: clamp(1.45rem, 2.2vw, 2rem); line-height: 1.2; }
+@media (max-width: 767px) { .h-hero { font-size: clamp(2.3rem, 11vw, 3.1rem); } }

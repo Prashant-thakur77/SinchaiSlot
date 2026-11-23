@@ -41,7 +41,7 @@ export default function HisaabPage() {
     <Shell title="Hisaab: ask the ledger">
       <div className="mx-auto flex max-w-4xl flex-col gap-4">
         <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); ask(q); }}>
-          <input value={q} onChange={(e) => setQ(e.target.value)} aria-label="Question about the ledger" className="deva min-w-0 flex-1 border-b-2 border-sun/60 bg-transparent px-1 py-2.5 font-display text-[clamp(1.1rem,2.2vw,1.6rem)] outline-none focus:border-sun" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} aria-label="Question about the ledger" className="deva min-w-0 flex-1 border-b-2 border-sun/60 bg-transparent px-1 py-2.5 text-[clamp(1.1rem,2.2vw,1.6rem)] outline-none focus:border-sun" />
           <Btn type="submit" tone="sun" disabled={busy}>{busy ? "…" : "Ask"}</Btn>
         </form>
         <div className="flex flex-wrap gap-1.5">
@@ -52,10 +52,10 @@ export default function HisaabPage() {
         {a && (
           <article className="paper perforated relative rounded-b-lg px-6 pb-6 pt-7 text-ink shadow-[0_24px_50px_-20px_rgba(110,80,30,.22)]" aria-live="polite">
             <div className="flex items-baseline justify-between gap-3 border-b border-ink/15 pb-2">
-              <span className="font-serif text-xl italic">Hisaab</span>
+              <span className="h-lead">Hisaab</span>
               <span className="text-[12px] text-ink/60">read-only, row-limited SQL over verified receipts</span>
             </div>
-            <p className="deva mt-3 font-serif text-[15px] italic text-ink/70">{q}</p>
+            <p className="deva mt-3 text-[16px] text-ink/70">{q}</p>
             <p className="mt-2 bg-[repeating-linear-gradient(to_bottom,transparent_0_31px,rgba(19,32,26,.12)_31px_32px)] text-[22px] leading-[32px]">{a.answer}</p>
             {numericCol >= 0 && a.rows && a.rows.length > 1 && (
               <ul className="mt-4 flex flex-col gap-1.5">

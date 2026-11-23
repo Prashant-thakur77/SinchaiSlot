@@ -9,7 +9,7 @@ export function Receipt({ r, fresh = false, stamp = "verified" }: { r: LedgerRow
       aria-label={`Receipt ${r.receipt_id}`}
     >
       <div className="flex items-baseline justify-between gap-2">
-        <span className="font-serif text-lg italic">Rasid</span>
+        <span className="font-display text-[22px]">Rasid</span>
         <span className="num text-[11px] opacity-70">{r.receipt_id}</span>
       </div>
       <div className="num mt-1 text-[11px] opacity-70">

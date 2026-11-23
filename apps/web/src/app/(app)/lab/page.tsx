@@ -265,7 +265,7 @@ function Finding({ kicker, children }: { kicker: string; children: React.ReactNo
   return (
     <span className="block py-1">
       <span className="block text-[12px] font-normal text-mist">{kicker}</span>
-      <span className="mt-1 block font-serif text-[19px] font-normal leading-snug text-ink">{children}</span>
+      <span className="mt-1 block text-[19px] font-semibold leading-snug text-ink">{children}</span>
     </span>
   );
 }

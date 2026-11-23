@@ -74,7 +74,7 @@ export default function PlannerPage() {
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <div className="flex items-center gap-2 text-[12px] text-mist">Plan v{snap?.plan_version ?? "–"} · two-stage stochastic MILP over P10 / P50 / P90 sun <SourceTag kind="model" /></div>
-              <h2 className="mt-1 font-display text-[clamp(1.6rem,2.6vw,2.3rem)] font-medium leading-tight">
+              <h2 className="mt-1 text-[clamp(1.5rem,2.3vw,2rem)] font-semibold leading-tight">
                 Water first: <span className="text-water-ink"><Roll value={fmt.n(snap?.summary.water_m3_p50, 0)} /> m³</span> planned, then <span className="text-sun-ink"><Roll value={fmt.n((snap?.summary.mill_kwh_p50 ?? 0) + (snap?.summary.chaff_kwh_p50 ?? 0) + (snap?.summary.battery_kwh_p50 ?? 0), 1)} /> kWh</span> for the mill and batteries.
               </h2>
             </div>
@@ -141,7 +141,7 @@ export default function PlannerPage() {
 
         {/* Plan changes as a dated log */}
         <aside aria-label="Why the plan changed" className="min-w-0">
-          <h2 className="text-[13px] font-medium text-fog">Why the plan changed</h2>
+          <h2 className="text-[18px] font-semibold text-ink">Why the plan changed</h2>
           {!snap?.diffs.length && <p className="mt-2 text-sm text-mist">No re-plans yet. At 13:40 the nowcast replaces the afternoon forecast with what the sky is actually doing; click 13:45 on the day bar.</p>}
           <ol className="mt-3 flex flex-col border-l border-soil">
             {[...(snap?.diffs ?? [])].reverse().map((d) => (

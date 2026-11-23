@@ -60,7 +60,7 @@ export function Panel({ title, right, children, className = "" }: { title?: Reac
     <section className={`min-w-0 rounded-[20px] border border-soil bg-night-2 ${className}`}>
       {(title || right) && (
         <header className="flex items-center justify-between gap-3 border-b border-soil px-5 py-3">
-          <h2 className="font-display text-[18px]">{title}</h2>
+          <h2 className="text-[18px] font-semibold">{title}</h2>
           <div className="flex items-center gap-2">{right}</div>
         </header>
       )}
@@ -144,7 +144,7 @@ export function Readout({ label, value, unit, tone = "text-ink", sub, source }: 
   return (
     <div className="min-w-0 px-4 py-3 first:pl-0">
       <div className="flex items-center gap-2 text-[13px] text-mist">{label}{source && <SourceTag kind={source} />}</div>
-      <div className={`mt-1.5 flex items-baseline gap-1 font-display text-[28px] leading-none md:text-[34px] ${tone}`}>
+      <div className={`mt-1.5 flex items-baseline gap-1 font-medium text-[28px] leading-none md:text-[34px] ${tone}`}>
         <Roll value={value} />
         {unit && <span className="whitespace-nowrap text-sm text-mist">{unit}</span>}
       </div>

@@ -88,7 +88,7 @@ export function DayBar() {
       <div className="pointer-events-none absolute inset-0 transition-[background] duration-700" style={{ background: `linear-gradient(90deg, transparent, ${skyAt(now, data?.cloud_applied)} ${((now - DAY0) / (DAY1 - DAY0)) * 100}%, transparent)` }} aria-hidden />
       <div className="relative flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 md:px-8">
         <div className="num flex items-baseline gap-2 text-fog" aria-live="polite">
-          <span className="font-display text-2xl leading-none text-sun-ink md:text-[28px]">{data?.clock ?? "--:--"}</span>
+          <span className="font-medium text-2xl leading-none text-sun-ink md:text-[28px]">{data?.clock ?? "--:--"}</span>
           <span className="hidden text-[13px] text-mist sm:inline">{data?.day} · real sun</span>
           {data?.cloud_applied && <span className="rounded bg-water/15 px-1.5 py-px text-[12px] text-water-ink">nowcast</span>}
         </div>

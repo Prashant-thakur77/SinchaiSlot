@@ -59,7 +59,7 @@ export default function DrivePage() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-[12px] font-semibold tracking-wide text-se-ink">Schneider Electric</div>
-                <div className="font-display text-xl">Altivar Solar ATV320</div>
+                <div className="text-xl font-semibold">Altivar Solar ATV320</div>
               </div>
               <div className="text-right text-[12px] text-mist">
                 Modbus ID 1 · 19200 8E1

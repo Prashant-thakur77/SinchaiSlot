@@ -192,7 +192,7 @@ export default function Home() {
 
       <a href="#story" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-sun focus:px-3 focus:py-1 focus:text-ink">Skip to the story</a>
       <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-soil/60 bg-night/85 px-5 py-3 backdrop-blur-md md:px-10">
-        <Link href="/" className="flex items-center gap-2 text-ink"><Mark /> <span className="font-display text-lg font-medium">SinchaiSlot</span></Link>
+        <Link href="/" className="flex items-center gap-2 text-ink"><Mark /> <span className="font-display text-[22px]">SinchaiSlot</span></Link>
 <div ref={hudRef} className="num pointer-events-none hidden items-center gap-3 text-[12px] text-mist lg:motion-safe:flex" aria-hidden>
         <svg width="64" height="26" viewBox="0 0 64 26" className="overflow-visible">
           <path d="M4 24 Q32 -8 60 24" fill="none" stroke="var(--soil)" strokeWidth="1.5" strokeDasharray="2 3" />
@@ -211,7 +211,7 @@ export default function Home() {
       {/* HERO */}
       <section className="hero relative z-10 flex min-h-[100svh] flex-col overflow-hidden bg-gradient-to-b from-[#f9dfa8] via-night to-night" aria-label="Introduction">
         <div className="relative z-10 mx-auto w-full max-w-[1240px] px-5 pt-28 md:px-10 md:pt-[max(5.2rem,14vh)]">
-          <h1 className="max-w-[17ch] font-display text-[clamp(2.3rem,min(5vw,8.2vh),4.4rem)] max-md:text-[clamp(2.1rem,9.6vw,2.8rem)] font-medium leading-[1.04]">
+          <h1 className="max-w-[15ch] h-hero">
             One solar pump, shared well, waters a whole village.
           </h1>
           <p className="mt-5 max-w-[46ch] text-[17px] leading-relaxed text-fog md:text-[19px]">
@@ -229,7 +229,7 @@ export default function Home() {
       {/* 06:00 PROBLEM */}
       <section id="story" className="problem relative z-10 mx-auto max-w-[1400px] px-5 py-[15vh] md:px-10" aria-labelledby="t-problem">
         <Clock t="06:00" label="Dawn, Samastipur" />
-        <h2 id="t-problem" className="mt-8 max-w-5xl font-display text-[clamp(1.9rem,4vw,3.6rem)] font-medium leading-[1.14] ">
+        <h2 id="t-problem" className="mt-8 max-w-5xl h-chapter ">
           {`Solar pumps put about ${ceew ? Math.round(ceew.value * 100) : "…"}% of their sunshine to work. Next door, a tenant farmer pays a diesel seller ₹${dieselRate?.value ?? "…"} an hour for the same water.`
             .split(" ")
             .map((w, i) => <span key={i} className="fill-word">{w} </span>)}
@@ -254,7 +254,7 @@ export default function Home() {
           <div>
             <Motif name="parrot" size={120} />
             <div className="mt-6"><Clock t="10:00" label="Ramesh gives a missed call" dark /></div>
-            <h2 id="t-book" className="mt-8 font-display text-[clamp(1.8rem,3.6vw,3.2rem)] font-medium leading-[1.14] ">
+            <h2 id="t-book" className="mt-8 h-chapter ">
               The call is free. Saathi calls back in Maithili, already knowing what his wheat needs.
             </h2>
             <p className="mt-6 max-w-xl text-[16px] leading-relaxed">
@@ -287,7 +287,7 @@ export default function Home() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <Clock t="13:40" label="The day replays: watch the cloud arrive at 13:40" />
-              <h2 id="t-cloud" className="mt-4 max-w-3xl font-display text-[clamp(1.5rem,3vw,2.8rem)] font-medium leading-[1.14] ">
+              <h2 id="t-cloud" className="mt-4 max-w-3xl h-page ">
                 The forecast said sun. The sky said otherwise. The plan moves before the water stops.
               </h2>
             </div>
@@ -369,7 +369,7 @@ export default function Home() {
           <div>
             <Motif name="fish" size={120} />
             <div className="mt-6"><Clock t="18:00" label="The pump stops; the books close" /></div>
-            <h2 id="t-receipt" className="mt-8 font-display text-[clamp(1.8rem,3.6vw,3.2rem)] font-medium leading-[1.14] ">
+            <h2 id="t-receipt" className="mt-8 h-chapter ">
               Every booking leaves a receipt a funder can pay against.
             </h2>
             <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-fog">
@@ -384,7 +384,7 @@ export default function Home() {
       {/* PROOF */}
       <section id="proof" className="relative z-10 mx-auto max-w-[1400px] px-5 py-[14vh] md:px-10" aria-labelledby="t-proof">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 id="t-proof" className="font-display text-[clamp(1.8rem,3.6vw,3.2rem)] font-medium ">The proof</h2>
+          <h2 id="t-proof" className="h-chapter ">The proof</h2>
           <p className="max-w-xl text-[13px] text-mist">
             {proof ? `${proof.setup.runs_per_policy} simulated years per policy on real NASA POWER weather (${proof.setup.years.join(", ")}, held out), real archived forecasts, ${proof.setup.seeds} synthetic villages. Bands are P10 to P90.` : "Loading reports/proof.json…"}{" "}
             <SourceTag kind="simulated" />
@@ -420,7 +420,7 @@ export default function Home() {
       {/* SCHNEIDER */}
       <section id="schneider" className="relative z-10 bg-night-2" aria-labelledby="t-se">
         <div className="mx-auto max-w-[1400px] px-5 py-[12vh] md:px-10">
-          <h2 id="t-se" className="font-display text-[clamp(1.8rem,4vw,3.4rem)] font-medium ">
+          <h2 id="t-se" className="h-chapter ">
             Remove the <span className="text-se-ink">Altivar Solar</span> drive and nothing works.
           </h2>
           <ol className="relative mt-12 grid gap-10 md:grid-cols-3 md:gap-0">
@@ -433,7 +433,7 @@ export default function Home() {
               <li key={layer} className="relative pl-8 md:pl-0 md:pr-10 md:pt-8">
                 <span className={`absolute left-0 top-0 h-4 w-4 rounded-full ring-4 ring-night-2 ${dot}`} aria-hidden />
                 <div className="text-[13px] text-mist">{layer}</div>
-                <div className="mt-1 font-display text-2xl">{name}</div>
+                <div className="mt-1 h-lead">{name}</div>
                 <p className="mt-3 max-w-sm text-[16px] leading-relaxed text-fog">{text}</p>
               </li>
             ))}
@@ -473,7 +473,7 @@ function Row({ what, to, dec = 0, prefix = "", unit, base, tone = "text-sun-ink"
     <li className="grid items-baseline gap-x-8 gap-y-1 border-b border-dashed border-fog/25 py-5 md:grid-cols-[220px_minmax(0,1fr)_minmax(0,320px)] md:py-7">
       <div className="text-[14px] text-fog">{what}</div>
       <div className={`num flex items-baseline gap-3 leading-none ${tone}`}>
-        <span className="font-display text-[clamp(2.8rem,5.4vw,5rem)] ">{prefix}<span className="count" data-to={to} data-dec={dec}>{to.toLocaleString("en-IN", { maximumFractionDigits: dec, minimumFractionDigits: dec })}</span></span>
+        <span className="text-[clamp(2.8rem,5.4vw,5rem)] font-medium ">{prefix}<span className="count" data-to={to} data-dec={dec}>{to.toLocaleString("en-IN", { maximumFractionDigits: dec, minimumFractionDigits: dec })}</span></span>
         <span className="text-[15px] text-mist">{unit}</span>
       </div>
       <div className="num text-[13px] leading-relaxed text-mist md:text-right">{base}</div>
