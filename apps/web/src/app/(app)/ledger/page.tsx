@@ -60,7 +60,7 @@ export default function LedgerPage() {
       <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
         {/* Left: the books */}
         <div className="flex min-w-0 flex-col gap-6 xl:sticky xl:top-28 xl:self-start">
-          <div>
+          <div className="min-h-[150px] md:min-h-[170px]">
             <div className="text-[12px] text-mist">Solar water on receipts, each chained to the one before</div>
             <div className="num mt-2 text-[clamp(3.4rem,7vw,6.5rem)] leading-none text-water"><Roll value={fmt.n(s?.m3)} /><span className="ml-2 text-lg text-mist">m³</span></div>
             <div className="num mt-2 text-[12px] text-mist">{fmt.n(s?.receipts)} receipts · 3 pumps{s ? ` · ${s.first?.slice(0, 10)} to ${s.last?.slice(0, 10)}` : ""} <SourceTag kind="simulated" /></div>
@@ -142,6 +142,7 @@ export default function LedgerPage() {
             {scan !== null && (
               <span className="pointer-events-none absolute -left-2 -right-2 z-10 h-[3px] rounded-full bg-sun shadow-[0_0_24px_6px_rgba(245,184,61,.45)] transition-[top] duration-150" style={{ top: `${(scan / Math.max(1, roll.length)) * 100}%` }} aria-hidden />
             )}
+            {!data && [0, 1, 2].map((k) => <li key={k} className="paper h-[268px] rounded-b-md opacity-20" aria-hidden />)}
             {roll.map((r, i) => (
               <li key={r.seq} className="relative">
                 <span className={`num absolute -left-14 top-5 flex h-10 w-10 items-center justify-center rounded-full border text-[9px] ${stampFor(i) === "verified" ? "border-sun/60 bg-night text-sun" : "border-soil bg-night text-mist"}`} title={`hash ${r.hash}`} aria-hidden>{r.hash.slice(0, 4)}</span>
