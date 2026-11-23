@@ -1,0 +1,299 @@
+{
+  "labels": {
+    "imagery": "REAL",
+    "classes": "DERIVED"
+  },
+  "validation": "not validated against field labels",
+  "source": {
+    "catalogue": "Earth Search STAC v1 (earth-search.aws.element84.com/v1)",
+    "reflectance": "DN * 0.0001 - 0.1 (scale and offset from the item raster:bands metadata)",
+    "collection": "sentinel-2-c1-l2a",
+    "mgrs_tile": "MGRS-45RUJ",
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "SCL"
+    ]
+  },
+  "aoi": {
+    "site_lat": 25.86,
+    "site_lon": 85.78,
+    "size_km": 2.5,
+    "bounds_utm": [
+      376510.0,
+      2859500.0,
+      379010.0,
+      2862000.0
+    ],
+    "epsg": 32645,
+    "bounds_lonlat": [
+      85.767459,
+      25.848632,
+      85.792636,
+      25.871411
+    ],
+    "pixels": 62500,
+    "pixels_no_data": 0
+  },
+  "period": {
+    "start": "2024-06-01",
+    "end": "2025-05-31"
+  },
+  "shares": {
+    "kharif_paddy": 0.0742,
+    "rabi_wheat_mustard": 0.0013,
+    "double_cropped": 0.0395,
+    "orchard_trees": 0.0655,
+    "fallow_builtup": 0.3519,
+    "water": 0.0183,
+    "other_mixed": 0.4493
+  },
+  "area_ha": {
+    "kharif_paddy": 46.4,
+    "rabi_wheat_mustard": 0.8,
+    "double_cropped": 24.7,
+    "orchard_trees": 41.0,
+    "fallow_builtup": 220.0,
+    "water": 11.4,
+    "other_mixed": 280.8
+  },
+  "classes": {
+    "kharif_paddy": "Kharif crop only (mostly paddy)",
+    "rabi_wheat_mustard": "Rabi crop only (wheat, maize, mustard)",
+    "double_cropped": "Double cropped (kharif + rabi)",
+    "orchard_trees": "Orchard / trees (green all year)",
+    "fallow_builtup": "Fallow / built-up (never green)",
+    "water": "Water",
+    "other_mixed": "Other / mixed (weak or partial signal)"
+  },
+  "method": {
+    "index": "NDVI = (B08-B04)/(B08+B04) at 10 m; NDWI = (B03-B08)/(B03+B08)",
+    "mask": "SCL classes [4, 5, 6] kept; scene used if AOI clear >= 60%",
+    "thinning": "monsoon (Jun-Oct) all usable scenes; other months clearest scene per 10 days",
+    "windows": {
+      "kharif_peak": "Aug 1 - Oct 31",
+      "rabi_peak": "Dec 15 - Mar 15",
+      "inter_season_trough": "Nov 1 - Dec 20"
+    },
+    "thresholds": {
+      "crop_peak": 0.6,
+      "no_crop_peak": 0.4,
+      "never_green_max": 0.35,
+      "trees_p10": 0.35,
+      "trees_median": 0.55,
+      "water_ndwi_median": 0.05
+    },
+    "rules": [
+      "kharif_paddy: kharif peak >= crop_peak and rabi peak < no_crop_peak",
+      "rabi_wheat_mustard: rabi peak >= crop_peak and kharif peak < no_crop_peak",
+      "double_cropped: both peaks >= crop_peak with a trough >= 0.15 below the lower peak",
+      "orchard_trees: year NDVI 10th percentile >= trees_p10 and median >= trees_median (overrides the above)",
+      "fallow_builtup: year NDVI max < never_green_max",
+      "water: median NDWI > water_ndwi_median and median NDVI < 0.1",
+      "other_mixed: anything else (moderate or partial green-up, sugarcane, mixed pixels)",
+      "no data: fewer than 3 clear looks or no look in either peak window"
+    ],
+    "limits": [
+      "Season classes only: NDVI cannot separate paddy from kharif maize, or wheat from rabi maize, mustard or potato.",
+      "Fallow land and built-up land are one class.",
+      "Monsoon cloud leaves few clear kharif looks; a pixel's kharif peak may be missed."
+    ]
+  },
+  "scenes": [
+    {
+      "id": "S2B_T45RUJ_20240605T045159_L2A",
+      "date": "2024-06-05",
+      "tile_cloud_pct": 18.12,
+      "aoi_clear_pct": 94.9
+    },
+    {
+      "id": "S2B_T45RUJ_20240615T045200_L2A",
+      "date": "2024-06-15",
+      "tile_cloud_pct": 39.94,
+      "aoi_clear_pct": 86.3
+    },
+    {
+      "id": "S2A_T45RUJ_20240620T045312_L2A",
+      "date": "2024-06-20",
+      "tile_cloud_pct": 83.95,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2B_T45RUJ_20240715T045750_L2A",
+      "date": "2024-07-15",
+      "tile_cloud_pct": 52.0,
+      "aoi_clear_pct": 70.3
+    },
+    {
+      "id": "S2A_T45RUJ_20240819T045541_L2A",
+      "date": "2024-08-19",
+      "tile_cloud_pct": 46.09,
+      "aoi_clear_pct": 99.4
+    },
+    {
+      "id": "S2B_T45RUJ_20240913T045336_L2A",
+      "date": "2024-09-13",
+      "tile_cloud_pct": 38.07,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2B_T45RUJ_20240923T045814_L2A",
+      "date": "2024-09-23",
+      "tile_cloud_pct": 19.9,
+      "aoi_clear_pct": 85.6
+    },
+    {
+      "id": "S2B_T45RUJ_20241013T050058_L2A",
+      "date": "2024-10-13",
+      "tile_cloud_pct": 50.64,
+      "aoi_clear_pct": 92.0
+    },
+    {
+      "id": "S2B_T45RUJ_20241023T045343_L2A",
+      "date": "2024-10-23",
+      "tile_cloud_pct": 15.67,
+      "aoi_clear_pct": 96.5
+    },
+    {
+      "id": "S2A_T45RUJ_20241107T045627_L2A",
+      "date": "2024-11-07",
+      "tile_cloud_pct": 8.33,
+      "aoi_clear_pct": 77.7
+    },
+    {
+      "id": "S2A_T45RUJ_20241117T045056_L2A",
+      "date": "2024-11-17",
+      "tile_cloud_pct": 0.87,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2B_T45RUJ_20241122T045607_L2A",
+      "date": "2024-11-22",
+      "tile_cloud_pct": 1.43,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2B_T45RUJ_20241202T045922_L2A",
+      "date": "2024-12-02",
+      "tile_cloud_pct": 0.11,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2B_T45RUJ_20241212T045116_L2A",
+      "date": "2024-12-12",
+      "tile_cloud_pct": 0.01,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2A_T45RUJ_20241227T045528_L2A",
+      "date": "2024-12-27",
+      "tile_cloud_pct": 0.02,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2B_T45RUJ_20250111T050005_L2A",
+      "date": "2025-01-11",
+      "tile_cloud_pct": 0.05,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2C_T45RUJ_20250126T045121_L2A",
+      "date": "2025-01-26",
+      "tile_cloud_pct": 0.0,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2B_T45RUJ_20250131T045754_L2A",
+      "date": "2025-01-31",
+      "tile_cloud_pct": 1.54,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2B_T45RUJ_20250210T045707_L2A",
+      "date": "2025-02-10",
+      "tile_cloud_pct": 0.0,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2B_T45RUJ_20250220T045904_L2A",
+      "date": "2025-02-20",
+      "tile_cloud_pct": 0.02,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2C_T45RUJ_20250307T045934_L2A",
+      "date": "2025-03-07",
+      "tile_cloud_pct": 0.01,
+      "aoi_clear_pct": 99.9
+    },
+    {
+      "id": "S2B_T45RUJ_20250312T045713_L2A",
+      "date": "2025-03-12",
+      "tile_cloud_pct": 0.0,
+      "aoi_clear_pct": 99.9
+    },
+    {
+      "id": "S2B_T45RUJ_20250322T045338_L2A",
+      "date": "2025-03-22",
+      "tile_cloud_pct": 0.0,
+      "aoi_clear_pct": 99.9
+    },
+    {
+      "id": "S2C_T45RUJ_20250406T045319_L2A",
+      "date": "2025-04-06",
+      "tile_cloud_pct": 0.03,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2C_T45RUJ_20250416T045808_L2A",
+      "date": "2025-04-16",
+      "tile_cloud_pct": 0.02,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2B_T45RUJ_20250421T050021_L2A",
+      "date": "2025-04-21",
+      "tile_cloud_pct": 0.02,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2A_T45RUJ_20250508T045231_L2A",
+      "date": "2025-05-08",
+      "tile_cloud_pct": 0.13,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2C_T45RUJ_20250516T050123_L2A",
+      "date": "2025-05-16",
+      "tile_cloud_pct": 0.31,
+      "aoi_clear_pct": 100.0
+    },
+    {
+      "id": "S2A_T45RUJ_20250528T045714_L2A",
+      "date": "2025-05-28",
+      "tile_cloud_pct": 40.77,
+      "aoi_clear_pct": 80.8
+    },
+    {
+      "id": "S2B_T45RUJ_20250531T045810_L2A",
+      "date": "2025-05-31",
+      "tile_cloud_pct": 50.89,
+      "aoi_clear_pct": 100.0
+    }
+  ],
+  "crop_mix_mapping": {
+    "crop_mix_rabi": {
+      "wheat": 0.2711,
+      "potato": 0.0834,
+      "fallow": 0.6455
+    },
+    "crop_mix_kharif": {
+      "paddy": 0.989,
+      "fallow": 0.011
+    },
+    "cropland_share_of_aoi": 0.115,
+    "label": "DERIVED from REAL Sentinel-2 imagery; not validated against field labels"
+  }
+}

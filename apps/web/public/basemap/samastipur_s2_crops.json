@@ -1,0 +1,67 @@
+{
+  "crs": "EPSG:4326",
+  "west": 85.767459,
+  "south": 25.848632,
+  "east": 85.792636,
+  "north": 25.871411,
+  "leaflet_bounds": [
+    [
+      25.848632,
+      85.767459
+    ],
+    [
+      25.871411,
+      85.792636
+    ]
+  ],
+  "image": "/basemap/samastipur_s2_crops.png",
+  "width_px": 500,
+  "height_px": 500,
+  "alpha": 200,
+  "classes": [
+    {
+      "key": "kharif_paddy",
+      "code": 1,
+      "label": "Kharif crop only (mostly paddy)",
+      "color": "#2f9e44"
+    },
+    {
+      "key": "rabi_wheat_mustard",
+      "code": 2,
+      "label": "Rabi crop only (wheat, maize, mustard)",
+      "color": "#f2b705"
+    },
+    {
+      "key": "double_cropped",
+      "code": 3,
+      "label": "Double cropped (kharif + rabi)",
+      "color": "#1971c2"
+    },
+    {
+      "key": "orchard_trees",
+      "code": 4,
+      "label": "Orchard / trees (green all year)",
+      "color": "#0b5d1e"
+    },
+    {
+      "key": "fallow_builtup",
+      "code": 5,
+      "label": "Fallow / built-up (never green)",
+      "color": "#c2a383"
+    },
+    {
+      "key": "water",
+      "code": 6,
+      "label": "Water",
+      "color": "#4dabf7"
+    },
+    {
+      "key": "other_mixed",
+      "code": 7,
+      "label": "Other / mixed (weak or partial signal)",
+      "color": "#ced4da"
+    }
+  ],
+  "transparent": "no data (too few clear observations)",
+  "label": "DERIVED classes from REAL Sentinel-2 NDVI; not validated against field labels"
+}

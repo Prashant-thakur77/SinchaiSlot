@@ -1,0 +1,25 @@
+{
+  "crs": "EPSG:4326",
+  "west": 85.767459,
+  "south": 25.848632,
+  "east": 85.792636,
+  "north": 25.871411,
+  "leaflet_bounds": [
+    [
+      25.848632,
+      85.767459
+    ],
+    [
+      25.871411,
+      85.792636
+    ]
+  ],
+  "image": "/basemap/samastipur_s2_truecolor.png",
+  "width_px": 500,
+  "height_px": 500,
+  "native_resolution_m": 10.0,
+  "scene_id": "S2C_T45RUJ_20250126T045121_L2A",
+  "scene_date": "2025-01-26",
+  "bands": "B04, B03, B02 (2-98 percentile stretch)",
+  "label": "REAL (Sentinel-2 L2A imagery)"
+}
