@@ -10,6 +10,7 @@ COPY services ./services
 COPY docs/schneider/register_map.yaml docs/schneider/fault_codes.yaml ./docs/schneider/
 COPY reports/proof.json reports/evals.json reports/story_replay.json reports/
 
+ENV UV_HTTP_TIMEOUT=300
 RUN uv sync --frozen --no-dev
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
