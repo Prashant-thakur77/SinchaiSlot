@@ -4,23 +4,26 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { OPERATOR_TOKEN, postJSON, useApi } from "@/lib/api";
 
-type Booking = { id: string; farmer: string; tenant: boolean; crop: string | null; slot_start: string | null; slot_end: string | null; m3: number; m3_delivered: number; price_rs: number; status: string; paid: boolean; channel: string };
+type Booking = { id: string; pump_id: string; farmer_id: string; farmer: string; tenant: boolean; crop: string | null; slot_start: string | null; slot_end: string | null; m3: number; m3_delivered: number; price_rs: number; status: string; paid: boolean; channel: string };
 type Cash = { paid_rs: number; due_rs: number; bookings: number; saur_mitra_share_rs: number };
 type Budget = { season: string; season_cap_m3: number; used_m3: number; used_fraction: number; alert: boolean };
 type Drive = { state: string; fault: string | null; fault_name: string | null; freq_hz: number; power_kw: number };
 type Issue = { id: number; kind: string; note: string; status: string; at: string };
+type Offer = { eligible: boolean; pay_now_rs: number; after_harvest_rs: number; fee_rs: number; due: string | null; reason_hi: string; reason_en: string };
+type SoilRes = { taw_mm_per_m: number; taw_basis: string; texture_hi: string | null; irrigate_when_depleted_mm: number; default_irrigate_when_depleted_mm: number; interval_change: number; ratings: Record<string, string | null>; ph_class: string | null; flags: { en: string; hi: string }[]; card: Record<string, number | string | null> };
 type Diag = { step?: number; of?: number; instruction_en: string; instruction_hi: string | null; done: boolean };
 
 const T = {
-  hi: { today: "आज", cash: "पैसा", alerts: "अलर्ट", fix: "मरम्मत", water: "पानी", collect: "नकद लिया", paid: "भुगतान हो गया", noSlot: "आज समय नहीं", confirm: "पक्का करें", cancel: "रहने दें", code: "कोड", due: "बाकी", got: "जमा", share: "आपका हिस्सा", offline: "इंटरनेट नहीं है: पिछला डेटा दिखा रहे हैं", nofault: "ड्राइव ठीक चल रहा है", start: "मरम्मत शुरू करें", next: "हो गया, आगे", reset: "ड्राइव रीसेट करें", budget: "भूजल बजट", fault: "फ़ॉल्ट", m3: "घन मीटर", rs: "₹", tenant: "बटाईदार", lang: "English", issues: "शिकायतें" },
-  en: { today: "Today", cash: "Cash", alerts: "Alerts", fix: "Repair", water: "water", collect: "Cash received", paid: "Paid", noSlot: "no slot today", confirm: "Confirm", cancel: "Cancel", code: "Code", due: "Due", got: "Collected", share: "Your share", offline: "Offline: showing the last saved data", nofault: "Drive is running normally", start: "Start the guided fix", next: "Done, next", reset: "Reset the drive", budget: "Groundwater budget", fault: "Fault", m3: "m³", rs: "₹", tenant: "tenant", lang: "हिंदी", issues: "Complaints" },
+  hi: { today: "आज", cash: "पैसा", alerts: "अलर्ट", fix: "मरम्मत", water: "पानी", collect: "नकद लिया", paid: "भुगतान हो गया", noSlot: "आज समय नहीं", confirm: "पक्का करें", cancel: "रहने दें", code: "कोड", due: "बाकी", got: "जमा", share: "आपका हिस्सा", offline: "इंटरनेट नहीं है: पिछला डेटा दिखा रहे हैं", nofault: "ड्राइव ठीक चल रहा है", start: "मरम्मत शुरू करें", next: "हो गया, आगे", reset: "ड्राइव रीसेट करें", budget: "भूजल बजट", fault: "फ़ॉल्ट", m3: "घन मीटर", rs: "₹", tenant: "बटाईदार", lang: "English", issues: "शिकायतें", harvest: "आधा अभी, बाकी फ़सल के बाद", later: "फ़सल के बाद", soil: "मिट्टी", scan: "नमूना कार्ड पढ़ें", upload: "कार्ड की फ़ोटो लें", farmerPick: "किसान", useCard: "खेत पर लागू करें", applied: "लागू हो गया", water_every: "पानी तब दें जब इतना सूखे", manual: "फ़ोटो नहीं पढ़ी जा सकी: मान हाथ से भरें" },
+  en: { today: "Today", cash: "Cash", alerts: "Alerts", fix: "Repair", water: "water", collect: "Cash received", paid: "Paid", noSlot: "no slot today", confirm: "Confirm", cancel: "Cancel", code: "Code", due: "Due", got: "Collected", share: "Your share", offline: "Offline: showing the last saved data", nofault: "Drive is running normally", start: "Start the guided fix", next: "Done, next", reset: "Reset the drive", budget: "Groundwater budget", fault: "Fault", m3: "m³", rs: "₹", tenant: "tenant", lang: "हिंदी", issues: "Complaints", harvest: "Half now, rest after harvest", later: "after harvest", soil: "Soil", scan: "Read the sample card", upload: "Photograph a card", farmerPick: "Farmer", useCard: "Apply to the plot", applied: "Applied", water_every: "Water when the root zone has dried by", manual: "Photo could not be read: type the values" },
 };
 
 export default function MitraPage() {
   const [lang, setLang] = useState<"hi" | "en">("hi");
   const t = T[lang];
-  const [tab, setTab] = useState<"today" | "cash" | "alerts" | "fix">("today");
-  const { data: bookings, error, reload } = useApi<Booking[]>("/api/bookings", 4000);
+  const [tab, setTab] = useState<"today" | "cash" | "alerts" | "fix" | "soil">("today");
+  const { data: allBookings, error, reload } = useApi<Booking[]>("/api/bookings", 4000);
+  const bookings = allBookings?.filter((b) => (b.pump_id ?? "P1") === "P1");
   const { data: budget } = useApi<Budget>("/api/budget", 8000);
   const { data: drive } = useApi<Drive>("/api/drive", 3000);
   const { data: issues } = useApi<Issue[]>("/api/issues", 8000);
@@ -30,6 +33,12 @@ export default function MitraPage() {
   const [diag, setDiag] = useState<Diag | null>(null);
   const [step, setStep] = useState(0);
   const [online, setOnline] = useState(true);
+  const [offer, setOffer] = useState<Offer | null>(null);
+  const [laterNote, setLaterNote] = useState<Record<string, string>>({});
+  const [soilFarmer, setSoilFarmer] = useState("H01");
+  const [card, setCard] = useState<Record<string, number | string | null> | null>(null);
+  const [cardLabel, setCardLabel] = useState<string | null>(null);
+  const [soil, setSoil] = useState<SoilRes | null>(null);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
@@ -51,6 +60,42 @@ export default function MitraPage() {
     setCodes((c) => ({ ...c, [b.id]: r.unlock_code }));
     setConfirm(null);
     reload();
+  };
+  const openConfirm = async (b: Booking) => {
+    setConfirm(b);
+    setOffer(null);
+    if (!b.tenant) return;
+    try {
+      setOffer(await postJSON<Offer>("/api/tools/harvest_offer", { args: { booking_id: b.id } }, OPERATOR_TOKEN));
+    } catch {}
+  };
+  const payLater = async (b: Booking) => {
+    const r = await postJSON<{ unlock_code: string; after_harvest_rs: number; fee_rs: number; due: string }>(
+      "/api/tools/pay_after_harvest", { args: { booking_id: b.id }, confirm: true }, OPERATOR_TOKEN);
+    setCodes((c) => ({ ...c, [b.id]: r.unlock_code }));
+    setLaterNote((n) => ({ ...n, [b.id]: `₹${(r.after_harvest_rs + r.fee_rs).toFixed(0)} ${r.due.slice(8, 10)}/${r.due.slice(5, 7)}` }));
+    setConfirm(null);
+    reload();
+  };
+  const readCard = async (file?: File) => {
+    setSoil(null);
+    let body: Record<string, unknown> = { sample: true };
+    if (file) {
+      const b64 = await new Promise<string>((res) => {
+        const fr = new FileReader();
+        fr.onload = () => res(String(fr.result));
+        fr.readAsDataURL(file);
+      });
+      body = { image_b64: b64, media_type: file.type || "image/jpeg" };
+    }
+    const r = await postJSON<{ card: Record<string, number | string | null> | null; label: string; needs_manual_entry?: boolean }>("/api/soil-card/read", body);
+    setCardLabel(r.needs_manual_entry ? t.manual : r.label);
+    setCard(r.card ?? { texture: null, ph: null, ec_dsm: null, oc_pct: null, n_kg_ha: null, p_kg_ha: null, k_kg_ha: null });
+  };
+  const applyCard = async () => {
+    if (!card) return;
+    const args = Object.fromEntries(Object.entries(card).map(([k, v]) => [k, v === "" ? null : v]));
+    setSoil(await postJSON<SoilRes>("/api/tools/apply_soil_card", { args: { ...args, farmer_id: soilFarmer } }, OPERATOR_TOKEN));
   };
   const ask = async (k: number) => {
     const r = await postJSON<{ diagnosis: Diag }>("/api/agents/copilot", { text: `${drive?.fault ?? ""} fault`, session_id: "mitra", step: k });
@@ -103,9 +148,10 @@ export default function MitraPage() {
                   <div className="deva rounded-xl bg-[#e3f3e6] px-3 py-2.5 text-[15px] font-medium text-[#1d6b30]">
                     ✓ {t.paid}
                     {codes[b.id] && <span className="num ml-2">{t.code} {codes[b.id]}</span>}
+                    {laterNote[b.id] && <span className="num ml-2 text-[13px] opacity-80">· {t.later} {laterNote[b.id]}</span>}
                   </div>
                 ) : (
-                  <button onClick={() => setConfirm(b)} className="deva min-h-12 w-full rounded-xl bg-ink text-[17px] font-semibold text-paper">
+                  <button onClick={() => openConfirm(b)} className="deva min-h-12 w-full rounded-xl bg-ink text-[17px] font-semibold text-paper">
                     {t.collect} ₹{b.price_rs.toFixed(0)}
                   </button>
                 )}
@@ -139,6 +185,48 @@ export default function MitraPage() {
                 <span className="num opacity-60">#{i.id} {i.at.slice(11, 16)}</span> {i.kind}: {i.note}
               </div>
             ))}
+          </section>
+        )}
+
+        {tab === "soil" && (
+          <section className="flex flex-col gap-3 rounded-2xl bg-white p-5 shadow-sm">
+            <label className="deva flex items-center justify-between gap-3 text-[15px]">
+              {t.farmerPick}
+              <select value={soilFarmer} onChange={(e) => setSoilFarmer(e.target.value)} className="min-h-11 flex-1 rounded-xl border border-ink/20 bg-paper px-3">
+                {[...new Map((allBookings ?? []).filter((b) => b.pump_id === "P1").map((b) => [b.farmer_id, b.farmer])).entries(), ["H01", "Ramesh Sahni"]]
+                  .filter((x, i, a) => a.findIndex((y) => y[0] === x[0]) === i)
+                  .map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+              </select>
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => readCard()} className="deva min-h-12 rounded-xl bg-ink text-[16px] font-semibold text-paper">{t.scan}</button>
+              <label className="deva flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-ink/20 text-[16px]">
+                {t.upload}
+                <input type="file" accept="image/*" capture="environment" className="sr-only" onChange={(e) => e.target.files?.[0] && readCard(e.target.files[0])} />
+              </label>
+            </div>
+            {cardLabel && <p className="text-[12px] opacity-70">{cardLabel}</p>}
+            {card && (
+              <div className="grid grid-cols-2 gap-2">
+                {(["texture", "ph", "ec_dsm", "oc_pct", "n_kg_ha", "p_kg_ha", "k_kg_ha"] as const).map((k) => (
+                  <label key={k} className="flex flex-col text-[12px] opacity-90">
+                    <span className="num">{k}</span>
+                    <input value={card[k] ?? ""} inputMode={k === "texture" ? "text" : "decimal"}
+                      onChange={(e) => setCard({ ...card, [k]: k === "texture" ? e.target.value : e.target.value === "" ? null : Number(e.target.value) })}
+                      className="num min-h-10 rounded-lg border border-ink/20 bg-paper px-2 text-[15px]" />
+                  </label>
+                ))}
+                <button onClick={applyCard} className="deva col-span-2 mt-1 min-h-12 rounded-xl bg-[#145b85] text-[16px] font-semibold text-white">{t.useCard}</button>
+              </div>
+            )}
+            {soil && (
+              <div role="status" className="rounded-xl bg-[#e8f1f6] p-3">
+                <p className="deva text-[16px]">{soil.texture_hi ?? soil.card.texture ?? "–"} · {t.water_every} <span className="num font-semibold">{soil.irrigate_when_depleted_mm} mm</span> <span className="num text-[13px] opacity-70">(पहले {soil.default_irrigate_when_depleted_mm})</span></p>
+                <p className="mt-1 text-[12px] opacity-70">{soil.taw_basis} · TAW {soil.taw_mm_per_m} mm/m · pH {soil.ph_class ?? "–"} · OC {soil.ratings.oc_pct ?? "–"} · N {soil.ratings.n_kg_ha ?? "–"}</p>
+                {soil.flags.map((f) => <p key={f.en} className="deva mt-1 text-[14px] text-[#8a4b00]">{lang === "hi" ? f.hi : f.en}</p>)}
+                <p className="deva mt-1 text-[12px] opacity-70">{lang === "hi" ? "खाद की सलाह: भारत-विस्तार 155261" : "Fertiliser advice: Bharat-VISTAAR 155261"}</p>
+              </div>
+            )}
           </section>
         )}
 
@@ -181,6 +269,12 @@ export default function MitraPage() {
             <p id="cfm" className="deva text-[19px]">
               {lang === "hi" ? `${confirm.farmer} से ₹${confirm.price_rs.toFixed(0)} नकद लिया?` : `Received ₹${confirm.price_rs.toFixed(0)} cash from ${confirm.farmer}?`}
             </p>
+            {offer?.eligible && (
+              <button onClick={() => payLater(confirm)} className="deva mt-4 min-h-12 w-full rounded-xl border-2 border-[#145b85] text-[16px] font-semibold text-[#145b85]">
+                {t.harvest}: ₹{offer.pay_now_rs.toFixed(0)} + ₹{(offer.after_harvest_rs + offer.fee_rs).toFixed(0)} {offer.due ? `${offer.due.slice(8, 10)}/${offer.due.slice(5, 7)}` : ""}
+              </button>
+            )}
+            {offer && !offer.eligible && <p className="deva mt-3 text-[13px] opacity-70">{lang === "hi" ? offer.reason_hi : offer.reason_en}</p>}
             <div className="mt-5 grid grid-cols-2 gap-3">
               <button onClick={() => setConfirm(null)} className="deva min-h-12 rounded-xl border border-ink/20 text-[16px]">{t.cancel}</button>
               <button onClick={() => collect(confirm)} className="deva min-h-12 rounded-xl bg-ink text-[16px] font-semibold text-paper">{t.confirm}</button>
@@ -189,12 +283,13 @@ export default function MitraPage() {
         </div>
       )}
 
-      <nav aria-label="Saur Mitra" className="fixed inset-x-0 bottom-0 mx-auto grid max-w-md grid-cols-4 border-t border-ink/10 bg-paper md:absolute">
+      <nav aria-label="Saur Mitra" className="fixed inset-x-0 bottom-0 mx-auto grid max-w-md grid-cols-5 border-t border-ink/10 bg-paper md:absolute">
         {([
           ["today", "☀", t.today],
           ["cash", "₹", t.cash],
           ["alerts", "!", t.alerts],
           ["fix", "🔧", t.fix],
+          ["soil", "◍", t.soil],
         ] as const).map(([k, icon, label]) => (
           <button key={k} onClick={() => setTab(k)} aria-current={tab === k ? "page" : undefined} className={`deva flex min-h-16 flex-col items-center justify-center gap-0.5 text-[13px] ${tab === k ? "font-semibold text-ink" : "text-[#3d4a43]"}`}>
             <span className="text-[20px]" aria-hidden>{icon}</span>

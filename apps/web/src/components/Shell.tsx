@@ -10,6 +10,7 @@ export const NAV = [
   { href: "/twin", label: "Village Twin", key: "1", icon: "M3 12h4l3-8 4 16 3-8h4" },
   { href: "/planner", label: "Planner", key: "2", icon: "M4 6h16M4 12h10M4 18h6" },
   { href: "/phone", label: "Saathi phone", key: "3", icon: "M8 3h8v18H8zM11 18h2" },
+  { href: "/cluster", label: "Pump cluster", key: "0", icon: "M5 17a2 2 0 104 0 2 2 0 00-4 0M15 17a2 2 0 104 0 2 2 0 00-4 0M10 6a2 2 0 104 0 2 2 0 00-4 0M7 15l4-7M17 15l-4-7" },
   { href: "/drive", label: "Altivar drive", key: "4", icon: "M4 5h16v14H4zM8 9h8M8 13h4" },
   { href: "/ledger", label: "Rasid ledger", key: "5", icon: "M6 3h12v18l-3-2-3 2-3-2-3 2z" },
   { href: "/lab", label: "Prayogshala", key: "6", icon: "M9 3v6L4 19h16L15 9V3" },
