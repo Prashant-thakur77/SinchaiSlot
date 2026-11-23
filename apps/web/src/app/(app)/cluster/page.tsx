@@ -143,7 +143,7 @@ export default function ClusterPage() {
         <div className="flex min-w-0 flex-col gap-4">
           <Panel>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <Stat label="Pumps reporting" value={`${data?.transmitting ?? "–"}/${data?.pumps.length ?? "–"}`} tone={data && data.transmitting < data.pumps.length ? "fault" : "leaf"} />
+              <Stat label="Pumps reporting" value={`${data?.transmitting ?? "–"}/${data?.pumps.length ?? "–"}`} tone={data && data.transmitting < data.pumps.length ? "sun" : "default"} />
               <Stat label="Planned today" value={fmt.n(totals.water)} unit="m³" tone="water" source="simulated" />
               <Stat label="Asked for" value={fmt.n(totals.req)} unit="m³" />
               <Stat label="Clock" value={data?.clock ?? "–"} sub={data?.day} />

@@ -85,7 +85,7 @@ export function Shell({ title, children, actions }: { title: string; children: R
       </nav>
       <div className="flex min-w-0 flex-1 flex-col">
         <DayBar title={title} actions={actions} />
-        <nav aria-label="Main (mobile)" className="flex gap-1 overflow-x-auto border-b border-soil px-3 py-2 md:hidden">
+        <nav aria-label="Main (mobile)" className="flex gap-1 overflow-x-auto border-b border-soil px-3 py-2 [mask-image:linear-gradient(90deg,#000_85%,transparent)] md:hidden">
           {NAV.map((n) => (
             <Link key={n.href} href={n.href} className={`shrink-0 rounded-full px-3 py-1 text-[12px] ${path === n.href ? "bg-sun text-ink" : "bg-night-2 text-fog"}`}>
               {n.label}

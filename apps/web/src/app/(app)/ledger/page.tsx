@@ -86,6 +86,11 @@ export default function LedgerPage() {
               <Btn tone="sun" onClick={runVerify} disabled={scan !== null}>{scan !== null ? "Checking…" : "Verify the whole chain"}</Btn>
               <Btn onClick={async () => setAudit(await getJSON<Audit>("/api/ledger/audit"))}>Run anomaly audit</Btn>
             </div>
+            {scan !== null && (
+              <div className="num mt-3 text-[13px] text-sun" aria-live="off">
+                checking <Roll value={fmt.n(Math.round(((data?.total ?? 0) * scan) / Math.max(1, roll.length)))} /> of {fmt.n(data?.total)} receipts…
+              </div>
+            )}
             {verify && (
               <div role="status" className={`num mt-3 rounded-md border px-3 py-2 text-[13px] ${verify.ok ? "border-se/50 text-se" : "border-fault/60 text-fault"}`}>
                 {verify.ok ? `Verified: ${verify.checked} receipts, chain intact` : `Broken at receipt #${verify.first_bad_seq}`}

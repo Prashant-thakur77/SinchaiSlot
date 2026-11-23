@@ -32,6 +32,8 @@ export default function PhonePage() {
   const [callbacks, setCallbacks] = useState<{ at: string; name: string; text: string; language: string }[]>([]);
   const [ringing, setRinging] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
+  const { data: pastCalls } = useApi<{ at: string; name: string; text: string; language: string }[]>("/api/channels/callbacks", 5000);
+  const allCalls = [...callbacks, ...(pastCalls ?? []).filter((p) => !callbacks.some((c) => c.at === p.at && c.name === p.name))].slice(0, 12);
 
   const onEvent = useCallback((e: ServerEvent) => {
     if (e.kind !== "callback") return;
@@ -199,9 +201,9 @@ export default function PhonePage() {
             )}
           </Panel>
           <Panel title="Plan-change calls" right={<span className="text-[11px] text-mist">sent when the planner moves a slot</span>}>
-            {callbacks.length === 0 && <p className="text-sm text-mist">None yet. Use “Jump to 13:45” in the top bar: the cloud moves slots and Saathi calls each affected farmer.</p>}
+            {allCalls.length === 0 && <p className="text-sm text-mist">None yet. Use “Jump to 13:45” in the top bar: the cloud moves slots and Saathi calls each affected farmer.</p>}
             <ul className="deva flex flex-col gap-2 text-[13px]">
-              {callbacks.map((c, i) => (
+              {allCalls.map((c, i) => (
                 <li key={i} className="rounded-md border border-soil p-2.5">
                   <div className="num text-[11px] text-mist">{c.at} · {c.name} · {LANG[c.language] ?? c.language}</div>
                   <div>{c.text}</div>

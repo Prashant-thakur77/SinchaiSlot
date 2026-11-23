@@ -77,7 +77,7 @@ export default function PassportView({ id }: { id: string }) {
             <ul className="mt-4 flex flex-col gap-2">
               {Object.entries(p.score.parts).map(([k, v]) => (
                 <li key={k}>
-                  <div className="flex justify-between text-[12px]"><span>{PART_LABEL[k] ?? k}</span><span className="num text-ink/60">{p.score.weights[k]} pts · {fmt.pct(v)}</span></div>
+                  <div className="flex justify-between gap-3 text-[12px]"><span className="min-w-0">{PART_LABEL[k] ?? k}</span><span className="num shrink-0 text-ink/60">{p.score.weights[k]} pts · {fmt.pct(v)}</span></div>
                   <div className="mt-1 h-1.5 rounded-full bg-ink/10"><div className="h-1.5 rounded-full bg-[#c98b1a]" style={{ width: `${Math.min(v, 1) * 100}%` }} /></div>
                 </li>
               ))}

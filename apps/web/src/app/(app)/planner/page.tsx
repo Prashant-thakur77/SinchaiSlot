@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BandChart, BandLegend } from "@/components/BandChart";
 import { Gantt } from "@/components/Gantt";
 import { Shell } from "@/components/Shell";
@@ -47,6 +47,12 @@ export default function PlannerPage() {
 
   // Drag across the forecast to place a cloud: x maps to the chart's slot axis (BandChart: pad.l 38, pad.r 8 of 1000).
   const chartRef = useRef<HTMLDivElement>(null);
+  const ganttRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const g = ganttRef.current;
+    if (!g || now < 0 || g.scrollWidth <= g.clientWidth) return;
+    g.scrollLeft = Math.max(0, (now / 24) * g.scrollWidth - g.clientWidth / 2);
+  }, [now]);
   const [drag, setDrag] = useState<number | null>(null);
   const idxAt = (clientX: number) => {
     const r = chartRef.current?.getBoundingClientRect();
@@ -81,20 +87,23 @@ export default function PlannerPage() {
               <h3 className="text-[13px] font-medium text-fog">Sun the plan is built on</h3>
               <span className="text-[11.5px] text-mist">Drag across the sky to place a cloud</span>
             </div>
+            <div role="region" tabIndex={0} aria-label="Forecast chart, scrolls sideways on small screens" className="mt-2 overflow-x-auto">
             <div
               ref={chartRef}
-              className="relative mt-2 cursor-crosshair touch-none select-none"
+              className="relative min-w-[560px] cursor-crosshair touch-none select-none"
               onPointerDown={(e) => { (e.target as HTMLElement).setPointerCapture?.(e.pointerId); const i = idxAt(e.clientX); setDrag(i); setFrom(lab(i)); setTo(lab(Math.min(24, i + 1))); setWhatIf(null); }}
               onPointerMove={(e) => { if (drag === null) return; const i = idxAt(e.clientX); setFrom(lab(Math.min(drag, i))); setTo(lab(Math.max(drag, i) + (i === drag ? 1 : 0))); }}
               onPointerUp={() => setDrag(null)}
             >
               {snap && <BandChart labels={snap.forecast.labels} q10={snap.forecast.q10} q50={snap.forecast.q50} q90={snap.forecast.q90} actual={snap.forecast.actual} actualUpTo={now} nowIndex={now} height={190} />}
+
               {fromI >= 0 && toI > fromI && (
                 <div className="pointer-events-none absolute top-[4%] h-[78%] transition-[left,width] duration-150" style={{ left: `${leftPct}%`, width: `${Math.max(1, rightPct - leftPct)}%` }} aria-hidden>
                   <div className="h-full w-full rounded-[40%] bg-[radial-gradient(closest-side,rgba(70,88,96,.78),rgba(70,88,96,0))]" style={{ opacity: 0.35 + cut / 140 }} />
                   <span className="num absolute -top-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-night/85 px-1.5 text-[11px] text-fog">{from}–{to} · −{cut}% sun</span>
                 </div>
               )}
+            </div>
             </div>
             <div className="mt-1"><BandLegend /></div>
             <form className="mt-3 flex flex-wrap items-end gap-3 text-[12.5px]" onSubmit={(e) => { e.preventDefault(); simulate(); }}>
@@ -111,7 +120,8 @@ export default function PlannerPage() {
             </form>
             {whatIf && (
               <div className="mt-4 border-t border-soil pt-3" role="status">
-                <p className="text-[14px] text-fog">
+                <p className="num text-[12px] text-mist">Your cloud: {from}–{to}, {cut}% of the sun lost under it.</p>
+                <p className="mt-1 text-[14px] text-fog">
                   Water <span className="num text-water">{fmt.n(whatIf.water_m3_p50_before)} → {fmt.n(whatIf.water_m3_p50_after)} m³</span>, mill <span className="num text-sun">{fmt.n(whatIf.mill_kwh_before, 1)} → {fmt.n(whatIf.mill_kwh_after, 1)} kWh</span>, batteries end at <span className="num">{fmt.n(whatIf.battery_kwh_after, 1)} kWh</span>. Nothing is changed until the real sky does this.
                 </p>
                 <ul className="mt-2 flex flex-col gap-1 text-[13px] text-mist">
@@ -125,7 +135,7 @@ export default function PlannerPage() {
           {/* The plan itself, slot by slot, on the same time axis */}
           <div className="mt-5">
             <h3 className="mb-2 text-[13px] font-medium text-fog">Who gets the sun, slot by slot</h3>
-            {snap && <div role="region" className="overflow-x-auto" tabIndex={0} aria-label="Plan timeline, scrolls sideways on small screens"><div className="min-w-[720px]"><Gantt slots={snap.slots} nowIndex={now} highlight={moved} /></div></div>}
+            {snap && <div ref={ganttRef} role="region" className="overflow-x-auto" tabIndex={0} aria-label="Plan timeline, scrolls sideways on small screens"><div className="min-w-[720px]"><Gantt slots={snap.slots} nowIndex={now} highlight={moved} /></div></div>}
           </div>
         </section>
 

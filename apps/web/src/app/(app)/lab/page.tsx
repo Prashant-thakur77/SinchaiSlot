@@ -171,7 +171,7 @@ export default function LabPage() {
                     <Stat value={fmt.pct(ev.first_heldout_run.case_success)} label={`Conversations right (${ev.first_heldout_run.cases})`} />
                     <Stat value={fmt.pct(ev.first_heldout_run.wrong_booking_rate, 1)} label="Wrong bookings" tone="leaf" />
                     <Stat value={fmt.pct(ev.first_heldout_run.booking_success)} label="Bookings completed" />
-                    <Stat value={ev.first_heldout_run.passes_thresholds ? "yes" : "no"} label="Met pre-set thresholds" tone={ev.first_heldout_run.passes_thresholds ? "leaf" : "fault"} />
+                    <Stat value={ev.first_heldout_run.passes_thresholds ? "yes" : "no"} label="Met pre-set thresholds" tone={ev.first_heldout_run.passes_thresholds ? "default" : "sun"} />
                   </div>
                   {ev.agent && (
                     <p className="mt-3 text-[12px] text-mist">

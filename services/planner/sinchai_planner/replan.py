@@ -123,8 +123,15 @@ def explain_diff(old: Plan, new: Plan, old_scen: list[Scenario], new_scen: list[
             changes.append(Change(kind, subj, hh_of.get(a), os_, ns_, en, hi))
         else:
             name_hi = {"mill": "चक्की", "chaff": "कुट्टी मशीन"}.get(a, a)
-            en = f"{cause_en}: {a} moved from {ranges(os_)} to {ranges(ns_)}"
-            hi = f"{cause_hi}: {name_hi} {ranges(os_)} से {ranges(ns_)} पर"
+            if not ns_:
+                en = f"{cause_en}: {a} at {ranges(os_)} cancelled for today; the sun goes to water first"
+                hi = f"{cause_hi}: {name_hi} का {ranges(os_)} का समय आज रद्द; धूप पहले पानी को"
+            elif not os_:
+                en = f"{cause_en}: {a} added {ranges(ns_)}"
+                hi = f"{cause_hi}: {name_hi} {ranges(ns_)} जोड़ा गया"
+            else:
+                en = f"{cause_en}: {a} moved from {ranges(os_)} to {ranges(ns_)}"
+                hi = f"{cause_hi}: {name_hi} {ranges(os_)} से {ranges(ns_)} पर"
             changes.append(Change("load_moved", a, None, os_, ns_, en, hi))
     ob, nb = old.total("battery"), new.total("battery")
     if abs(nb - ob) > 0.2:

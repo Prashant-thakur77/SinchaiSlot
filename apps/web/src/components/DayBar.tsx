@@ -90,7 +90,7 @@ export function DayBar({ title, actions }: { title: string; actions?: ReactNode 
         <h1 className="font-display text-base font-semibold tracking-tight md:text-lg">{title}</h1>
         <div className="num flex items-baseline gap-2 text-fog" aria-live="polite">
           <span className="text-2xl leading-none text-sun md:text-[28px]">{data?.clock ?? "--:--"}</span>
-          <span className="text-[11px] text-mist">{data?.day} · Samastipur · real sun</span>
+          <span className="hidden text-[11px] text-mist sm:inline">{data?.day} · Samastipur · real sun</span>
           {data?.cloud_applied && <span className="rounded bg-water/15 px-1.5 py-px text-[11px] text-water">nowcast</span>}
         </div>
 
@@ -106,7 +106,7 @@ export function DayBar({ title, actions }: { title: string; actions?: ReactNode 
             aria-valuenow={now}
             aria-valuetext={data?.clock ?? ""}
             aria-disabled={busy}
-            className="relative h-10 cursor-pointer rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sun"
+            className="relative h-7 cursor-pointer rounded-md outline-none md:h-10 focus-visible:ring-2 focus-visible:ring-sun"
             onClick={(e) => !busy && goTo(minAt(e.clientX))}
             onMouseMove={(e) => setHover(minAt(e.clientX))}
             onMouseLeave={() => setHover(null)}
@@ -146,14 +146,14 @@ export function DayBar({ title, actions }: { title: string; actions?: ReactNode 
           <button
             disabled={busy}
             onClick={() => run(async () => { const next = !playing; setPlaying(next); await postJSON("/api/demo/autoplay", { on: next, speed: 60 }); })}
-            className="rounded-md border border-soil px-2.5 py-1 text-[12px] text-fog hover:bg-night-2"
+            className="hidden rounded-md border border-soil px-2.5 py-1 text-[12px] text-fog hover:bg-night-2 sm:inline-block"
           >
             {playing ? "Pause" : "Play ×60"}
           </button>
           <button disabled={busy} onClick={() => goTo(13 * 60 + 45)} className="rounded-md border border-water/60 px-2.5 py-1 text-[12px] text-water hover:bg-water/10">
             Jump to 13:45
           </button>
-          <button disabled={busy} onClick={() => run(async () => { setPlaying(false); await postJSON("/api/demo/reset"); })} className="rounded-md border border-soil px-2.5 py-1 text-[12px] text-mist hover:bg-night-2">
+          <button disabled={busy} onClick={() => run(async () => { setPlaying(false); await postJSON("/api/demo/reset"); })} className="hidden rounded-md border border-soil px-2.5 py-1 text-[12px] text-mist hover:bg-night-2 sm:inline-block">
             Reset
           </button>
         </div>

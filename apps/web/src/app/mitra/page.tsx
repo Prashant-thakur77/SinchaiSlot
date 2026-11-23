@@ -40,6 +40,7 @@ export default function MitraPage() {
   const bookings = useMemo(() => allBookings?.filter((b) => (b.pump_id ?? "P1") === "P1"), [allBookings]);
   const { data: budget } = useApi<Budget>("/api/budget", 8000);
   const { data: drive } = useApi<Drive>("/api/drive", 3000);
+  const { data: snap } = useApi<{ clock: string }>("/api/state", 3000);
   const { data: issues } = useApi<Issue[]>("/api/issues", 8000);
   const [cashBook, setCashBook] = useState<Cash | null>(null);
   const [confirm, setConfirm] = useState<Booking | null>(null);
@@ -141,6 +142,22 @@ export default function MitraPage() {
       {(!online || error) && <div role="status" className="deva bg-sun px-4 py-2 text-[14px] text-ink">{t.offline}</div>}
 
       <main className="mx-auto flex max-w-xl flex-col gap-3 p-4">
+        {tab === "today" && drive?.state === "operation_enabled" && (() => {
+          const clock = snap?.clock ?? "";
+          const now = (bookings ?? []).find((b) => b.slot_start && b.slot_end && b.slot_start <= clock && clock < b.slot_end);
+          return (
+            <section aria-live="polite" className="overflow-hidden rounded-2xl bg-[#145b85] p-4 text-white">
+              <div className="deva text-[13px] opacity-80">{lang === "hi" ? "अभी चल रहा है" : "Running now"} · <span className="num">{clock}</span></div>
+              <div className="deva mt-1 text-[20px] font-semibold">{now ? now.farmer : lang === "hi" ? "चक्की / बैटरी" : "Mill / batteries"}</div>
+              <div className="num mt-2 flex gap-4 text-[15px]"><span>{drive.freq_hz.toFixed(0)} Hz</span><span>{drive.power_kw.toFixed(2)} kW</span>{now && <span>{now.m3_delivered.toFixed(0)}/{now.m3.toFixed(0)} {t.m3}</span>}</div>
+              {now && (
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/20" aria-hidden>
+                  <div className="h-full rounded-full bg-white transition-[width] duration-700" style={{ width: `${Math.min(100, (now.m3_delivered / Math.max(1, now.m3)) * 100)}%` }} />
+                </div>
+              )}
+            </section>
+          );
+        })()}
         {tab === "today" &&
           (bookings ?? []).map((b) => (
             <article key={b.id} className="rounded-2xl border border-ink/15 bg-[#fbf8ef] bg-[repeating-linear-gradient(0deg,transparent_0_27px,rgba(20,40,30,.06)_27px_28px)] p-4">

@@ -36,7 +36,7 @@ type Story = {
   } | null;
 };
 
-const SLOT_CLS: Record<string, string> = { req: "bg-water", mill: "bg-sun", chaff: "bg-[#c98b4a]", battery: "bg-mist/70", idle: "bg-transparent" };
+const SLOT_CLS: Record<string, string> = { req: "bg-water", mill: "bg-sun", chaff: "bg-[#c98b4a]", battery: "bg-mist/70", idle: "bg-white/[.06]" };
 
 const FARMER_SHADES = ["bg-water", "bg-[#8fd0f5]", "bg-[#2c7bb0]", "bg-[#b9e3fa]"];
 
@@ -49,7 +49,7 @@ function SlotStrip({ slots, order, className = "" }: { slots: { start: string; a
         return (
           <div key={s.start} title={`${s.start} ${s.action === "req" ? s.farmer : s.action}`}
             className={`relative rounded-[2px] ${s.action === "req" ? FARMER_SHADES[Math.max(0, order.indexOf(s.farmer ?? "")) % FARMER_SHADES.length] : SLOT_CLS[s.action] ?? "bg-soil"}`}>
-            {head && <span className="absolute -top-4 left-0 whitespace-nowrap text-[10px] text-fog">{s.farmer?.split(" ")[0]}</span>}
+            {head && <span className="absolute -top-4 left-0 hidden whitespace-nowrap text-[10px] text-fog md:block">{s.farmer?.split(" ")[0]}</span>}
           </div>
         );
       })}
@@ -130,7 +130,7 @@ export default function Home() {
         // Signature: the real day's sun draws across the screen; the cloud passes at 13:40.
         const tl = gsap.timeline({ scrollTrigger: { trigger: ".day", start: "top top", end: "+=260%", scrub: 0.6, pin: true } });
         tl.fromTo(".curve-actual", { strokeDashoffset: 1 }, { strokeDashoffset: 0, ease: "none", duration: 1 }, 0)
-          .fromTo(".curve-band", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 0)
+          .fromTo(".curve-band", { opacity: 0 }, { opacity: 0.26, duration: 0.25 }, 0)
           .fromTo(".curve-p50", { strokeDashoffset: 1 }, { strokeDashoffset: 0, ease: "none", duration: 1 }, 0)
           .fromTo(".day-clock", { innerText: "06" }, { innerText: 18, snap: { innerText: 1 }, ease: "none", duration: 1, onUpdate() { const el = document.querySelector(".day-clock"); if (el) el.textContent = String(el.textContent).padStart(2, "0"); } }, 0)
           .fromTo(".cloud", { xPercent: -120, opacity: 0 }, { xPercent: 40, opacity: 1, duration: 0.3 }, 0.55)
@@ -186,7 +186,11 @@ export default function Home() {
   return (
     <div ref={root} className="grain relative overflow-x-clip bg-night text-[#eef3ee]">
       <div ref={skyRef} className="pointer-events-none fixed inset-0 z-0" aria-hidden />
-      <div ref={hudRef} className="num pointer-events-none fixed bottom-5 left-5 z-20 hidden items-center gap-3 rounded-full border border-white/10 bg-night/80 py-1.5 pl-3 pr-4 text-[12px] text-mist backdrop-blur md:motion-safe:flex" aria-hidden>
+
+      <a href="#story" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-sun focus:px-3 focus:py-1 focus:text-ink">Skip to the story</a>
+      <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-white/5 bg-night/75 px-5 py-3 backdrop-blur-md md:px-10">
+        <Link href="/" className="flex items-center gap-2 text-white"><Mark /> <span className="font-display text-lg font-semibold">SinchaiSlot</span></Link>
+<div ref={hudRef} className="num pointer-events-none hidden items-center gap-3 text-[12px] text-mist lg:motion-safe:flex" aria-hidden>
         <svg width="64" height="26" viewBox="0 0 64 26" className="overflow-visible">
           <path d="M4 24 Q32 -8 60 24" fill="none" stroke="var(--soil)" strokeWidth="1.5" strokeDasharray="2 3" />
           <line x1="0" x2="64" y1="24" y2="24" stroke="var(--soil)" strokeWidth="1" />
@@ -194,9 +198,6 @@ export default function Home() {
         </svg>
         <span data-hud="clock" className="text-[15px] text-sun">06:00</span><span data-hud="kwh">0.0 kWh of real sun so far</span>
       </div>
-      <a href="#story" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-sun focus:px-3 focus:py-1 focus:text-ink">Skip to the story</a>
-      <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-white/5 bg-night/75 px-5 py-3 backdrop-blur-md md:px-10">
-        <Link href="/" className="flex items-center gap-2 text-white"><Mark /> <span className="font-display text-lg font-semibold">SinchaiSlot</span></Link>
         <nav className="flex items-center gap-5 text-[13px] text-white">
           <a href="#proof" className="hidden hover:underline sm:inline">Proof</a>
           <a href="#schneider" className="hidden hover:underline sm:inline">Schneider inside</a>
@@ -287,7 +288,7 @@ export default function Home() {
         <div className="relative mx-auto w-full max-w-[1400px] px-5 md:px-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <Clock t="13:40" label="A cloud band crosses the afternoon" />
+              <Clock t="13:40" label="The day replays: watch the cloud arrive at 13:40" />
               <h2 id="t-cloud" className="mt-4 max-w-3xl font-display text-[clamp(1.5rem,3vw,2.8rem)] font-semibold leading-[1.05] tracking-tight">
                 The forecast said sun. The sky said otherwise. The plan moves before the water stops.
               </h2>
@@ -298,15 +299,17 @@ export default function Home() {
             </div>
           </div>
           {chart && (
-            <div className="relative mt-6">
+            <div className="mt-6">
+              <div className="relative">
               <svg viewBox={`0 0 ${chart.W} ${chart.H}`} preserveAspectRatio="none" className="aspect-[3/1] w-full overflow-visible md:aspect-auto md:h-[30vh]" role="img" aria-label="Solar power on the demo day: forecast band, forecast median and actual">
-                <path className="curve-band" d={chart.band} fill="var(--sun)" opacity="0.22" />
+                <path className="curve-band" d={chart.band} fill="var(--sun)" opacity="0.26" />
                 <path className="curve-p50" d={chart.p50} pathLength={1} strokeDasharray="1" fill="none" stroke="var(--sun-deep)" strokeWidth="3" strokeOpacity="0.8" vectorEffect="non-scaling-stroke" />
                 <path className="curve-actual" d={chart.actual} pathLength={1} strokeDasharray="1" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
               </svg>
               <div className="cloud-note pointer-events-none absolute flex items-center gap-2" style={{ left: `${(chart.cloudX / chart.W) * 100}%`, top: `${(chart.cloudY / chart.H) * 100}%`, transform: chart.cloudX / chart.W > 0.6 ? "translate(calc(-100% + 7px), -7px)" : "translate(-7px, -7px)", flexDirection: chart.cloudX / chart.W > 0.6 ? "row-reverse" : "row" }}>
                 <span className="h-3.5 w-3.5 rounded-full bg-water ring-4 ring-water/25" />
                 <span className="hidden whitespace-nowrap rounded bg-night/80 px-2 py-0.5 text-[13px] text-water md:inline">actual sun below the P10 forecast</span>
+              </div>
               </div>
               {story?.replay && (
                 <div role="img" className="relative mt-7" aria-label="Pump plan for the day, before and after the 13:40 re-plan">
@@ -483,6 +486,29 @@ const SKY: [number, number[], number[]][] = [
 ];
 
 /** Paint the sky, the sun on its arc and the corner clock for a scroll progress p (0..1). */
+/** The story's clock: chapter times between chapters; inside the pinned 13:40 chapter, its own clock. */
+function storyMinutes(): number {
+  const day = document.querySelector<HTMLElement>(".day");
+  const dc = document.querySelector<HTMLElement>(".day-clock");
+  if (day && dc) {
+    const r = day.getBoundingClientRect();
+    if (r.top <= 1 && r.bottom >= window.innerHeight - 1) return Number(dc.textContent || 6) * 60;
+  }
+  const mark = window.innerHeight * 0.45;
+  const anchors: [string, number][] = [[".hero", 330], [".problem", 360], [".beam-wrap", 600], [".day", 600], [".dusk", 1080], ["#proof", 1110], ["#schneider", 1140]];
+  const pts = anchors
+    .map(([sel, m]) => [document.querySelector<HTMLElement>(sel)?.getBoundingClientRect().top ?? Infinity, m] as [number, number])
+    .filter(([y]) => Number.isFinite(y));
+  let m = pts[0]?.[1] ?? 360;
+  for (let i = 0; i < pts.length; i++) {
+    const [y0, m0] = pts[i];
+    const next = pts[i + 1];
+    if (y0 <= mark) m = m0;
+    if (y0 <= mark && next && next[0] > mark && next[1] > m0) m = m0 + ((mark - y0) / (next[0] - y0)) * (next[1] - m0);
+  }
+  return Math.max(330, Math.min(1140, m));
+}
+
 function paintSky(p: number, sky: HTMLDivElement | null, sun: SVGCircleElement | null, hud: HTMLDivElement | null, cum: number[]) {
   const i = Math.max(0, SKY.findIndex(([q]) => q >= p) - 1);
   const [q0, h0, z0] = SKY[i];
@@ -501,7 +527,7 @@ function paintSky(p: number, sky: HTMLDivElement | null, sun: SVGCircleElement |
     sun.style.opacity = p > 0.48 && p < 0.6 ? "0.45" : "1";
   }
   if (hud) {
-    const mins = 360 + p * 720;
+    const mins = storyMinutes();
     const hh = Math.floor(mins / 60);
     const clock = hud.querySelector('[data-hud="clock"]');
     const kwh = hud.querySelector('[data-hud="kwh"]');

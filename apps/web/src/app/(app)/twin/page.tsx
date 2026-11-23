@@ -100,7 +100,7 @@ export default function TwinPage() {
   return (
     <Shell title="Village Twin">
       <ErrorNote error={error} />
-      <div className="grid min-w-0 gap-x-6 gap-y-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)]">
+      <div className="grid min-w-0 gap-x-6 gap-y-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         {/* Stage: the command area itself, lit by the hour */}
         <section aria-label="Command area of pump P1" className="relative min-w-0 overflow-hidden rounded-[14px] border border-soil bg-night-2">
           <div className="pointer-events-none absolute inset-0 transition-[background] duration-1000"
@@ -152,10 +152,12 @@ export default function TwinPage() {
             <span className="text-[44px] leading-none text-sun md:text-[56px]"><Roll value={pv.toFixed(2)} /></span>
             <span className="text-sm text-mist">kW of sun</span>
           </div>
-          <div className="mt-2 flex-1">
+          <div className="mt-2 flex-1 overflow-x-auto" role="region" tabIndex={0} aria-label="Energy flow diagram">
+            <div className="min-w-[520px]">
             <EnergyFlow pvKw={pv} pumpKw={tel?.power_kw ?? 0} flowM3h={tel?.flow_m3h_true ?? 0}
               activeLoad={cur?.action === "mill" ? "mill" : cur?.action === "chaff" ? "chaff" : null}
               loadKw={loadKw} batteryKw={batKw} driveState={tel?.state ?? "–"} fault={tel?.fault ?? null} />
+            </div>
           </div>
         </section>
 
