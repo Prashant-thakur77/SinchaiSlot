@@ -262,6 +262,21 @@ def init_db(drop: bool = False) -> None:
              *[f"GRANT SELECT ON {t} TO sinchai_analyst" for t in sorted(ANALYST_TABLES)])
 
 
+def schema_outdated() -> bool:
+    """True when an existing database lacks a table or column the models define (an older install)."""
+    from sqlalchemy import inspect
+
+    insp = inspect(engine())
+    have = set(insp.get_table_names())
+    for name, table in Base.metadata.tables.items():
+        if name not in have:
+            return True
+        cols = {c["name"] for c in insp.get_columns(name)}
+        if any(c.name not in cols for c in table.columns):
+            return True
+    return False
+
+
 def refresh_geometry() -> None:
     """Fill PostGIS geometry from the stored GeoJSON (Postgres only; called after seeding)."""
     eng = engine()

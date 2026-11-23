@@ -57,15 +57,18 @@ async def _ticker():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    outdated = db.schema_outdated()
     db.init_db()
     from . import bridge
     bridge.start()
     with db.session() as s:
         empty = s.query(db.Farmer).count() == 0
-    if empty:
+    if empty or outdated:  # first run, or a database from an older version: build the demo data afresh
         from .seed import seed
         await asyncio.to_thread(seed, verbose=False)
     await asyncio.to_thread(state.get_state)
+    from . import cluster
+    await asyncio.to_thread(cluster.neighbours)  # plans P2 and P3 and sends P2's plan to its edge
     task = asyncio.create_task(_ticker())
     yield
     task.cancel()
