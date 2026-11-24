@@ -10,6 +10,8 @@ and every booking leaves a verified receipt of water, diesel and CO₂ avoided.
 Schneider Electric Yuva Yodha Energy Tech Hackathon 2026 · Challenge 1: Sustainable Agriculture ·
 Pilot geography: Samastipur district, Bihar.
 
+**Live demo:** https://sinchaislot.prashantthakur.dev (start at [Check it yourself](https://sinchaislot.prashantthakur.dev/judge))
+
 ![architecture](docs/architecture.png)
 
 ## The proof (from `reports/proof.json`, generated 2026-11-23T03:41:02+05:30)
