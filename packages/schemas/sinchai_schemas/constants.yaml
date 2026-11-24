@@ -36,6 +36,7 @@ sources:
   vistaar_launch: https://www.tribuneindia.com/news/india/shivraj-chouhan-launches-ai-powered-bharat-vistaar-platform-for-farmers/
   nasa_power: https://power.larc.nasa.gov/
   open_meteo: https://open-meteo.com/
+  giz_uspc: https://www.giz.de/sites/default/files/media/pkb-document/2026-02/giz2023-en-productive-use-solar-water-pumps-uspc.pdf
 
 constants:
   # ---- Prices and costs ----
@@ -319,7 +320,7 @@ constants:
     value: 50
     unit: households
     kind: assumption
-    note: Mid-point of the 40-60 households a 20-acre command serves at Bihar holding sizes (PLAN.md 7.1).
+    note: Mid-point of the 40-60 households a 20-acre command serves at Bihar holding sizes.
   tenant_share:
     value: 0.35
     unit: fraction of households
@@ -365,6 +366,29 @@ constants:
     unit: Rs/yr
     kind: assumption
     note: Annual operation and maintenance of a 5 kWp shared pump (cleaning, small parts). Confirm with operators.
+
+  uspc_owners_surveyed:
+    value: 51
+    unit: owners
+    kind: published
+    source: giz_uspc
+  uspc_owners_running_other_machines:
+    value: 1
+    unit: owners
+    kind: published
+    source: giz_uspc
+    note: Only one of 51 owners of a universal controller ran any machine besides the pump.
+  uspc_extra_cost_rs_5hp:
+    value: 17960
+    unit: Rs
+    kind: published
+    source: giz_uspc
+    note: 5 HP set with universal controller Rs 247,666 vs Rs 229,706 with a normal controller.
+  retrofit_kit_rs:
+    value: 60000
+    unit: Rs
+    kind: assumption
+    note: Drive, edge controller and cabling on an existing pump. No vendor quote yet; adjustable in the rollout screen.
 
   # ---- Extras: cluster, health, credit, water quality, recharge, advisory ----
   cluster_pump_offsets_deg:

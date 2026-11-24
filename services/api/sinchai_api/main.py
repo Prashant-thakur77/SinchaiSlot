@@ -691,6 +691,18 @@ def evals() -> dict:
     return json.loads(p.read_text()) if p.exists() else {"status": "run `make evals`"}
 
 
+@app.get("/api/doctor")
+def doctor() -> dict:
+    """Pump Doctor: measured accuracy, one example pump per fault, and the advice given for each cause."""
+    from sinchai_devices.doctor import ADVICE
+    return {**json.loads((ROOT / "reports" / "doctor.json").read_text()), "advice": ADVICE}
+
+
+@app.get("/api/scale")
+def scale() -> dict:
+    return json.loads((ROOT / "reports" / "scale.json").read_text())
+
+
 @app.get("/api/budget")
 def budget() -> dict:
     return tools.call("budget_status", {}, tools.ToolContext())

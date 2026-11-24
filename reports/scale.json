@@ -1,0 +1,724 @@
+{
+ "generated_by": "python -m sinchai_data.scale",
+ "years": [
+  2024,
+  2025
+ ],
+ "label": "REAL: NASA POWER hourly sun and weather at the district headquarters point. DERIVED: panel output, pump flow (Samastipur head) and FAO-56 crop need",
+ "districts": [
+  {
+   "name": "Samastipur",
+   "state": "Bihar",
+   "lat": 25.86,
+   "lon": 85.78,
+   "elevation_m": 53,
+   "pv_kwh_per_kwp": 1244,
+   "pump_m3_per_year_if_always_on": 58154,
+   "pv_kwh_per_kwp_by_month": [
+    67,
+    107,
+    134,
+    128,
+    121,
+    109,
+    99,
+    100,
+    100,
+    99,
+    99,
+    82
+   ],
+   "rain_mm": 1014,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 4,
+     "gross_m3_per_acre": 2111
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 8,
+     "gross_m3_per_acre": 4002
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 7,
+     "gross_m3_per_acre": 2960
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 14,
+     "gross_m3_per_acre": 1952
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 16,
+     "gross_m3_per_acre": 3546
+    }
+   }
+  },
+  {
+   "name": "Vaishali",
+   "state": "Bihar",
+   "lat": 25.69,
+   "lon": 85.21,
+   "elevation_m": 59,
+   "pv_kwh_per_kwp": 1241,
+   "pump_m3_per_year_if_always_on": 58043,
+   "pv_kwh_per_kwp_by_month": [
+    66,
+    106,
+    133,
+    128,
+    120,
+    108,
+    99,
+    100,
+    100,
+    99,
+    99,
+    83
+   ],
+   "rain_mm": 906,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 4,
+     "gross_m3_per_acre": 2116
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 9,
+     "gross_m3_per_acre": 4468
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 9,
+     "gross_m3_per_acre": 3614
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 15,
+     "gross_m3_per_acre": 2112
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 19,
+     "gross_m3_per_acre": 4143
+    }
+   }
+  },
+  {
+   "name": "Muzaffarpur",
+   "state": "Bihar",
+   "lat": 26.12,
+   "lon": 85.39,
+   "elevation_m": 53,
+   "pv_kwh_per_kwp": 1239,
+   "pump_m3_per_year_if_always_on": 57928,
+   "pv_kwh_per_kwp_by_month": [
+    57,
+    103,
+    133,
+    129,
+    120,
+    108,
+    107,
+    105,
+    103,
+    103,
+    93,
+    77
+   ],
+   "rain_mm": 1014,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 4,
+     "gross_m3_per_acre": 2124
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 8,
+     "gross_m3_per_acre": 4018
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 7,
+     "gross_m3_per_acre": 2899
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 14,
+     "gross_m3_per_acre": 1913
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 16,
+     "gross_m3_per_acre": 3583
+    }
+   }
+  },
+  {
+   "name": "Darbhanga",
+   "state": "Bihar",
+   "lat": 26.15,
+   "lon": 85.9,
+   "elevation_m": 53,
+   "pv_kwh_per_kwp": 1239,
+   "pump_m3_per_year_if_always_on": 57943,
+   "pv_kwh_per_kwp_by_month": [
+    57,
+    103,
+    133,
+    129,
+    120,
+    108,
+    107,
+    105,
+    103,
+    103,
+    93,
+    77
+   ],
+   "rain_mm": 1014,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 4,
+     "gross_m3_per_acre": 2124
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 8,
+     "gross_m3_per_acre": 4018
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 7,
+     "gross_m3_per_acre": 2899
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 14,
+     "gross_m3_per_acre": 1912
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 16,
+     "gross_m3_per_acre": 3583
+    }
+   }
+  },
+  {
+   "name": "Madhubani",
+   "state": "Bihar",
+   "lat": 26.35,
+   "lon": 86.07,
+   "elevation_m": 133,
+   "pv_kwh_per_kwp": 1245,
+   "pump_m3_per_year_if_always_on": 58349,
+   "pv_kwh_per_kwp_by_month": [
+    66,
+    102,
+    131,
+    129,
+    118,
+    106,
+    107,
+    105,
+    103,
+    100,
+    95,
+    82
+   ],
+   "rain_mm": 1360,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 3,
+     "gross_m3_per_acre": 1574
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 7,
+     "gross_m3_per_acre": 3417
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 6,
+     "gross_m3_per_acre": 2594
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 13,
+     "gross_m3_per_acre": 1794
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 14,
+     "gross_m3_per_acre": 2847
+    }
+   }
+  },
+  {
+   "name": "Purnia",
+   "state": "Bihar",
+   "lat": 25.78,
+   "lon": 87.47,
+   "elevation_m": 49,
+   "pv_kwh_per_kwp": 1253,
+   "pump_m3_per_year_if_always_on": 58530,
+   "pv_kwh_per_kwp_by_month": [
+    73,
+    102,
+    128,
+    124,
+    112,
+    104,
+    101,
+    103,
+    105,
+    100,
+    111,
+    92
+   ],
+   "rain_mm": 1439,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 3,
+     "gross_m3_per_acre": 1561
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 6,
+     "gross_m3_per_acre": 2970
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 5,
+     "gross_m3_per_acre": 2290
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 12,
+     "gross_m3_per_acre": 1641
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 13,
+     "gross_m3_per_acre": 2767
+    }
+   }
+  },
+  {
+   "name": "Nalanda",
+   "state": "Bihar",
+   "lat": 25.2,
+   "lon": 85.52,
+   "elevation_m": 108,
+   "pv_kwh_per_kwp": 1239,
+   "pump_m3_per_year_if_always_on": 57965,
+   "pv_kwh_per_kwp_by_month": [
+    66,
+    106,
+    133,
+    128,
+    119,
+    108,
+    99,
+    100,
+    100,
+    99,
+    98,
+    82
+   ],
+   "rain_mm": 1001,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 4,
+     "gross_m3_per_acre": 2089
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 8,
+     "gross_m3_per_acre": 3965
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 6,
+     "gross_m3_per_acre": 2568
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 14,
+     "gross_m3_per_acre": 1972
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 18,
+     "gross_m3_per_acre": 3744
+    }
+   }
+  },
+  {
+   "name": "Gaya",
+   "state": "Bihar",
+   "lat": 24.79,
+   "lon": 85.0,
+   "elevation_m": 93,
+   "pv_kwh_per_kwp": 1255,
+   "pump_m3_per_year_if_always_on": 58575,
+   "pv_kwh_per_kwp_by_month": [
+    88,
+    108,
+    136,
+    125,
+    120,
+    107,
+    91,
+    93,
+    99,
+    97,
+    100,
+    89
+   ],
+   "rain_mm": 1026,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 4,
+     "gross_m3_per_acre": 2121
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 9,
+     "gross_m3_per_acre": 4439
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 8,
+     "gross_m3_per_acre": 3283
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 15,
+     "gross_m3_per_acre": 2102
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 19,
+     "gross_m3_per_acre": 4073
+    }
+   }
+  },
+  {
+   "name": "Gorakhpur",
+   "state": "Uttar Pradesh",
+   "lat": 26.76,
+   "lon": 83.37,
+   "elevation_m": 86,
+   "pv_kwh_per_kwp": 1228,
+   "pump_m3_per_year_if_always_on": 57269,
+   "pv_kwh_per_kwp_by_month": [
+    56,
+    109,
+    138,
+    130,
+    121,
+    108,
+    101,
+    95,
+    103,
+    106,
+    87,
+    72
+   ],
+   "rain_mm": 1287,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 4,
+     "gross_m3_per_acre": 2082
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 9,
+     "gross_m3_per_acre": 4496
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 7,
+     "gross_m3_per_acre": 2929
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 14,
+     "gross_m3_per_acre": 1930
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 19,
+     "gross_m3_per_acre": 4159
+    }
+   }
+  },
+  {
+   "name": "Ranchi",
+   "state": "Jharkhand",
+   "lat": 23.34,
+   "lon": 85.31,
+   "elevation_m": 608,
+   "pv_kwh_per_kwp": 1257,
+   "pump_m3_per_year_if_always_on": 58699,
+   "pv_kwh_per_kwp_by_month": [
+    100,
+    111,
+    137,
+    124,
+    117,
+    102,
+    85,
+    90,
+    94,
+    97,
+    103,
+    97
+   ],
+   "rain_mm": 1611,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 4,
+     "gross_m3_per_acre": 2087
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 7,
+     "gross_m3_per_acre": 3399
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 4,
+     "gross_m3_per_acre": 1886
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 12,
+     "gross_m3_per_acre": 1703
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 16,
+     "gross_m3_per_acre": 3298
+    }
+   }
+  },
+  {
+   "name": "Cooch Behar",
+   "state": "West Bengal",
+   "lat": 26.32,
+   "lon": 89.45,
+   "elevation_m": 180,
+   "pv_kwh_per_kwp": 1188,
+   "pump_m3_per_year_if_always_on": 55780,
+   "pv_kwh_per_kwp_by_month": [
+    84,
+    89,
+    112,
+    114,
+    100,
+    91,
+    97,
+    92,
+    97,
+    93,
+    113,
+    105
+   ],
+   "rain_mm": 2766,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 3,
+     "gross_m3_per_acre": 1562
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 4,
+     "gross_m3_per_acre": 1899
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 3,
+     "gross_m3_per_acre": 1582
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 9,
+     "gross_m3_per_acre": 1241
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 8,
+     "gross_m3_per_acre": 1595
+    }
+   }
+  },
+  {
+   "name": "Kalahandi",
+   "state": "Odisha",
+   "lat": 19.91,
+   "lon": 83.16,
+   "elevation_m": 353,
+   "pv_kwh_per_kwp": 1260,
+   "pump_m3_per_year_if_always_on": 58759,
+   "pv_kwh_per_kwp_by_month": [
+    112,
+    118,
+    129,
+    118,
+    115,
+    90,
+    71,
+    85,
+    91,
+    107,
+    120,
+    102
+   ],
+   "rain_mm": 1313,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 3,
+     "gross_m3_per_acre": 1609
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 7,
+     "gross_m3_per_acre": 3445
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 6,
+     "gross_m3_per_acre": 2601
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 13,
+     "gross_m3_per_acre": 1805
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 15,
+     "gross_m3_per_acre": 3145
+    }
+   }
+  },
+  {
+   "name": "Raipur",
+   "state": "Chhattisgarh",
+   "lat": 21.25,
+   "lon": 81.63,
+   "elevation_m": 277,
+   "pv_kwh_per_kwp": 1335,
+   "pump_m3_per_year_if_always_on": 61925,
+   "pv_kwh_per_kwp_by_month": [
+    115,
+    124,
+    143,
+    124,
+    121,
+    99,
+    76,
+    91,
+    95,
+    110,
+    118,
+    120
+   ],
+   "rain_mm": 1435,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 4,
+     "gross_m3_per_acre": 2115
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 7,
+     "gross_m3_per_acre": 3420
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 6,
+     "gross_m3_per_acre": 2572
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 15,
+     "gross_m3_per_acre": 2093
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 16,
+     "gross_m3_per_acre": 3239
+    }
+   }
+  },
+  {
+   "name": "Nagaon",
+   "state": "Assam",
+   "lat": 26.35,
+   "lon": 92.68,
+   "elevation_m": 174,
+   "pv_kwh_per_kwp": 1228,
+   "pump_m3_per_year_if_always_on": 57428,
+   "pv_kwh_per_kwp_by_month": [
+    101,
+    93,
+    112,
+    111,
+    97,
+    89,
+    105,
+    96,
+    103,
+    94,
+    115,
+    113
+   ],
+   "rain_mm": 1419,
+   "crops": {
+    "wheat": {
+     "name": "Wheat",
+     "irrigations": 3,
+     "gross_m3_per_acre": 1554
+    },
+    "maize": {
+     "name": "Maize",
+     "irrigations": 4,
+     "gross_m3_per_acre": 1898
+    },
+    "paddy": {
+     "name": "Paddy",
+     "irrigations": 5,
+     "gross_m3_per_acre": 2264
+    },
+    "potato": {
+     "name": "Potato",
+     "irrigations": 9,
+     "gross_m3_per_acre": 1270
+    },
+    "veg_summer": {
+     "name": "Summer vegetables",
+     "irrigations": 7,
+     "gross_m3_per_acre": 1372
+    }
+   }
+  }
+ ]
+}
