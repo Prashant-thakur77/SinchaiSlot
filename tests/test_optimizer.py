@@ -1,4 +1,4 @@
-"""Optimiser invariants (PLAN.md 13.5): budget never exceeded, minimum shares met, no double booking,
+"""Optimiser invariants: budget never exceeded, minimum shares met, no double booking,
 crop-water caps respected, secondary loads never take energy the pump needs."""
 
 import numpy as np

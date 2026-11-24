@@ -1,6 +1,6 @@
 # 0003 Modelling assumptions
 
-Values that no publication in PLAN.md section 18 gives are recorded in
+Values with no published source are recorded in
 `packages/schemas/sinchai_schemas/constants.yaml` with `kind: assumption` and a reason. The ones that
 move the headline numbers (mill demand, mill price, battery packs, tariff) are swept in the
 Prayogshala sensitivity analysis so the reader can see how much each matters.

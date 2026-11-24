@@ -1,4 +1,4 @@
-"""Edge controller tests, including fully offline operation (PLAN.md 13.6, 17)."""
+"""Edge controller tests, including fully offline operation."""
 
 from datetime import datetime, timedelta
 

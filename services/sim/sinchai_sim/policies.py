@@ -1,4 +1,4 @@
-"""Policies A-D (PLAN.md 7.2) plus ablations used for the honest comparison.
+"""Policies A-D plus ablations used for the honest comparison.
 
 A  Owner-only        pump serves the owner's plots only; everyone else buys diesel water.
 B  Chakhaji          owner sells water by the hour, first come first served, owner first. PRIMARY BASELINE

@@ -84,6 +84,8 @@ neighbour), Pump Passport (`/passport/P1`, one-page PDF), Saur Mitra app (`/mitr
 | Harvest-linked repayment | Part now, rest after harvest at the KCC rate; limit grows with on-time repayment | `services/rasid` |
 | Soil and water | Soil Health Card reader (texture sets TAW), borewell water-quality card, recharge pairing | `services/planner`, `services/jalprahari` |
 | Bharat-VISTAAR handoff | Agronomy questions go to the national advisory line with the farm context | `services/channels` |
+| Pump Doctor | Dust, module, bearing and falling-water faults found from drive readings; misses and false alarms published | `services/devices/sinchai_devices/doctor.py`, `services/sim/sinchai_sim/doctor_eval.py` |
+| Rollout calculator | 14 districts on real sun, site check for usable loads, who earns what | `services/data/sinchai_data/scale.py`, `apps/web/src/lib/economics.ts` |
 | Sentinel-2 crop map | NDVI phenology classes and a true-colour basemap from 30 clear scenes | `services/data` |
 | Web | Story page, dashboards, phone simulator, Saur Mitra PWA | `apps/web` |
 
@@ -96,7 +98,7 @@ Satellite: **REAL** Sentinel-2 L2A imagery (Jun 2024-May 2025); crop-season clas
 against field labels.
 Village, bookings, pump and drive telemetry, ledger history: **SIMULATED**. Prices, factors, capex,
 subsidy rules: **PUBLISHED** with source URLs in `packages/schemas/sinchai_schemas/constants.yaml`.
-Modelling values not found in a publication are marked **ASSUMPTION** there (44 of them) and the
+Modelling values not found in a publication are marked **ASSUMPTION** there (45 of them) and the
 ones that move the headline are swept in the sensitivity analysis.
 
 ## UNVERIFIED (check before field use)

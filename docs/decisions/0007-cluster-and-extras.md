@@ -1,4 +1,4 @@
-# 0007 Cluster and the PLAN §11 extras
+# 0007 Cluster and extras
 
 **Cluster.** P1 stays the live pump (edge controller and drive model, the scripted 13:40 story). P2 and P3 are
 neighbouring pumps with their own synthetic villages (seeds 1 and 2), bookings and a year of ledger history, planned

@@ -1,6 +1,6 @@
 """Rolling re-planner and plain-language plan diffs.
 
-Re-plan rule (PLAN.md 8.2): every 30 minutes, or immediately when the P50 forecast for the
+Re-plan rule: every 30 minutes, or immediately when the P50 forecast for the
 remaining day moves by more than `shift_threshold`; slots starting within `freeze_min` minutes are
 frozen so nobody's water is moved at the last moment.
 """

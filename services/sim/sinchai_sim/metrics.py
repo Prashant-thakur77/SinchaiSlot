@@ -1,4 +1,4 @@
-"""Metrics for one simulated year (PLAN.md 7.3). Every published number is computed here."""
+"""Metrics for one simulated year. Every published number is computed here."""
 
 from __future__ import annotations
 

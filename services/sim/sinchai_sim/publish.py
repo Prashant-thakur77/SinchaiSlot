@@ -215,6 +215,8 @@ neighbour), Pump Passport (`/passport/P1`, one-page PDF), Saur Mitra app (`/mitr
 | Harvest-linked repayment | Part now, rest after harvest at the KCC rate; limit grows with on-time repayment | `services/rasid` |
 | Soil and water | Soil Health Card reader (texture sets TAW), borewell water-quality card, recharge pairing | `services/planner`, `services/jalprahari` |
 | Bharat-VISTAAR handoff | Agronomy questions go to the national advisory line with the farm context | `services/channels` |
+| Pump Doctor | Dust, module, bearing and falling-water faults found from drive readings; misses and false alarms published | `services/devices/sinchai_devices/doctor.py`, `services/sim/sinchai_sim/doctor_eval.py` |
+| Rollout calculator | 14 districts on real sun, site check for usable loads, who earns what | `services/data/sinchai_data/scale.py`, `apps/web/src/lib/economics.ts` |
 | Sentinel-2 crop map | NDVI phenology classes and a true-colour basemap from 30 clear scenes | `services/data` |
 | Web | Story page, dashboards, phone simulator, Saur Mitra PWA | `apps/web` |
 
@@ -260,6 +262,8 @@ Facts only. Final answers are written by the team. Every number below is copied 
   groundwater budget; missed-call booking in Maithili/Hindi/Bhojpuri; verified receipts.
 - Modules: Saathi, Surya Planner, Saur Mitra Copilot, Jal Prahari, Rasid, Paani Khata, Anudan Meter, Hisaab,
   Prayogshala.
+- Pump Doctor (slow faults from drive readings; `reports/doctor.json`), rollout calculator for 14 districts
+  (`reports/scale.json`, screen /rollout), browser voice on the Saathi phone, evaluator page /judge.
 - Extras: multi-pump cluster with booking transfer, Pump Passport (scorecard, PDF), data-health monitor,
   harvest-linked repayment, Soil Health Card reader, borewell water-quality card, recharge pairing,
   Bharat-VISTAAR handoff, Sentinel-2 crop-season map.
@@ -318,7 +322,7 @@ Facts only. Final answers are written by the team. Every number below is copied 
 
 ## Next steps
 - Pilot on existing shared pumps in Samastipur; Oorja-style operators and Schneider partners; state programmes;
-  PM-KUSUM universal controller (PLAN.md 10.3).
+  PM-KUSUM universal controller.
 - Field: confirm UNVERIFIED items (README), native-speaker review of Maithili/Bhojpuri, real ASR test set.
 
 ## Broader impact

@@ -1,7 +1,7 @@
 """Prayogshala synthetic village: households, plots, crops and the FAO-56 demand trace.
 
 All plots share one weather series (real NASA POWER), so every policy sees the identical list of
-irrigation requests: the "same demand trace" required by PLAN.md 7.2. Labelled SIMULATED.
+irrigation requests: the "same demand trace". Labelled SIMULATED.
 """
 
 from __future__ import annotations
