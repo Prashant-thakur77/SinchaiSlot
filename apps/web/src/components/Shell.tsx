@@ -15,6 +15,8 @@ export const NAV: Item[] = [
   { href: "/phone", label: "Saathi phone", key: "3", group: "Farmers", motif: "parrot", what: "Give a missed call. Saathi calls back and books in the farmer's language.", icon: "M8 3h8v18H8zM11 18h2" },
   { href: "/mitra", label: "Saur Mitra app", key: "9", group: "Farmers", motif: "pump", what: "The operator's phone app.", icon: "M12 3a9 9 0 100 18 9 9 0 000-18zM12 7v5l3 2" },
   { href: "/hisaab", label: "Hisaab", key: "8", group: "Farmers", motif: "pot", what: "Ask the accounts a question in plain words.", icon: "M4 19h16M7 15V9M12 15V5M17 15v-4" },
+  { href: "/judge", label: "Check it yourself", key: "j", group: "Proof", motif: "parrot", what: "Five questions, where to look, and what each answer does not show.", icon: "M4 12l5 5L20 6" },
+  { href: "/rollout", label: "Will it pay here?", key: "r", group: "Proof", motif: "pot", what: "Pick a district, change the costs, see who earns what.", icon: "M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11zM12 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" },
   { href: "/ledger", label: "Rasid ledger", key: "5", group: "Proof", motif: "fish", what: "Every litre has a receipt. Check the whole chain yourself.", icon: "M6 3h12v18l-3-2-3 2-3-2-3 2z" },
   { href: "/drive", label: "Altivar drive", key: "4", group: "Proof", motif: "wheel", what: "The drive that runs and meters the pump. Inject a fault and watch the response.", icon: "M4 5h16v14H4zM8 9h8M8 13h4" },
   { href: "/lab", label: "Prayogshala", key: "6", group: "Proof", motif: "tree", what: "How every number was tested, including what did not help.", icon: "M9 3v6L4 19h16L15 9V3" },

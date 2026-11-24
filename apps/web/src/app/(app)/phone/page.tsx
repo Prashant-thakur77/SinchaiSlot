@@ -6,6 +6,7 @@ import { Btn, Panel, SourceTag } from "@/components/ui";
 import { postJSON, type ServerEvent, useApi, useEvents } from "@/lib/api";
 import { ToolList } from "@/components/ToolList";
 import { TypeOut } from "@/components/TypeOut";
+import { useVoice } from "@/lib/voice";
 import type { AgentReply } from "@/lib/types";
 
 type Turn = { who: "farmer" | "saathi" | "system"; text: string; dtmf?: string | null };
@@ -87,6 +88,19 @@ export default function PhonePage() {
   };
 
   const lang = farmer?.language ?? "hi";
+  const { canSpeak, canListen, speak, hush, listen } = useVoice(lang);
+  const [aloud, setAloud] = useState(false);
+  const [hearing, setHearing] = useState<string | null>(null);
+  const lastLine = call?.turns.filter((t) => t.who === "saathi").at(-1)?.text;
+  useEffect(() => {
+    if (aloud && lastLine) speak(lastLine);
+  }, [aloud, lastLine, speak]);
+  useEffect(() => hush, [hush]);
+  const talk = () => {
+    hush();
+    setHearing("Listening…");
+    listen((t) => answer(t), (err) => setHearing(err === "not-allowed" ? "The browser blocked the microphone." : err ? "Did not catch that. Try again or type." : null));
+  };
   return (
     <Shell title="Saathi: farmer phone">
       <div className="mb-4 flex flex-wrap items-center gap-3 text-[13px]">
@@ -100,7 +114,7 @@ export default function PhonePage() {
             ))}
           </select>
         </label>
-        <span className="text-mist">Speech is simulated as text in the demo (no paid speech service needed). <SourceTag kind="simulated" /></span>
+        <span className="text-mist">The phone line is simulated. <SourceTag kind="simulated" /> Voice uses your own browser.</span>
       </div>
       <div className="grid gap-5 xl:grid-cols-[320px_320px_minmax(0,1fr)]">
         {/* Feature phone */}
@@ -131,7 +145,7 @@ export default function PhonePage() {
               <button onClick={missedCall} disabled={busy} className="rounded-full bg-water py-2 text-[13px] font-medium text-ink disabled:opacity-50">
                 Missed call
               </button>
-              <button onClick={() => setCall(null)} className="rounded-full bg-[#284636] py-2 text-[13px] font-medium text-white">
+              <button onClick={() => { hush(); setCall(null); }} className="rounded-full bg-[#284636] py-2 text-[13px] font-medium text-white">
                 Hang up
               </button>
             </div>
@@ -153,6 +167,12 @@ export default function PhonePage() {
             <input value={say} onChange={(e) => setSay(e.target.value)} disabled={!call || call.closed} placeholder="Speak (type what the farmer says)" aria-label="Farmer speaks" className="deva min-w-0 flex-1 rounded-md border border-soil bg-night-2 px-2 py-1.5 text-[13px]" />
             <Btn type="submit" disabled={!call || call.closed || busy}>Say</Btn>
           </form>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {canSpeak && <button type="button" aria-pressed={aloud} onClick={() => { if (aloud) hush(); setAloud(!aloud); }} className={`min-h-9 rounded-full border px-3 text-[13px] ${aloud ? "border-ink bg-ink text-paper" : "border-soil text-fog hover:bg-night-2"}`}>{aloud ? "Voice is on" : "Hear Saathi"}</button>}
+            {canListen && <button type="button" onClick={talk} disabled={!call || call.closed || busy || hearing === "Listening…"} className="min-h-9 rounded-full border border-soil px-3 text-[13px] text-fog hover:bg-night-2 disabled:text-mist">Speak</button>}
+          </div>
+          {hearing && <p role="status" className="mt-1 text-[13px] text-mist">{hearing}</p>}
+          {(canListen || canSpeak) && <p className="mt-1.5 text-[12px] text-mist">{lang === "mai" || lang === "bho" ? "Browsers have no Maithili or Bhojpuri voice, so a Hindi one reads it. " : ""}{canListen ? "“Speak” may send your voice to your browser's maker to turn it into text." : ""}</p>}
           <div className="mt-2 flex flex-wrap gap-1.5">
             {(QUICK[lang] ?? QUICK.hi).map((q) => (
               <button key={q} disabled={!call || call.closed || busy} onClick={() => answer(q)} className="deva rounded-full border border-soil px-2.5 py-0.5 text-[12px] text-fog hover:bg-night-2 disabled:text-mist disabled:opacity-80">

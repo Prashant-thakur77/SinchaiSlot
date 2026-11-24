@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const SCREENS = ["/", "/twin", "/planner", "/phone", "/drive", "/ledger", "/lab", "/trace", "/hisaab", "/mitra", "/cluster", "/passport/P2"];
+const SCREENS = ["/", "/twin", "/planner", "/phone", "/drive", "/ledger", "/lab", "/trace", "/hisaab", "/mitra", "/cluster", "/passport/P2", "/rollout", "/judge"];
 
 test.beforeAll(async ({ request }) => {
   await request.post("/api/demo/reset");
@@ -35,6 +35,35 @@ test("farmer books by missed call; nothing is booked before the yes", async ({ p
   expect(f.bookings.length).toBe(1);
 });
 
+test("farmer can answer by speaking, and Saathi is read aloud", async ({ page, request }) => {
+  await request.post("/api/demo/reset");
+  // The browser's own recogniser and voices need a microphone and audio, so both are stood in for here.
+  await page.addInitScript(() => {
+    const w = window as unknown as Record<string, unknown>;
+    w.spoken = [];
+    w.SpeechRecognition = class {
+      onresult: ((e: unknown) => void) | null = null;
+      onend: (() => void) | null = null;
+      start() { setTimeout(() => { this.onresult?.({ results: [[{ transcript: "हाँ" }]] }); this.onend?.(); }, 50); }
+      stop() {}
+    };
+    w.SpeechSynthesisUtterance = class { constructor(public text: string) {} };
+    Object.defineProperty(window, "speechSynthesis", { value: {
+      getVoices: () => [{ lang: "hi-IN" }], cancel() {}, speak: (u: { text: string }) => (w.spoken as string[]).push(u.text),
+      addEventListener() {}, removeEventListener() {},
+    } });
+  });
+  await page.goto("/phone");
+  await page.getByRole("button", { name: "Hear Saathi" }).click();
+  await page.getByRole("button", { name: "Missed call" }).click();
+  await expect(page.getByText("Waiting for confirmation")).toBeVisible();
+  await page.getByRole("button", { name: "Speak", exact: true }).click();
+  await expect(page.getByText("confirmed by farmer")).toBeVisible();
+  const f = await (await request.get("/api/farmers/H01")).json();
+  expect(f.bookings.length).toBe(1);
+  expect((await page.evaluate(() => (window as unknown as { spoken: string[] }).spoken)).length).toBeGreaterThanOrEqual(2);
+});
+
 test("cloud at 13:40 re-plans with reasons and callbacks", async ({ page, request }) => {
   await request.post("/api/demo/reset");
   await page.goto("/planner");
@@ -65,6 +94,30 @@ test("Saur Mitra reads the sample soil card and applies it @mobile", async ({ pa
   await page.getByRole("button", { name: "नमूना कार्ड पढ़ें" }).click();
   await page.getByRole("button", { name: "खेत पर लागू करें" }).click();
   await expect(page.getByRole("status")).toContainText("72 mm");
+});
+
+test("rollout matches the published proof and reacts to a site with no machine", async ({ page, request }) => {
+  const proof = await (await request.get("/api/proof")).json();
+  await page.goto("/rollout");
+  await page.getByRole("button", { name: "Buy a new one" }).click();
+  await page.getByRole("button", { name: "A paid Saur Mitra" }).click();
+  await page.getByRole("slider", { name: /paid by subsidy/ }).fill("0");
+  await page.getByRole("slider", { name: /Bookings/ }).fill("1");
+  const years = async () => parseFloat(await page.getByTestId("payback").innerText());
+  // Same inputs as the proof run: 6 lakh, no subsidy, paid operator.
+  expect(Math.abs((await years()) - proof.policies.D.payback_years.p50)).toBeLessThan(0.15);
+  const before = await years();
+  await page.getByRole("checkbox", { name: /three-phase/ }).uncheck();
+  await expect(page.getByText("the mill and cutter earn nothing")).toBeVisible();
+  expect(await years()).toBeGreaterThan(before);
+});
+
+test("Pump Doctor names the cause of each fault", async ({ page }) => {
+  await page.goto("/drive");
+  for (const [btn, text] of [["Dust builds up", "Wash them"], ["Bearing wears", "bearing"], ["Water drops", "getting deeper"], ["Nothing wrong", "when it was new"]]) {
+    await page.getByRole("button", { name: btn }).click();
+    await expect(page.getByRole("status").filter({ hasText: text })).toBeVisible();
+  }
 });
 
 test("ledger chain verifies from the UI", async ({ page }) => {

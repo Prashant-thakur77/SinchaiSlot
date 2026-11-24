@@ -4,6 +4,7 @@ import { scaleLinear } from "d3-scale";
 import { line } from "d3-shape";
 import { useState } from "react";
 import { Shell } from "@/components/Shell";
+import { PumpDoctor } from "@/components/PumpDoctor";
 import { Btn, ErrorNote, Panel, SourceTag } from "@/components/ui";
 import { postJSON, useApi } from "@/lib/api";
 import type { Telemetry } from "@/lib/types";
@@ -183,6 +184,7 @@ export default function DrivePage() {
           </Panel>
         </div>
       </div>
+      <PumpDoctor />
     </Shell>
   );
 }

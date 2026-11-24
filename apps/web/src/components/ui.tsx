@@ -55,9 +55,9 @@ export function Stat({
   );
 }
 
-export function Panel({ title, right, children, className = "" }: { title?: ReactNode; right?: ReactNode; children: ReactNode; className?: string }) {
+export function Panel({ title, right, children, className = "", id }: { title?: ReactNode; right?: ReactNode; children: ReactNode; className?: string; id?: string }) {
   return (
-    <section className={`min-w-0 rounded-[20px] border border-soil bg-night-2 ${className}`}>
+    <section id={id} className={`min-w-0 scroll-mt-24 rounded-[20px] border border-soil bg-night-2 ${className}`}>
       {(title || right) && (
         <header className="flex items-center justify-between gap-3 border-b border-soil px-5 py-3">
           <h2 className="text-[18px] font-semibold">{title}</h2>
