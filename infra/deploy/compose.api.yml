@@ -5,7 +5,7 @@ name: sinchaislot
 services:
   db:
     image: timescale/timescaledb-ha:pg16
-    environment: {POSTGRES_USER: sinchai, POSTGRES_PASSWORD: sinchai, POSTGRES_DB: sinchai}
+    environment: {POSTGRES_USER: sinchai, POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-sinchai}", POSTGRES_DB: sinchai}
     volumes: [dbdata:/home/postgres/pgdata/data]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sinchai -d sinchai"]
@@ -28,7 +28,7 @@ services:
     # Only Caddy can reach this container, so its forwarded address is trusted.
     command: ["uvicorn", "sinchai_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips", "*"]
     environment:
-      DATABASE_URL: postgresql+psycopg://sinchai:sinchai@db:5432/sinchai
+      DATABASE_URL: postgresql+psycopg://sinchai:${POSTGRES_PASSWORD:-sinchai}@db:5432/sinchai
       REDIS_URL: redis://redis:6379/0
       MQTT_HOST: mqtt
     env_file: [{path: ../../.env, required: false}]
@@ -52,6 +52,7 @@ services:
     image: sinchaislot-py
     command: ["python", "-m", "sinchai_edge.run", "--pump", "P2", "--drive", "tcp://drive-sim:5020", "--mqtt", "mqtt:1883"]
     environment: {EDGE_STATE_DIR: /tmp/edge}
+    env_file: [{path: ../../.env, required: false}]
     depends_on: [drive-sim, mqtt]
     restart: unless-stopped
 

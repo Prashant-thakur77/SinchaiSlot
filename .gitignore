@@ -43,3 +43,11 @@ reports/proof_quick.json
 .design-refs/
 submission/video/captures/
 submission/video/rough_cut.mp4
+
+# Private working files
+PLAN.md
+docs/progress.md
+.design/
+submission/
+*.bundle
+.claude/

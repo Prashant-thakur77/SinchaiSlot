@@ -5,7 +5,7 @@ import { BandChart, BandLegend } from "@/components/BandChart";
 import { Gantt } from "@/components/Gantt";
 import { Shell } from "@/components/Shell";
 import { Btn, ErrorNote, Roll, SourceTag } from "@/components/ui";
-import { fmt, postJSON, useApi } from "@/lib/api";
+import { OPERATOR_TOKEN, fmt, postJSON, useApi } from "@/lib/api";
 import type { Change, Snapshot } from "@/lib/types";
 
 type WhatIf = {
@@ -38,7 +38,7 @@ export default function PlannerPage() {
     setBusy(true);
     try {
       setWhatIf(
-        await postJSON<WhatIf>("/api/tools/what_if", { args: { cloud_factor: 1 - cut / 100, from_hhmm: from, to_hhmm: to } }, "dev-operator-token"),
+        await postJSON<WhatIf>("/api/tools/what_if", { args: { cloud_factor: 1 - cut / 100, from_hhmm: from, to_hhmm: to } }, OPERATOR_TOKEN),
       );
     } finally {
       setBusy(false);

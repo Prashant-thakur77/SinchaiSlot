@@ -88,6 +88,7 @@ export function useEvents(onEvent: (e: ServerEvent) => void, kinds: string[]) {
   }, [key]);
 }
 
+// Public on purpose: the hosted demo holds simulated data only and visitors act as the operator.
 export const OPERATOR_TOKEN = process.env.NEXT_PUBLIC_DEMO_OPERATOR_TOKEN ?? "dev-operator-token";
 
 export const fmt = {

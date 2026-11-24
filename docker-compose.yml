@@ -6,7 +6,7 @@ services:
     image: timescale/timescaledb-ha:pg16
     environment:
       POSTGRES_USER: sinchai
-      POSTGRES_PASSWORD: sinchai
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sinchai}
       POSTGRES_DB: sinchai
     volumes: [dbdata:/home/postgres/pgdata/data]
     healthcheck:
@@ -25,7 +25,7 @@ services:
   api:
     build: {context: ., dockerfile: services/Dockerfile}
     environment:
-      DATABASE_URL: postgresql+psycopg://sinchai:sinchai@db:5432/sinchai
+      DATABASE_URL: postgresql+psycopg://sinchai:${POSTGRES_PASSWORD:-sinchai}@db:5432/sinchai
       REDIS_URL: redis://redis:6379/0
       MQTT_HOST: mqtt
     env_file: [{path: .env, required: false}]
